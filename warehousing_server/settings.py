@@ -50,6 +50,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "wcommon.middleware.LoginRequiredMiddleware",
+    "wcommon.middleware.AuthenticationMiddleware",
 ]
 
 ROOT_URLCONF = "warehousing_server.urls"
@@ -115,6 +116,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_NAME = "your_session_cookie_name"  # 自定义会话 cookie 名称
+SESSION_SAVE_EVERY_REQUEST = True  # 在每个请求上都保存会话
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 关闭浏览器后会话过期
+SESSION_COOKIE_AGE = 1800  # 会话过期时间，单位秒（这里设置为30分钟）
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

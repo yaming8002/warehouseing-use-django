@@ -1,7 +1,7 @@
 from wcommon.views import (
     AccountLogin,
+    ItemListView,
     account_edit,
-    account_list,
     home,
 )
 from django.contrib.auth.views import LogoutView
@@ -16,8 +16,6 @@ urlpatterns = [
     # path('logout/', AccountLogout.as_view(), name='logout'),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("home/", home, name="home"),
-    path("account/list/", account_list, name="account"),
+    path("account/list/", ItemListView.as_view(), name="account"),
     path("account/edit/", account_edit, name="account"),
 ]
-
-

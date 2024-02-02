@@ -1,10 +1,9 @@
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
-from django.views.generic.list import BaseListView
+from django.views.generic.list import ListView
+from wcommon.forms.accountform import MuserSearchFrom
 from wcommon.models import Menu, Muser
 from wcommon.references import menu_category
 
@@ -26,7 +25,7 @@ class AccountLogin(LoginView):
             return self.form_invalid(self.get_form())
 
 
-@login_required(login_url="/login/")  # 通过装饰器确保用户已登录才能访问此视图
+# @login_required(login_url="/login/")  # 改用攔截器處裡
 def home(request):
     # 将查询结果传递给模板
     context = {"allmenu": _get_menu_map(request.user)}
@@ -60,32 +59,39 @@ def _get_menu_map(user: Muser):
     return allmenu
 
 
-@login_required  # 通过装饰器确保用户已登录才能访问此视图
-def account_list(request):
-    # 获取客户输入的用户名和单位
-    username = request.GET.get("username")
-    unit = request.GET.get("unit")
+# 通过装饰器确保用户已登录才能访问此视图
+class ItemListView(ListView):
+    model = Muser
+    template_name = "commmon/item_list.html"
+    context_object_name = "musers"
+    forms = MuserSearchFrom
 
-    # 创建一个查询集，包含所有的 Muser 记录
-    query_set = Muser.objects.all()
-    print(query_set)
-    # 如果客户提供了用户名，则添加用户名筛选条件
-    if username:
-        query_set = query_set.filter(userName=username)
+    def get_queryset(self):
+        result = Muser.objects
+        username_zh = self.request.GET.get("search_username_zh")
+        if username_zh:
+            result = result.filter(username_zh=username_zh)
+        unit = self.request.GET.get("search_unit")
+        if unit:
+            result = result.filter(unit=unit)
+        group = self.request.GET.get("search_group")
+        if group:
+            result = result.filter(group=group)
+        return result.all()
 
-    # 如果客户提供了单位，则添加单位筛选条件
-    if unit:
-        query_set = query_set.filter(unit=unit)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    # 将查询结果传递给模板
-    context = {"accounts": query_set}
-    context["group_map"] = Group.objects.all()
+        # 将查询条件传递到模板
+        context["username_zh"] = self.request.GET.get(
+            "search_username_zh", ""
+        )  # 如果为None，使用''代替
+        context["unit"] = self.request.GET.get("search_unit", "")  # 如果为None，使用''代替
+        context["group"] = self.request.GET.get("search_group", "")  # 如果为None，使用''代替
 
-    # 渲染模板并返回响应
-    return render(request, "common/account.html", context)
+        return context
 
 
-@login_required  # 通过装饰器确保用户已登录才能访问此视图
 def account_edit(request):
     if request.method == "GET":
         account = request.GET.get("account")
