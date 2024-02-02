@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0"
+    />
+    <title>{% block title %}base table{% endblock %}</title>
+    <script src="/static/js/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+    {% block javascript %}
+    <script></script>
+    {% endblock %}
+    {% block styles %}
+    <style></style>
+    {% endblock %}
+    <style>
+      caption {
+          position: absolute;
+          left: -9999px;
+          width: 1px;
+          height: 1px;
+          overflow: hidden;
+          clip: rect(1px, 1px, 1px, 1px); /* 將元素裁剪為1x1像素並隱藏 */
+      }
+    </style>
+  </head>
+  <body>
+        {% block content %}
+            <h2>Welcome, {{ request.user.username }}.</h2>
+        {% endblock %}
+    </div>
+  </body>
+</html>

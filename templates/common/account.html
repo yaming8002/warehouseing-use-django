@@ -1,0 +1,130 @@
+{% extends "base/base.html" %} 
+{% block title %}Account Control{% endblock %} 
+
+{% block javascript %}
+<script>
+  $(document).ready(function () {
+    // 選擇所有具有id="report"的表格，位於class="col-md-9 m-0"的div內
+    $(".col-md-9.m-0 table").each(function () {
+      // 添加所需的CSS類
+      $(this).addClass("table table-primary table-striped");
+    });
+  });
+
+  function addUser() {
+    // Define the addUser function
+  }
+
+  function upload() {
+    // Define the upload function
+  }
+
+  function editRow(link, id) {
+    // 轉換姓名欄位
+    var nameCell = $("#name-" + id);
+    var currentName = nameCell.text();
+    nameCell.html(
+      '<input type="text" id="edit-name-' +
+        id +
+        '" value="' +
+        currentName +
+        '">'
+    );
+
+    // 轉換單位欄位
+    var unitCell = $("#unit-" + id);
+    var currentUnit = unitCell.text();
+    unitCell.html(
+      '<input type="text" id="edit-unit-' +
+        id +
+        '" value="' +
+        currentUnit +
+        '">'
+    );
+
+    // 轉換權限欄位
+    var permissionCell = $("#permission-" + id);
+    var currentPermission = permissionCell.text();
+    permissionCell.html(
+      '<input type="text" id="edit-permission-' +
+        id +
+        '" value="' +
+        currentPermission +
+        '">'
+    );
+
+    // 更新編輯鏈接以保存變更
+    $(link)
+      .text("保存")
+      .attr("onclick", "saveRow(this, " + id + ")");
+  }
+
+  function saveRow(link, id) {
+    // 提取編輯後的值
+    var newName = $("#edit-name-" + id).val();
+    var newUnit = $("#edit-unit-" + id).val();
+    var newPermission = $("#edit-permission-" + id).val();
+    var account = $("#account-" + id).text();
+
+    // 更新介面上的文字並恢復原來的編輯鏈接
+    $("#name-" + id).text(newName);
+    $("#unit-" + id).text(newUnit);
+    $("#permission-" + id).text(newPermission);
+    $(link)
+      .text("編輯")
+      .attr("onclick", "editRow(this, " + id + ")");
+    $.ajax({
+      url: "/account/edit/",
+      method: "GET",
+      data: {
+        account: account,
+        username: newName,
+        unit: newUnit,
+        permission: newPermission,
+      },
+      success: function (data) {
+        window.alert("儲存成功");
+      },
+    });
+  }
+</script>
+{% endblock %} 
+
+{% block content %}
+<!-- Corrected form tag and added trailing slash to action attribute -->
+<form action="/account/list/" method="get">
+  <label for="username">帳號:</label>
+  <input type="text" id="username" name="username" />
+  <label for="unit">所屬單位:</label>
+  <input type="text" id="unit" name="unit" />
+  <button type="submit">查詢</button>
+  <button type="button" id="upload" onclick="upload()">上傳EXCEL</button>
+  <button type="button" id="add" onclick="addUser()">新增</button>
+</form>
+<table class="table table-primary table-striped">
+  <caption>帳號</caption>
+  <thead>
+    <tr>
+      <th scope="col">帳號</th>
+      <th scope="col">姓名</th>
+      <th scope="col">所屬單位</th>
+      <th scope="col">權限</th>
+      <th scope="col">編輯</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Corrected the template variables with double curly braces -->
+    {% for info in accounts %}
+    <tr>
+      <td id="account-{{ info.id }}">{{ info.username }}</td>
+      <td id="name-{{ info.id }}">{{ info.userName_zh }}</td>
+      <td id="unit-{{ info.id }}">{{ info.unit }}</td>
+      <td id="permission-{{ info.id }}">{{ info.group }}</td>
+      <td id="edit-{{ info.id }}">
+        <a href="#" onclick="editRow(this, {{ info.id }})">編輯</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
