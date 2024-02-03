@@ -1,8 +1,23 @@
 {% extends "base/base_table.html" %}{{""}} {% block title %}Account Control
 {{""}} {% endblock %} {% block javascript %}
 <script>
-  function addUser() {
-    // Define the addUser function
+  function addUser(event) {
+    // event.preventDefault(); // 防止預設行為
+    let button = $(event.target);
+    let url = button.attr("url");
+
+    // 向後端發送 AJAX 請求
+    $.ajax({
+      url: url,
+      method: "GET",
+      success: function (data) {
+        $("#modalContainer").html(data);
+        $("#createModal").modal("show");
+      },
+      error: function (error) {
+        console.error("Error loading modal content: ", error);
+      },
+    });
   }
 
   function upload() {
@@ -102,7 +117,9 @@
   </p>
   <input type="submit" value="查詢" />
   <button type="button" id="upload" onclick="upload()">上傳EXCEL</button>
-  <button type="button" id="add" onclick="addUser()">新增</button>
+  <button type="button" url="/account/add/" onclick="addUser(event)">
+    新增
+  </button>
 </form>
 {% endblock %} {% block table %}
 <caption>
@@ -131,4 +148,5 @@
   </tr>
   {% endfor %}
 </tbody>
+<div id="modalContainer"></div>
 {% endblock %}

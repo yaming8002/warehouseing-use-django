@@ -1,0 +1,66 @@
+<!-- modal_create.html -->
+<div
+  class="modal fade"
+  id="createModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="createModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createModalLabel">Create Item</h5>
+      </div>
+      <div class="modal-body">
+        <!-- 表單內容將會透過 jQuery 載入 -->
+        <div class="modal-body">
+          <form action="{{action}}" method="post">
+            {% csrf_token %} {{ form.as_p }}
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    // 綁定保存按鈕的點擊事件
+    $("#createModal").on("click", ".btn-primary", function (event) {
+      event.preventDefault();
+      var form = $("#createModal form");
+      // TODO: 添加表單驗證邏輯
+
+      // 提交表單
+      $.ajax({
+        url: form.attr("action"), // 或者指定提交到的 URL
+        method: "POST",
+        data: form.serialize(), // 序列化表單數據
+        success: function (response) {
+          alter(response);
+          // TODO: 處理提交成功的情況
+          $("#createModal").modal("hide"); // 隱藏模態框
+        },
+        error: function (response) {
+          alert("Error: " + xhr.status + " " + xhr.responseText);
+          alert("Error:"+response )
+          // TODO: 處理錯誤情況
+        },
+      });
+    });
+    $("#createModal").on("click", ".btn-secondary", function (event) {
+      // TODO: 添加取消按鈕的額外邏輯
+      console.log("取消操作");
+
+      // 關閉模態框，這行代碼是可選的，因為 `data-dismiss="modal"` 已經處理了關閉行為
+      $("#createModal").modal("hide");
+    });
+  });
+</script>

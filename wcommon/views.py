@@ -2,8 +2,11 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LoginView
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
-from wcommon.forms.accountform import MuserSearchFrom
+
+from wcommon.forms.accountform import AddMuserForm
 from wcommon.models import Menu, Muser
 from wcommon.references import menu_category
 
@@ -64,7 +67,6 @@ class ItemListView(ListView):
     model = Muser
     template_name = "commmon/item_list.html"
     context_object_name = "musers"
-    forms = MuserSearchFrom
 
     def get_queryset(self):
         result = Muser.objects
@@ -86,8 +88,12 @@ class ItemListView(ListView):
         context["username_zh"] = self.request.GET.get(
             "search_username_zh", ""
         )  # 如果为None，使用''代替
-        context["unit"] = self.request.GET.get("search_unit", "")  # 如果为None，使用''代替
-        context["group"] = self.request.GET.get("search_group", "")  # 如果为None，使用''代替
+        context["unit"] = self.request.GET.get(
+            "search_unit", ""
+        )  # 如果为None，使用''代替
+        context["group"] = self.request.GET.get(
+            "search_group", ""
+        )  # 如果为None，使用''代替
 
         return context
 
@@ -120,3 +126,40 @@ def account_edit(request):
     else:
         response_data = {"success": False, "message": "仅支持GET请求"}
         return JsonResponse(response_data)
+
+
+class MuserCreateView(CreateView):
+    model = Muser
+    form_class = AddMuserForm
+    template_name = "base/model_edit.html"
+    success_url = reverse_lazy(
+        "muser-list"
+    )  # Redirect to the Muser list view after creation
+
+    def form_valid(self, form):
+        """如果表單數據有效，則執行此方法。"""
+        print("--------------------------")
+        print(form.errors)
+
+        response = super().form_valid(form)
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"status": "success", "redirect_url": self.success_url})
+        return response
+
+    def form_invalid(self, form):
+        """如果表單數據無效，則執行此方法。"""
+        print("--------------------------")
+        print(form.errors)
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse(
+                {"status": "error", "errors": form.errors.as_json()}, status=400
+            )
+        return super().form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # 将查询条件传递到模板
+        context["action"] = "/account/add/"
+
+        return context
