@@ -139,7 +139,7 @@
   {% for info in musers %}
   <tr>
     <td id="account-{{ info.id }}">{{ info.username }}</td>
-    <td id="name-{{ info.id }}">{{ info.userName_zh|default:"" }}</td>
+    <td id="name-{{ info.id }}">{{ info.username_zh|default:"" }}</td>
     <td id="unit-{{ info.id }}">{{ info.unit|default:"" }}</td>
     <td id="permission-{{ info.id }}">{{ info.group|default:"" }}</td>
     <td id="edit-{{ info.id }}">

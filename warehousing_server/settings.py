@@ -70,6 +70,11 @@ TEMPLATES = [
         },
     },
 ]
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.0/howto/static-files/
+
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 WSGI_APPLICATION = "warehousing_server.wsgi.application"
 
@@ -133,13 +138,6 @@ USE_I18N = True
 
 USE_TZ = False
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
-STATIC_URL = "/static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -149,3 +147,20 @@ AUTH_USER_MODEL = "wcommon.Muser"  # 'myapp' 是您的應用程序的名稱
 LOGOUT_REDIRECT_URL = "/login/"  # 轉跳到登入畫面
 LOGIN_URL = "/login/"  # 轉跳到登入畫面
 APPEND_SLASH = False
+
+
+# 配置日志记录器，可以设置为适当的级别（例如'INFO'、'DEBUG'）
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',  # 设置日志级别为DEBUG
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}

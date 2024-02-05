@@ -2,14 +2,15 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LoginView
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 
 from wcommon.forms.accountform import AddMuserForm
 from wcommon.models import Menu, Muser
 from wcommon.references import menu_category
+import logging
 
+logger = logging.getLogger(__name__)
 
 class AccountLogin(LoginView):
     # 覆寫 LoginView 中的 post 方法，以實現自定義的登錄行為
@@ -62,10 +63,10 @@ def _get_menu_map(user: Muser):
     return allmenu
 
 
-# 通过装饰器确保用户已登录才能访问此视图
-class ItemListView(ListView):
+
+class MuserListView(ListView):
     model = Muser
-    template_name = "commmon/item_list.html"
+    template_name = "wcommmon/muser_list.html"
     context_object_name = "musers"
 
     def get_queryset(self):
@@ -128,33 +129,24 @@ def account_edit(request):
         return JsonResponse(response_data)
 
 
+
 class MuserCreateView(CreateView):
     model = Muser
     form_class = AddMuserForm
     template_name = "base/model_edit.html"
-    success_url = reverse_lazy(
-        "muser-list"
-    )  # Redirect to the Muser list view after creation
 
     def form_valid(self, form):
         """如果表單數據有效，則執行此方法。"""
-        print("--------------------------")
-        print(form.errors)
-
-        response = super().form_valid(form)
-        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return JsonResponse({"status": "success", "redirect_url": self.success_url})
-        return response
+        
+        return JsonResponse({"status": "success", "msg": "新增成功"})
 
     def form_invalid(self, form):
         """如果表單數據無效，則執行此方法。"""
-        print("--------------------------")
-        print(form.errors)
-        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return JsonResponse(
-                {"status": "error", "errors": form.errors.as_json()}, status=400
-            )
-        return super().form_invalid(form)
+        print("-----表單數據無效-----------")
+        logger.error("表單數據無效：%s", form.errors)
+        return JsonResponse(
+            {"status": "error", "errors": form.errors.as_json()}
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
