@@ -1,12 +1,5 @@
-<!-- modal_create.html -->
-{% extends "base/base.html" %} {% block styles %}
-<style>
-  .form-control.required::after {
-    content: " *";
-    color: red;
-  }
-</style>
-{% endblock %} {% block javascript %}
+{% extends "base/base.html" %} {% block title %} {{ title }} {% endblock %} 
+{% block javascript %}
 <script type="text/javascript">
   $(document).ready(function () {
     // 綁定保存按鈕的點擊事件
@@ -23,6 +16,7 @@
         success: function (response) {
           alert(response.msg);
           $("#createModal").modal("hide"); // 隱藏模態框
+          
         },
         error: function (response) {
           alert("Error:" + response.error);
@@ -55,8 +49,32 @@
       <div class="modal-body">
         <!-- 表單內容將會透過 jQuery 載入 -->
         <div class="modal-body">
-          <form action="{{action}}" method="post">
-            {% csrf_token %} {{ form.as_div }}
+          <form action="{{action}}" method="POST">
+            {% csrf_token %}
+            <label for="permission_name">權限名稱</label>
+            <input type="text" name="permission_name" id="permission_name" />
+            <table>
+              <caption></caption>
+              <thead>
+                <th>功能名稱</th>
+                <th>功能分類</th>
+                <th>啟用</th>
+              </thead>
+              {% load strmap %}
+              {% for menu in menus %}
+              <tr>
+                <td>{{ menu.name }}</td>
+                <td>{% get_category_name menu.category %}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    name="menu_{{ menu.id }}"
+                    id="menu_{{ menu.id }}"
+                  />
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
           </form>
         </div>
       </div>

@@ -1,0 +1,88 @@
+{% extends "base/base_table.html" %}{{""}} {% block title %} group list {{""}} 
+{% endblock %} {% block javascript %}
+<script>
+
+  $("#createModal").on("hidden.bs.modal", function () {
+    // 刷新当前页面
+    location.reload();
+  });
+
+  function addgroup(event) {
+    // event.preventDefault(); // 防止預設行為
+    let button = $(event.target);
+    let url = button.attr("url");
+
+    // 向後端發送 AJAX 請求
+    $.ajax({
+      url: url,
+      method: "GET",
+      success: function (data) {
+        $("#modalContainer").html(data);
+        $("#createModal").modal("show");
+      },
+      error: function (error) {
+        console.error("Error loading modal content: ", error);
+      },
+    });
+  }
+
+  function remove(event) {
+    var id = event;
+    $.ajax({
+      url: "group/remove",
+      method: "POST",
+      data: id,
+      success: function () {
+        alter("刪除成功");
+      },
+      error: function (error) {
+        alter("錯誤" + error);
+      },
+    });
+  }
+</script>
+{% endblock %} {% block form %}
+<!-- Corrected form tag and added trailing slash to action attribute -->
+<form id="search" action="/group/list/" method="GET">
+  {% csrf_token %}
+  <p>
+    <label for="search_name">權限名稱:</label>
+    <input
+      type="text"
+      id="search_name"
+      name="search_name"
+      value="{{ search_name }}"
+    />
+  </p>
+  <input type="submit" value="查詢" />
+  <button type="button" url="/group/add/" onclick="addgroup(event)">
+    新增
+  </button>
+</form>
+{% endblock %} {% block table %}
+<caption>
+  權限
+</caption>
+<thead>
+  <tr>
+    <th scope="col">權限名稱</th>
+    <th scope="col">編輯</th>
+  </tr>
+</thead>
+<tbody>
+  <!-- Corrected the template variables with double curly braces -->
+  {% for info in groups %}
+  <tr>
+    <td id="account-{{ info.id }}">{{ info.name }}</td>
+    <td id="edit-{{ info.id }}">
+      <a href="#" onclick="edit(this, {{ info.id }})">編輯</a>
+      <a href="#" onclick="remove(this, {{ info.id }})">刪除</a>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+
+<div id="modalContainer"></div>
+
+{% endblock %}
+

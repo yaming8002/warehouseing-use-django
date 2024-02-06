@@ -1,6 +1,8 @@
 from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractUser, Group
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+from .user_group import UserGroup
 
 
 class Muser(AbstractUser):
@@ -10,7 +12,7 @@ class Muser(AbstractUser):
     unit = models.CharField(max_length=30, null=True, verbose_name="所屬單位")
 
     group = models.ForeignKey(
-        Group, on_delete=models.SET_NULL, null=True, verbose_name="權限組"
+        UserGroup, on_delete=models.SET_NULL, null=True, verbose_name="權限組"
     )
 
     # Django原先的項目過於複雜，目前重構直接 連接到auth_group 。group的id 在關連到menu

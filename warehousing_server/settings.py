@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -51,6 +50,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "wcommon.middleware.LoginRequiredMiddleware",
     "wcommon.middleware.AuthenticationMiddleware",
+    "wcommon.middleware.LoggingMiddleware",
 ]
 
 ROOT_URLCONF = "warehousing_server.urls"

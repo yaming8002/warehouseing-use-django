@@ -2,15 +2,17 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LoginView
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
-
+from django.core import serializers
 from wcommon.forms.accountform import AddMuserForm
-from wcommon.models import Menu, Muser
-from wcommon.references import menu_category
+from wcommon.models import Menu, Muser, UserGroup
+from wcommon.templatetags import menu_category
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class AccountLogin(LoginView):
     # 覆寫 LoginView 中的 post 方法，以實現自定義的登錄行為
@@ -33,6 +35,7 @@ class AccountLogin(LoginView):
 def home(request):
     # 将查询结果传递给模板
     context = {"allmenu": _get_menu_map(request.user)}
+    print(context["allmenu"])
     # 渲染模板并返回响应
     return render(request, "home.html", context)
 
@@ -63,7 +66,6 @@ def _get_menu_map(user: Muser):
     return allmenu
 
 
-
 class MuserListView(ListView):
     model = Muser
     template_name = "wcommmon/muser_list.html"
@@ -71,12 +73,18 @@ class MuserListView(ListView):
 
     def get_queryset(self):
         result = Muser.objects
+        username = self.request.GET.get("search_username")
+        if username:
+            result = result.filter(username__istartswith=username)
+
         username_zh = self.request.GET.get("search_username_zh")
         if username_zh:
-            result = result.filter(username_zh=username_zh)
+            result = result.filter(username_zh__istartswith=username_zh)
+
         unit = self.request.GET.get("search_unit")
         if unit:
             result = result.filter(unit=unit)
+
         group = self.request.GET.get("search_group")
         if group:
             result = result.filter(group=group)
@@ -84,6 +92,11 @@ class MuserListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # 将查询条件传递到模板
+        context["username"] = self.request.GET.get(
+            "search_username", ""
+        )  # 如果为None，使用''代替
 
         # 将查询条件传递到模板
         context["username_zh"] = self.request.GET.get(
@@ -95,6 +108,9 @@ class MuserListView(ListView):
         context["group"] = self.request.GET.get(
             "search_group", ""
         )  # 如果为None，使用''代替
+        context["group_list"] = serializers.serialize(
+            "json", UserGroup.objects.filter(is_active=True)
+        )
 
         return context
 
@@ -102,18 +118,18 @@ class MuserListView(ListView):
 def account_edit(request):
     if request.method == "GET":
         account = request.GET.get("account")
-        username = request.GET.get("username")
+        username_zh = request.GET.get("username_zh")
         unit = request.GET.get("unit")
-        permission_id = request.GET.get("permission")
+        group = UserGroup.objects.filter(id=request.GET.get("group_id")).first()
 
         # 获取要更新的 Muser 对象
         info = Muser.objects.filter(username=account).first()
-
+        print(info)
         if info:
             # 更新对象的属性
-            info.userName_zh = username
+            info.username_zh = username_zh
             info.unit = unit
-            info.permission_id = permission_id
+            info.group = group
             print(info)
             # 保存更新到数据库
             info.save()
@@ -129,7 +145,6 @@ def account_edit(request):
         return JsonResponse(response_data)
 
 
-
 class MuserCreateView(CreateView):
     model = Muser
     form_class = AddMuserForm
@@ -137,21 +152,83 @@ class MuserCreateView(CreateView):
 
     def form_valid(self, form):
         """如果表單數據有效，則執行此方法。"""
-        
+        form.save()
         return JsonResponse({"status": "success", "msg": "新增成功"})
 
     def form_invalid(self, form):
         """如果表單數據無效，則執行此方法。"""
-        print("-----表單數據無效-----------")
         logger.error("表單數據無效：%s", form.errors)
-        return JsonResponse(
-            {"status": "error", "errors": form.errors.as_json()}
-        )
+        return JsonResponse({"status": "error", "msg": form.errors.as_json()})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         # 将查询条件传递到模板
         context["action"] = "/account/add/"
+        context["title"] = "新增使用者"
 
         return context
+
+
+class GroupListView(ListView):
+    model = UserGroup
+    template_name = "wcommon/group_list.html"
+    context_object_name = "groups"
+
+    def get_queryset(self):
+        result = UserGroup.objects
+        name = self.request.GET.get("search_name")
+        if name:
+            result = result.filter(name__istartswith=name)
+
+        return result.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # 将查询条件传递到模板
+        context["search_name"] = self.request.GET.get("search_name", "")
+        context["title"] = "權限管控"
+
+        return context
+
+
+def group_add(request):
+    if request.method == "GET":
+        context = {"title": "新增權限"}
+        context["action"] = "/group/add/"
+        context["menus"] = Menu.objects.filter(group__isnull=True).order_by(
+            "category", "order"
+        )
+
+        context["menu_category"] = menu_category
+
+        return render(request, "wcommon/group_menu.html", context)
+    else:
+        group = UserGroup(name=request.POST.get("permission_name"))
+        group.save()
+
+        # Loop through the request.POST dictionary
+        for key, value in request.POST.items():
+            # Check if the key starts with "menu_" to identify menu checkboxes
+            print(f"{key},{value}")
+            if key.startswith("menu_"):
+                menu_id = key.split("_")[1]
+                try:
+                    menu_template = Menu.objects.get(id=menu_id)
+                except Menu.DoesNotExist:
+                    # 处理模板不存在的情况
+                    menu_template = None
+
+                if menu_template:
+                    new_menu = Menu.objects.create(
+                        name=menu_template.name,
+                        url=menu_template.url,
+                        category=menu_template.category,
+                        order=menu_template.order,
+                        group=group,
+                    )
+                    new_menu.save()
+
+        response_data = {"success": True, "msg": "成功"}
+        return JsonResponse(response_data)

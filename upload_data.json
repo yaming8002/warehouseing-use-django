@@ -12,7 +12,7 @@
         "model": "wcommon.Menu",
         "fields": {
             "name": "權限管理",
-            "url": "",
+            "url": "/group/list/",
             "category": 99,
             "order": 2
         }
@@ -244,15 +244,17 @@
         }
     },
     {
-        "model": "auth.Group",
+        "model": "wcommon.UserGroup",
         "fields": {
-            "name": "管理者"
+            "name": "管理者",
+            "is_active":true
         }
     },
     {
-        "model": "auth.Group",
+        "model": "wcommon.UserGroup",
         "fields": {
-            "name": "一般使用者"
+            "name": "一般使用者",
+            "is_active":true
         }
     }
 ]
