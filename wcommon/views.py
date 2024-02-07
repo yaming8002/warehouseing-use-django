@@ -22,8 +22,6 @@ class AccountLogin(LoginView):
         password = self.request.POST["password"]
 
         account = authenticate(request, username=username, password=password)
-        print(account)
-        print(account is not None)
         if account is not None:
             login(request, account)  # 登錄用戶
             return redirect("home")
@@ -35,7 +33,6 @@ class AccountLogin(LoginView):
 def home(request):
     # 将查询结果传递给模板
     context = {"allmenu": _get_menu_map(request.user)}
-    print(context["allmenu"])
     # 渲染模板并返回响应
     return render(request, "home.html", context)
 
@@ -124,13 +121,12 @@ def account_edit(request):
 
         # 获取要更新的 Muser 对象
         info = Muser.objects.filter(username=account).first()
-        print(info)
+
         if info:
             # 更新对象的属性
             info.username_zh = username_zh
             info.unit = unit
             info.group = group
-            print(info)
             # 保存更新到数据库
             info.save()
 
@@ -205,13 +201,60 @@ def group_add(request):
 
         return render(request, "wcommon/group_menu.html", context)
     else:
-        group = UserGroup(name=request.POST.get("permission_name"))
+        group = UserGroup(name=request.POST.get("group_name"))
         group.save()
 
         # Loop through the request.POST dictionary
         for key, value in request.POST.items():
             # Check if the key starts with "menu_" to identify menu checkboxes
-            print(f"{key},{value}")
+            if key.startswith("menu_"):
+                menu_id = key.split("_")[1]
+                try:
+                    menu_template = Menu.objects.get(id=menu_id)
+                except Menu.DoesNotExist:
+                    # 处理模板不存在的情况
+                    menu_template = None
+
+                if menu_template:
+                    new_menu = Menu.objects.create(
+                        name=menu_template.name,
+                        url=menu_template.url,
+                        category=menu_template.category,
+                        order=menu_template.order,
+                        group=group,
+                    )
+                    new_menu.save()
+
+        response_data = {"success": True, "msg": "成功"}
+        return JsonResponse(response_data)
+    
+
+def group_edit(request):
+    if request.method == "GET":
+        context = {"title": "修改權限"}
+        context["action"] = "/group/edit/"
+        group = UserGroup.objects.filter(id=request.GET.get("id")).first()
+        context["menus"] = Menu.objects.filter(group__isnull=True).order_by(
+            "category", "order"
+        )
+        context["menus_acvite"] = (
+            Menu.objects.filter(group=group)
+            .order_by("category", "order")
+            .values_list("name", flat=True)
+        )
+        context["group"] = group
+
+        
+        return render(request, "wcommon/group_menu.html", context)
+    else:
+        group = UserGroup.objects.get(id=request.POST.get("group_id"))
+        group.name = request.POST.get("group_name")
+        group.is_active = request.POST.get("group_active") == "on"
+        group.save()
+        Menu.objects.filter(group=group).delete()
+        # Loop through the request.POST dictionary
+        for key, value in request.POST.items():
+            # Check if the key starts with "menu_" to identify menu checkboxes
             if key.startswith("menu_"):
                 menu_id = key.split("_")[1]
                 try:

@@ -5,6 +5,7 @@ from wcommon.views import (
     MuserListView,
     account_edit,
     group_add,
+    group_edit,
     home,
 )
 from django.contrib.auth.views import LogoutView
@@ -20,8 +21,7 @@ urlpatterns = [
     path("account/list/", MuserListView.as_view(), name="account"),
     path("account/add/", MuserCreateView.as_view(), name="account"),
     path("account/edit/", account_edit, name="account"),
-    
     path("group/list/", GroupListView.as_view(), name="group"),
     path("group/add/", group_add, name="group"),
-
+    path("group/edit/", group_edit, name="group"),
 ]

@@ -6,8 +6,7 @@
     $("#createModal").on("click", ".btn-primary", function (event) {
       event.preventDefault();
       var form = $("#createModal form");
-      // TODO: 添加表單驗證邏輯
-
+ 
       // 提交表單
       $.ajax({
         url: form.attr("action"), // 或者指定提交到的 URL
@@ -16,7 +15,7 @@
         success: function (response) {
           alert(response.msg);
           $("#createModal").modal("hide"); // 隱藏模態框
-          
+          reLoadMainPage();
         },
         error: function (response) {
           alert("Error:" + response.error);
@@ -51,8 +50,38 @@
         <div class="modal-body">
           <form action="{{action}}" method="POST">
             {% csrf_token %}
-            <label for="permission_name">權限名稱</label>
-            <input type="text" name="permission_name" id="permission_name" />
+            <div class="row">
+              <input
+                  type="hidden"
+                  name="group_id"
+                  id="group_id"
+                  value="{{group.id}}"
+                />
+              <!-- 权限名称输入框 -->
+              <div class="col-md-6 text-left">
+                <label for="group_name">權限名稱</label>
+                <input
+                  type="text"
+                  name="group_name"
+                  id="group_name"
+                  value="{{group.name}}"
+                  class="form-control"
+                />
+              </div>
+
+              <!-- 启用复选框 -->
+              <div class="col-md-6 text-right">
+                {%if "edit" in action %}
+                <label for="group_active" class="d-block">啟用</label>
+                <input
+                  type="checkbox"
+                  name="group_active"
+                  id="group_active"
+                  {% if  group.is_active  %}  checked {% endif %}
+                />
+                {% endif %}
+              </div>
+            </div>
             <table>
               <caption></caption>
               <thead>
@@ -60,8 +89,7 @@
                 <th>功能分類</th>
                 <th>啟用</th>
               </thead>
-              {% load strmap %}
-              {% for menu in menus %}
+              {% load strmap %} {% for menu in menus %}
               <tr>
                 <td>{{ menu.name }}</td>
                 <td>{% get_category_name menu.category %}</td>
@@ -70,6 +98,7 @@
                     type="checkbox"
                     name="menu_{{ menu.id }}"
                     id="menu_{{ menu.id }}"
+                    {% if  menu.name in menus_acvite  %}  checked {% endif %}
                   />
                 </td>
               </tr>

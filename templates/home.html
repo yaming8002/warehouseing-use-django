@@ -16,13 +16,14 @@
     <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
     <script>
+      var mainUrl = "";
       $(document).ready(function () {
         $(".collapse a").click(function (e) {
           e.preventDefault(); // 阻止默认链接行为
-          var url = $(this).attr("href");
+          mainUrl = $(this).attr("href");
           // 发送AJAX请求加载内容
           $.ajax({
-            url: url,
+            url: mainUrl,
             method: "GET",
             success: function (data) {
               // console.log(data);
@@ -60,6 +61,18 @@
           },
           error: function (xhr, status, error) {
             alert("Error:", error);
+          },
+        });
+      }
+
+      function reLoadMainPage() {
+        console.info(mainUrl);
+        $.ajax({
+          url: mainUrl,
+          method: "GET",
+          success: function (data) {
+            // console.log(data);
+            $("#main").html(data); // 将加载的内容放入main区块
           },
         });
       }

@@ -10,5 +10,5 @@ class LoggingMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         # 在这里记录响应信息
-        print(f"Response {response.status_code}: {response.content}")
+        # print(f"Response {response.status_code}: {response.content}")
         return response

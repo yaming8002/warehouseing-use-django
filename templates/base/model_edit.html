@@ -23,12 +23,14 @@
         success: function (response) {
           alert(response.msg);
           $("#createModal").modal("hide"); // 隱藏模態框
+          reLoadMainPage() ;
         },
         error: function (response) {
           alert("Error:" + response.error);
         },
       });
     });
+    
     $("#createModal").on("click", ".btn-secondary", function (event) {
       // TODO: 添加取消按鈕的額外邏輯
       console.log("取消操作");
