@@ -1,0 +1,170 @@
+[
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "0.1~1M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "1.01~2M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "2.01~3M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "3.01~4M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "4.01~5M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "5.01~6M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "6.01~7M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "7.01~8M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "8.01~9M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "9.01~10M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "10.01~11M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "11.01~12M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "12.01~13M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "13.01~14M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "14.01~15M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "15.01~16M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "16.01~17M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "17.01~18M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "18.01~19M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "19.01~20M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "20.01~21M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "21.01~22M"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "有規格"
+        }
+    },
+    {
+        "model": "whse.MatSpec",
+        "fields": {
+            "name": "無"
+        }
+    },
+     {
+        "model": "whse.MatCat",
+        "fields": {
+            "name": "鋼"
+        }
+    },
+    {
+        "model": "whse.MatCat",
+        "fields": {
+            "name": "鐵"
+        }
+    },
+    {
+        "model": "whse.MatCat",
+        "fields": {
+            "name": "零件"
+        }
+    },
+    {
+        "model": "whse.MatCat",
+        "fields": {
+            "name": "零星"
+        }
+    }
+]

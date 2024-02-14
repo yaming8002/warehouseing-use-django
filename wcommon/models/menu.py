@@ -8,9 +8,9 @@ class Menu(models.Model):
     # 選單URL（不為null）
     url = models.CharField(max_length=255, verbose_name="選單URL")
     # 分類代號（不為null，中文支援）
-    category = models.IntegerField(null=False, verbose_name="分類代號")
+    category = models.IntegerField( verbose_name="分類代號")
     # 項目順序
-    order = models.IntegerField(null=False, verbose_name="順序")
+    order = models.IntegerField( verbose_name="順序")
     # 權限群組
     group = models.ForeignKey(
         UserGroup, on_delete=models.SET_NULL, null=True, verbose_name="權限組"

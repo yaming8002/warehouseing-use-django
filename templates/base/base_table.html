@@ -1,4 +1,5 @@
 {% load static %}
+{% load strmap %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -22,6 +23,12 @@
           // 添加所需的CSS類
           $(this).addClass("table table-primary table-striped");
         });
+
+        $('.table.table-primary.table-striped.rounded').each(function() {
+          // 對於每個表格
+          var columnCount = $(this).find('tr:first').children('th, td').length;
+          $(this).find('tfoot tr td').attr('colspan', columnCount); // 更新tfoot中的td的colspan
+      });
       });
     </script>
     {% block javascript %}
@@ -59,6 +66,29 @@
           </thead>
           <tbody></tbody>
           {% endblock %}
+          <tfoot>
+            {% if is_paginated %}
+              <tr>
+                <td colspan="20">
+                  <div class="pagination">
+                    <span class="step-links">
+                      {% if page_obj.has_previous %}
+                        <a href="#" onclick="changePage(event, 1)">&laquo; 第一頁</a>
+                        <a href="#" onclick="changePage(event, {{ page_obj.previous_page_number }})">上一頁</a>
+                      {% endif %}
+        
+                      <span class="current">頁 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        
+                      {% if page_obj.has_next %}
+                        <a href="#" onclick="changePage(event, {{ page_obj.next_page_number }})">下一頁</a>
+                        <a href="#" onclick="changePage(event, {{ page_obj.paginator.num_pages }})">最後一頁 &raquo;</a>
+                      {% endif %}
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            {% endif %}
+          </tfoot>
         </table>
       </div>
     </div>

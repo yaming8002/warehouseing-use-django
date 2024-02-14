@@ -1,0 +1,48 @@
+{% extends 'base/base_table.html' %}{{ '' }} {% block title %}
+{{ title }} {{ '' }}
+{% endblock %} {% block javascript %}
+<script>
+</script>
+{% endblock %} {% block form %}
+<!-- Corrected form tag and added trailing slash to action attribute -->
+<form id="search" action="/whse/list/" method="GET">
+  {% csrf_token %}
+  <p>
+    <label for="car_number">車牌號</label>
+    <input type="text" id="car_number" name="car_numer" value="{{request.GET.car_number}}"/>
+    <label for="firm"> 公司</label>
+    <input type="text" id="firm" name="firm" value ="{{request.GET.firm}}"/>
+    <input for="patload">噸數</label>
+    <input type="text" id="patload" name="patload" value="{{request.GET.patload}}"/>
+
+</p>
+  <input type="submit" value="查詢" />
+</form>
+<div id="modalContainer"></div>
+{% endblock %} {% block table %}
+<caption>車輛資訊</caption>
+<thead>
+  <tr>
+    <th scope="col">車牌</th>
+    <th scope="col">駕駛人員</th>
+    <th scope="col">公司</th>
+    <th scope="col">噸數</th>
+    <th scope="col">基本台金額</th>
+    <th scope="col">備註</th>
+  </tr>
+</thead>
+<tbody>
+  <!-- Corrected the template variables with double curly braces -->
+  {% for item in pagelist %}
+  <tr>
+
+    <td><!--{{item.id}}-->{{ item.car_number }}</td>
+    <td>{% if item.driver %}{{ item.driver }} {%else%} --- {%endif%}</td>
+    <td>{{ item.firm }}</td>
+    <td>{% if item.patload %}{{item.patload}} {%else%} --- {%endif%}</td>
+    <td>{% if item.value %}{{item.value}} {%else%} --- {%endif%}</td>
+    <td>{% if item.remark %}{{item.remark}} {%else%} --- {%endif%}</td>
+  </tr>
+  {% endfor %}
+</tbody>
+{% endblock %}

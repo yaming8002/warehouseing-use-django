@@ -17,7 +17,12 @@ Including another URLconf
 from django.urls import path, include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-urlpatterns = [path("", include("wcommon.urls"))]
+urlpatterns = [
+    path("", include("wcommon.urls")),
+    path("",include("whse.urls")),
+    path("",include("trans.urls")),
+    path("",include("constn.urls")),
+    ]
 
 
 urlpatterns += staticfiles_urlpatterns()

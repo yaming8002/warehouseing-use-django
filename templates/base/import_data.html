@@ -1,0 +1,55 @@
+{% extends 'base/model_edit.html' %}
+
+{% block javascript %}
+  <script type="text/javascript">
+    $(document).ready(function () {
+      // 綁定保存按鈕的點擊事件
+      $('#createModal').on('click', '.btn-primary', function (event) {
+        event.preventDefault()
+        var form = $('#createModal form')
+        // TODO: 添加表單驗證邏輯
+        var formData = new FormData(form[0])
+        // 提交表單
+        $('#loadingSpinner').show()
+        $.ajax({
+          url: form.attr('action'), // 或者指定提交到的 URL
+          method: 'POST',
+          processData: false, // 防止 jQuery 处理数据
+          contentType: false, // 防止 jQuery 设置 Content-Type 请求头
+          data: formData, // 序列化表單數據
+          success: function (response) {
+            alert(response.msg)
+            $('#createModal').modal('hide') // 隱藏模態框
+            reLoadMainPage()
+          },
+          error: function (response) {
+            alert('Error:' + response.error)
+          },
+          complete: function () {
+            // 隱藏 loading spinner
+            $('#loadingSpinner').hide()
+          }
+        })
+      })
+    
+      $('#createModal').on('click', '.btn-secondary', function (event) {
+        // TODO: 添加取消按鈕的額外邏輯
+        console.log('取消操作')
+    
+        // 關閉模態框，這行代碼是可選的，因為 `data-dismiss="modal"` 已經處理了關閉行為
+        $('#createModal').modal('hide')
+      })
+    })
+  </script>
+{% endblock %}
+
+{% block form %}
+  <h2>{{ titles }}上傳EXCEL檔案</h2>
+  <form method="post" action="{{ action }}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="excel_file" accept=".xlsx" />
+  </form>
+  <div id="loadingSpinner" class="spinner-border text-primary" role="status" style="display: none;">
+    <span class="sr-only">Loading...</span>
+  </div>
+{% endblock %}

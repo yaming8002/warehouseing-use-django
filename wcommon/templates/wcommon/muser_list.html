@@ -93,15 +93,15 @@
     {% csrf_token %}
     <p>
       <label for="search_username">帳號:</label>
-      <input type="text" id="search_username" name="search_username" value="{{ username }}" />
+      <input type="text" id="search_username" name="search_username" value="{{ request.GET.username }}" />
       <label for="search_username_zh">姓名:</label>
-      <input type="text" id="search_username_zh" name="search_username_zh" value="{{ username_zh }}" />
+      <input type="text" id="search_username_zh" name="search_username_zh" value="{{ request.GET.username_zh }}" />
       <label for="search_unit">所屬單位:</label>
-      <input type="text" id="search_unit" name="search_unit" value="{{ unit }}" />
+      <input type="text" id="search_unit" name="search_unit" value="{{ request.GET.unit }}" />
     </p>
     <p>
       <label for="search_group">群組:</label>
-      <input type="text" id="search_group" name="search_group" value="{{ group }}" />
+      <input type="text" id="search_group" name="search_group" value="{{ request.GET.group }}" />
     </p>
     <input type="submit" value="查詢" />
     <button type="button" id="upload" onclick="upload()">上傳EXCEL</button>
@@ -120,7 +120,7 @@
   </thead>
   <tbody>
     <!-- Corrected the template variables with double curly braces -->
-    {% for info in musers %}
+    {% for info in pagelist %}
       <tr>
         <td id="account-{{ info.id }}">{{ info.username }}</td>
         <td id="name-{{ info.id }}">{{ info.username_zh|default:'' }}</td>

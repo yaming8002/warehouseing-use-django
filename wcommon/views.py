@@ -11,6 +11,8 @@ from wcommon.models import Menu, Muser, UserGroup
 from wcommon.templatetags import menu_category
 import logging
 
+from wcommon.utils.pagelist import PageListView
+
 logger = logging.getLogger(__name__)
 
 
@@ -32,16 +34,8 @@ class AccountLogin(LoginView):
 # @login_required(login_url="/login/")  # 改用攔截器處裡
 def home(request):
     # 将查询结果传递给模板
-    context = {"allmenu": _get_menu_map(request.user)}
-    # 渲染模板并返回响应
-    return render(request, "home.html", context)
 
-
-def _get_menu_map(user: Muser):
-    """
-    用於取得menu清單
-    """
-    group = user.group
+    user = request.user
 
     if user.is_superuser:
         menu_list = Menu.objects.filter(group__isnull=True).order_by(
@@ -49,7 +43,7 @@ def _get_menu_map(user: Muser):
         )
     # 查询菜单项并构建菜单映射
     else:
-        menu_list = Menu.objects.filter(group=group).order_by("category", "order")
+        menu_list = Menu.objects.filter(group=user.group).order_by("category", "order")
     allmenu = []
     group = 0
     i = -1
@@ -60,13 +54,15 @@ def _get_menu_map(user: Muser):
             group = menu.category
             i += 1
         allmenu[i]["list"].append(menu)
-    return allmenu
+
+    context = {"allmenu": allmenu}
+    # 渲染模板并返回响应
+    return render(request, "home.html", context)
 
 
-class MuserListView(ListView):
+class MuserListView(PageListView):
     model = Muser
     template_name = "wcommmon/muser_list.html"
-    context_object_name = "musers"
 
     def get_queryset(self):
         result = Muser.objects
@@ -89,22 +85,7 @@ class MuserListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # 将查询条件传递到模板
-        context["username"] = self.request.GET.get(
-            "search_username", ""
-        )  # 如果为None，使用''代替
-
-        # 将查询条件传递到模板
-        context["username_zh"] = self.request.GET.get(
-            "search_username_zh", ""
-        )  # 如果为None，使用''代替
-        context["unit"] = self.request.GET.get(
-            "search_unit", ""
-        )  # 如果为None，使用''代替
-        context["group"] = self.request.GET.get(
-            "search_group", ""
-        )  # 如果为None，使用''代替
+        context["title"] = "車輛清單"
         context["group_list"] = serializers.serialize(
             "json", UserGroup.objects.filter(is_active=True)
         )
@@ -166,10 +147,10 @@ class MuserCreateView(CreateView):
         return context
 
 
-class GroupListView(ListView):
+class GroupListView(PageListView):
     model = UserGroup
     template_name = "wcommon/group_list.html"
-    context_object_name = "groups"
+    # context_object_name = "groups"
 
     def get_queryset(self):
         result = UserGroup.objects
@@ -181,9 +162,6 @@ class GroupListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # 将查询条件传递到模板
-        context["search_name"] = self.request.GET.get("search_name", "")
         context["title"] = "權限管控"
 
         return context

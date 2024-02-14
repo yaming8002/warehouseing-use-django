@@ -44,7 +44,7 @@
       type="text"
       id="search_name"
       name="search_name"
-      value="{{ search_name }}"
+      value="{{ request.GET.search_name }}"
     />
   </p>
   <input type="submit" value="查詢" />
@@ -65,7 +65,7 @@
 </thead>
 <tbody>
   <!-- Corrected the template variables with double curly braces -->
-  {% for info in groups %}
+  {% for info in pagelist %}
   <tr>
     <td id="account-{{ info.id }}">{{ info.name }}</td>
     <td
