@@ -8,7 +8,7 @@ from whse.models.whse import Stock, StockBase
 
 # Create your models here.
 class Construction(models.Model):
-    code = models.CharField(max_length=30, primary_key=True , verbose_name="工地代號")
+    code = models.CharField(max_length=30, verbose_name="工地代號")
     owner = models.CharField(max_length=50, verbose_name="業主")
     name = models.CharField(max_length=50, default= '', verbose_name="工程名稱")
     address = models.TextField(verbose_name="地點")
@@ -19,12 +19,14 @@ class Construction(models.Model):
     state = models.IntegerField(default=2, choices=constn_state) 
     done_date = models.DateField(null=True, verbose_name="結案日期")
 
-
+    class Meta:
+        unique_together = ("code", "name","address")
+        
     def __str__(self):
         return self.code
 
 class ConStock(StockBase):
-    construction = models.ForeignKey(Construction, primary_key=True, on_delete=models.CASCADE, verbose_name="工地")
+    construction = models.ForeignKey(Construction, on_delete=models.CASCADE, verbose_name="工地")
 
     class Meta:
-        unique_together = ("construction")
+        unique_together = ("construction", "materiel")

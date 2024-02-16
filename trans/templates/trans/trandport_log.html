@@ -1,0 +1,120 @@
+{% extends 'base/base_table.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}<script></script>{% endblock %}
+{% block form %}
+  <!-- Corrected form tag and added trailing slash to action attribute -->
+  <form id="search" action="/whse/list/" method="GET">
+    {% csrf_token %}
+    <p>
+      <label for="car_number">車牌號</label>
+      <input type="text"
+             id="car_number"
+             name="car_numer"
+             value="{{ request.GET.car_number }}" />
+      <label for="firm">公司</label>
+      <input type="text" id="firm" name="firm" value ="{{ request.GET.firm }}" />
+      <input for="patload">
+      噸數
+    </label>
+    <input type="text"
+           id="patload"
+           name="patload"
+           value="{{ request.GET.patload }}" />
+  </p>
+  <input type="submit" value="查詢" />
+</form>
+<div id="modalContainer"></div>
+{% endblock %}
+{% block table %}
+  <caption>進出總表</caption>
+  <thead>
+    <tr>
+      <th rowspan="2">日期</th>
+      <th colspan="4">工 地</th>
+      <th colspan="4">材料規格</th>
+      <th colspan="2">月報表</th>
+      <th rowspan="2">備註</th>
+      <th rowspan="2">施工層別</th>
+      <th colspan="2">吊卡車公司</th>
+      <th colspan="2">經手人</th>
+      <th rowspan="2">倉庫</th>
+    </tr>
+    <tr>
+      
+      <th>工地編號</th>
+      <th>轉單工地</th>
+      <th>業主</th>
+      <th>工地名稱</th>
+      <th>單據編號</th>
+      <th>品名</th>
+      <th>單位(米)</th>
+      <th>米數規格</th>
+      <th>出(入)庫量</th>
+      <th>出(入)米數</th>
+      <th>公司</th>
+      <th>車號</th>
+      <th>編號</th>
+      <th>姓名</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Corrected the template variables with double curly braces -->
+    {% for item in pagelist %}
+      <tr>
+        <td>
+          <!--{{item.id}}-->{{ item.logistics.build_date }}
+        </td>
+        <td>
+          {{ item.logistics.construction.code }}
+        </td>
+        <td>{{ item.firm }}</td>
+        <td>
+          {{ item.logistics.construction.owner }}
+        </td>
+        <td>
+          {{ item.logistics.construction.name }}
+        </td>
+        <td>
+          {{ item.logistics.code }}
+        </td>
+        <td>
+          {{ item.material.name }}
+        </td>
+        <td>
+          {{ item.all_unit }}
+        </td>
+        <td>
+          {{ item.material.unit_of_division }}
+        </td>
+        <td>
+          {{ item.quantity }}
+        </td>
+        <td>
+          {{ item.all_unit }}
+        </td>
+        <td>
+          ---
+        </td>
+        <td>
+          {{ item.logistics.level }}
+        </td>
+        <td>
+          {{ item.logistics.car.firm }}
+        </td>
+        <td>
+          {{ item.logistics.car.car_number }}
+        </td>
+        <td>
+          {{ item.logistics.member }}
+        </td>
+        <td>
+          {{ item.logistics.member }}
+        </td>
+        <td>
+          {{ item.logistics.whse.name }}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock %}

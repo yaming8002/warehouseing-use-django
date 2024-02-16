@@ -10,7 +10,7 @@ class WhseList(models.Model):
 
 class StockBase(models.Model):
     materiel = models.ForeignKey(
-        MatList,primary_key=True, on_delete=models.CASCADE, verbose_name="物料編號"
+        MatList, on_delete=models.CASCADE, verbose_name="物料編號"
     )
     quantity = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="數量"
