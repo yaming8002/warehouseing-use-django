@@ -19,7 +19,7 @@
     <script>
       $(document).ready(function () {
         // 選擇所有具有id="report"的表格，位於class="col-md-9 m-0"的div內
-        $(".col-md-9.m-0 table").each(function () {
+        $(".col-md-9.m-0 table").not('.emptytable').each(function () {
           // 添加所需的CSS類
           $(this).addClass("table table-primary table-striped");
         });

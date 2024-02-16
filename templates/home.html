@@ -4,13 +4,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0" />
+    <meta name="viewport"
+          content="width=device-width, height=device-height, initial-scale=1.0" />
     <title>
-      {% block title %}
-        Home Page
-      {% endblock %}
+      {% block title %}Home Page{% endblock %}
     </title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
     <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
@@ -64,10 +64,10 @@
         })
       }
       
-      function reLoadMainPage() {
+      function reLoadMainPage(toUrl) {
         console.info(mainUrl)
         $.ajax({
-          url: mainUrl,
+          url: toUrl? toUrl: mainUrl,
           method: 'GET',
           success: function (data) {
             // console.log(data);
@@ -160,7 +160,10 @@
           </div>
           <div class="col-md-6">
             <a href="#" onclick="document.getElementById('logout-form').submit();">Logout</a>
-            <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none">
+            <form id="logout-form"
+                  action="{% url 'logout' %}"
+                  method="post"
+                  style="display: none">
               {% csrf_token %}
             </form>
           </div>
@@ -169,17 +172,22 @@
     </header>
     <div class="row container-fluid p-0 h-100">
       <!-- menu 清單 -->
-      <div class="col-md-2 m-0 flex-shrink-0 h-100 p-2" style="background-color: gray; color: black">
+      <div class="col-md-2 m-0 flex-shrink-0 h-100 p-2"
+           style="background-color: gray;
+                  color: black">
         <ul class="list-unstyled ps-0">
           {% for category in allmenu %}
             <!-- 循環每個分類開始 -->
-      
             <li class="mb-1">
-              <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed" data-bs-toggle="collapse" data-bs-target="#category-{{ category.list.1.category }}" aria-expanded="false"><h3>{{ category.name }}</h3></button>
+              <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#category-{{ category.list.1.category }}"
+                      aria-expanded="false">
+                <h3>{{ category.name }}</h3>
+              </button>
               <br />
               <div class="collapse m-10" id="category-{{ category.list.1.category }}">
                 <ul class="btn-toggle-nav fw-normal small">
-                 
                   {% for menu in category.list %}
                     <li>
                       <a href="{{ menu.url }}" class="link-dark rounded h5">{{ menu.name }}</a>
