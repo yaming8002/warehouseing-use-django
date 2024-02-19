@@ -1,12 +1,12 @@
 from django.db import models
 
 from django import forms
-from whse.models.material import MatCat, MatList, MatSpec
+from whse.models.material import MatCat, Materials, MatSpec
 
 
-class MatListForm(forms.ModelForm):
+class MaterialsForm(forms.ModelForm):
     class Meta:
-        model = MatList
+        model = Materials
         fields = [
             "mat_code",
             "name",
@@ -63,4 +63,6 @@ class MatListForm(forms.ModelForm):
     unit_of_division = forms.CharField(
         label="拆分單位",
         widget=forms.TextInput(attrs={"class": "form-control required"}),
+        required=False,  # 允许字段为空
+        label_suffix="(可留空)"  # 添加帮助文本
     )

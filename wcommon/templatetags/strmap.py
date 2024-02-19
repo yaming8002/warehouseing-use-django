@@ -17,7 +17,7 @@ def get_category_name(key):
     return menu_category.get(key, "沒有對應的資訊")
 
 
-constn_state = [(0, "完工"), (1, "運作中"), (2, "未動工"), (3, "取消")]
+constn_state = [(0, "結案"), (1, "運作中"), (2, "尚未動工"), (3, "取消")]
 
 
 @register.simple_tag

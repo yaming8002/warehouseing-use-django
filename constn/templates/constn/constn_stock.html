@@ -1,10 +1,30 @@
 {% extends 'base/base_table.html' %}{{ '' }}
 {% block title %}{{ title }} {{ '' }}{% endblock %}
-{% block javascript %}<script></script>{% endblock %}
+{% block javascript %}<script>
+
+  function material_split(event) {
+    // 向後端發送 AJAX 請求
+    url = '/material/split/constn/'
+
+    $.ajax({
+      url: url,
+      method: 'GET',
+      data:{'id':event},
+      success: function (data) {
+        $('#modalContainer').html(data)
+        $('#createModal').modal('show')
+      },
+      error: function (error) {
+        console.error('Error loading modal content: ', error)
+      }
+    })
+  }
+
+</script>{% endblock %}
 {% block form %}
   {% load strmap %}
   <!-- Corrected form tag and added trailing slash to action attribute -->
-  <form id="search" action="/constn/list/" method="GET">
+  <form id="search" action="/constn_stock/list/" method="GET">
     {% csrf_token %}
     <p>
       <label for="owner">業主</label>
@@ -21,7 +41,8 @@
       {% get_constn_state as constn_state %}  <!-- 调用模板标签并将结果赋值给变量 -->
       <!-- {{constn_state}}-->
       <label for="state">狀態</label>
-      <select id="state" name="state">
+      <select id="state" name="state">]
+        <option value> 全部</option>
         {% for state in constn_state %}
           <!-- 迭代 constn_state 变量 -->
           <option value="{{ state.0 }}"
@@ -31,7 +52,7 @@
     </p>
     <input type="submit" value="查詢" />
   </form>
-  <div id="modalContainer"></div>
+  <div id="modalContainer" ></div>
 {% endblock %}
 {% block table %}
   <caption>車輛資訊</caption>
@@ -46,7 +67,9 @@
       <th scope="col">規格</th>
       <th scope="col">數量</th>
       <th scope="col">單位量</th>
+      <th scope="col">單位y總量</th>
       <th scope="col">單位</th>
+      <th scope="col">編輯</th>
     </tr>
   </thead>
   <tbody>
@@ -70,9 +93,22 @@
         </td>
         <td>
           {% if item.materiel.is_divisible %}
+            {{ item.total_unit }}
+          {% else %}
+            ---
+          {% endif %}
+        </td>
+        <td>
+          {% if item.materiel.is_divisible %}
             {{ item.materiel.unit_of_division }}
           {% else %}
             ---
+          {% endif %}
+        </td>
+
+        <td>
+          {% if item.materiel.is_divisible %}
+            <a href="#" onclick="material_split('{{ item.pk }}')">拆分</a> 
           {% endif %}
         </td>
       </tr>

@@ -1,6 +1,42 @@
 {% extends 'base/base_table.html' %}{{ '' }}
 {% block title %}{{ title }} {{ '' }}{% endblock %}
-{% block javascript %}<script></script>{% endblock %}
+{% block javascript %}<script>
+  function constn_edit(event) {
+    // 向後端發送 AJAX 請求
+    url = '/constn/edit/'
+
+    $.ajax({
+      url: url,
+      method: 'GET',
+      data:{'id':event},
+      success: function (data) {
+        console.log(data)
+        $('#modalContainer').html(data)
+        $('#createModal').modal('show')
+      },
+      error: function (error) {
+        console.error('Error loading modal content: ', error)
+      }
+    })
+  }
+  
+  function upload(event) {
+    // 向後端發送 AJAX 請求
+    $.ajax({
+      url: '/constn/uploadexcel/',
+      method: 'GET',
+      success: function (data) {
+        console.log(data)
+        $('#modalContainer').html(data)
+        $('#createModal').modal('show')
+      },
+      error: function (error) {
+        console.error('Error loading modal content: ', error)
+      }
+    })
+  }
+
+</script>{% endblock %}
 {% block form %}
   {% load strmap %}
   <!-- Corrected form tag and added trailing slash to action attribute -->
@@ -22,6 +58,7 @@
       <!-- {{constn_state}}-->
       <label for="state">狀態</label>
       <select id="state" name="state">
+        <option value>全部</option>
         {% for state in constn_state %}
           <!-- 迭代 constn_state 变量 -->
           <option value="{{ state.0 }}"
@@ -30,6 +67,8 @@
       </select>
     </p>
     <input type="submit" value="查詢" />
+    <button type="button" onclick="constn_edit(null)">新增</button>
+    <button type="button" onclick="upload(event)">上傳EXCEL</button>
   </form>
   <div id="modalContainer"></div>
 {% endblock %}
@@ -44,6 +83,7 @@
       <th scope="col">發案日期</th>
       <th scope="col">狀態</th>
       <th scope="col">結案日期</th>
+      <th scope="col">編輯</th>
     </tr>
   </thead>
   <tbody>
@@ -64,7 +104,7 @@
         </td>
         <td>
           {% if item.crate_date %}
-            {{ item.crate_date }} {% else %} --- {% endif %}
+            {{ item.crate_date | date:'Y-m-d' }} {% else %} --- {% endif %}
           </td>
           <td>
             {% get_constn_state as constn_state %}
@@ -75,8 +115,12 @@
           </td>
           <td>
             {% if item.done_date %}
-              {{ item.done_date }} {% else %} --- {% endif %}
+              {{ item.done_date | date:'Y-m-d' }} {% else %} --- {% endif %}
             </td>
+          
+          <td>
+            <a href="#" onclick="constn_edit('{{ item.pk }}')">編輯</a>  
+          </td>
           </tr>
         {% endfor %}
       </tbody>

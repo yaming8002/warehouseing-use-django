@@ -171,9 +171,12 @@
 {% block styles %}
     <style>
 .formStyle {
-    background-color: {% if 'out' in request.path %}salmon{% endif %};
+    background-color: {% if 'out' in request.path %}salmon{% else %} #83D182 {% endif %};
   }
 
+  .formStyle td {
+    background-color: {% if 'out' in request.path %}salmon{% else %} #83D182 {% endif %};
+  }
 
     </style>
 {% endblock %}
@@ -270,7 +273,7 @@
                     <td></td>
                 </tr>
             </table>
-            <table id='matertialList'>
+            <table id='matertialList' class="table table-primary table-striped">
                 <thead>
                     <tr>
                         <th>物料編號</th>

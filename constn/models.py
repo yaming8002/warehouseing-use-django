@@ -2,7 +2,6 @@ from django.db import models
 from wcommon.templatetags import constn_state
 from django.utils import timezone
 
-from whse.models.material import MatList
 from whse.models.whse import Stock, StockBase
 
 
@@ -18,9 +17,10 @@ class Construction(models.Model):
     company = models.CharField(max_length=10, blank=True, null=True, verbose_name="公司行號")
     state = models.IntegerField(default=2, choices=constn_state) 
     done_date = models.DateField(null=True, verbose_name="結案日期")
-
+    remark = models.TextField(null=True, verbose_name="備註")
     class Meta:
         unique_together = ("code", "name","address")
+        ordering = ['code']  # 按照 id 升序排序
         
     def __str__(self):
         return self.code
@@ -30,3 +30,4 @@ class ConStock(StockBase):
 
     class Meta:
         unique_together = ("construction", "materiel")
+        ordering = ['construction']  # 按照 id 升序排序

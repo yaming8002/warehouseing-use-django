@@ -1,5 +1,4 @@
 from datetime import date
-import datetime
 from decimal import Decimal
 from django.core import serializers
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -11,8 +10,9 @@ from django.views.generic.list import ListView
 from datetime import datetime, timedelta
 from constn.models import ConStock, Construction
 from trans.models import CarInfo, TransportDetailLog, TransportLog
+from wcommon.utils.excel_tool import ImportDataGeneric
 from wcommon.utils.pagelist import PageListView
-from whse.models.material import MatCat, MatList, MatSpec
+from whse.models.material import MatCat, Materials, MatSpec
 from whse.models.whse import Stock, StockBase, WhseList
 
 
@@ -46,33 +46,14 @@ class TrandportView(PageListView):
     template_name = "trans/trandport_log.html"
 
     def get_queryset(self):
+        
         detail = TransportDetailLog.objects
         log = TransportLog.objects
-        material = MatList.objects
+        material = Materials.objects
         car = CarInfo.objects
         construction = Construction.objects
-        now = datetime.now()
 
-        # 获取当前月份的第一天
-        begin = self.request.GET.get("begin")
-        if not begin:
-            begin = now.replace(day=1)
-
-        # 获取当前月份的最后一天
-        end = self.request.GET.get("end")
-        if not end:
-            next_month = now.replace(day=28) + timedelta(
-                days=4
-            )  # 这将确保总是到达下个月
-            end = next_month - timedelta(days=next_month.day)
-
-        # 确保 begin 和 end 是日期格式
-        begin = (
-            begin
-            if isinstance(begin, datetime)
-            else datetime.strptime(begin, "%Y-%m-%d")
-        )
-        end = end if isinstance(end, datetime) else datetime.strptime(end, "%Y-%m-%d")
+        begin, end = self.get_month_range()
         print([begin, end])
         whse = self.request.GET.get("whse")
         code = self.request.GET.get("code")
@@ -89,7 +70,7 @@ class TrandportView(PageListView):
         if begin and end:
             log = log.filter(build_date__range=[begin, end])
         if whse:
-            log = log.filter(whse__istartswith=whse)
+            log = log.filter(whse=whse)
         if code:
             log = log.filter(code__istartswith=code)
         if member:
@@ -100,11 +81,11 @@ class TrandportView(PageListView):
         if constn:
             construction = construction.filter(id=constn)
 
-        # 过滤 MatList
+        # 过滤 Materials
         if matinfo_core:
             material = material.filter(mat_code=matinfo_core)
         if matinfo_cat:
-            material = material.filter(category=matinfo_cat)
+            material = material.filter(category= MatCat.objects.get(name=matinfo_cat))
         if matinfo_name:
             material = material.filter(name__istartswith=matinfo_name)
 
@@ -123,6 +104,9 @@ class TrandportView(PageListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "出入總表"
+        context["whses"] = WhseList.objects.all()
+        context["matinfo_cats"] = MatCat.objects.all()
+
         return context
 
 
@@ -142,10 +126,12 @@ def transport_log_from(request, log_type):
         return render(request, "trans/transport_request.html", context)
     else:
         constn = Construction.objects.get(id=request.POST.get("construction"))
+        print(request.POST.get("whse")) 
+        whse=WhseList.objects.get(id=request.POST.get("whse"))
         tran = TransportLog.objects.create(
             code=request.POST.get("code"),
             construction=constn,
-            whse=WhseList.objects.get(id=request.POST.get("whse")),
+            whse=whse,
             level=request.POST.get("level"),
             car=CarInfo.objects.get(car_number=request.POST.get("car_number")),
             transaction_type="IN" if "in" in log_type else "OUT",
@@ -158,8 +144,8 @@ def transport_log_from(request, log_type):
             quantity = Decimal(request.POST.get(f"mat_item[{index}].quantity"))
             unit_req = request.POST.get(f"mat_item[{index}].unit")
             unit = Decimal(unit_req) if unit_req != "---" else Decimal(0)
-            print(quantity)
-            mat = MatList.objects.get(id=mat_id)
+
+            mat = Materials.objects.get(id=mat_id)
             TransportDetailLog.objects.create(
                 logistics=tran,
                 material=mat,
@@ -169,57 +155,125 @@ def transport_log_from(request, log_type):
                 all_unit=unit * quantity if unit else unit,
             )
 
-            stock = Stock.objects.get(materiel=mat)
-            chang_quantity_util("in" in log_type, stock, quantity, unit)
-            print(mat.id)
-            print(constn.code)
-            con_stock_fifter = ConStock.objects.filter(
-                construction=constn, materiel=mat
-            )
-            print(f"con_stock_fifter.count(){con_stock_fifter.count()}")
-            if con_stock_fifter.count() > 0:
-                con_stock = con_stock_fifter.get()
-                chang_quantity_util("out" in log_type, con_stock, quantity, unit)
-                con_stock.save()
-            else:
-                print("data not find")
-                new_con_stock = ConStock.objects.create(
-                    construction=constn,
-                    materiel=mat,
-                )
-                chang_quantity_util(True, new_con_stock, quantity, unit)
-                new_con_stock.save()
+            # stock = Stock.objects.get(whse=whse, materiel=mat)
+            # chang_quantity_util("in" in log_type, stock, quantity, unit)
+            # print(mat.id)
+            # print(constn.code)
+            # con_stock_fifter = ConStock.objects.filter(
+            #     construction=constn, materiel=mat
+            # )
+            # stock.save()
+            # print(f"con_stock_fifter.count(){con_stock_fifter.count()}")
+            # if con_stock_fifter.count() > 0:
+            #     con_stock = con_stock_fifter.get()
+            #     chang_quantity_util("out" in log_type, con_stock, quantity, unit)
+            #     con_stock.save()
+            # else:
+            #     print("data not find")
+            #     new_con_stock = ConStock.objects.create(
+            #         construction=constn,
+            #         materiel=mat,
+            #     )
+            #     chang_quantity_util(True, new_con_stock, quantity, unit)
+            #     new_con_stock.save()
             index += 1
         context = {"success": True, "msg": "成功"}
 
         return JsonResponse(context)
 
 
-def chang_quantity_util(isadd: bool, whse: StockBase, quantity: Decimal, unit: Decimal):
-    """
-    Args:
-        isadd (bool): _description_
-        whse (Stock): _description_
-        quantity (_type_): _description_
-        unit (_type_): _description_
-        用於調控數量與次級單位的計算
-    """
-    if isadd:
-        whse.quantity += quantity
-        if unit:
-            whse.unit += unit * quantity
-    else:
-        whse.quantity -= quantity
-        if unit:
-            whse.unit -= unit * quantity
+
+class ImportTransportView(ImportDataGeneric):
+    title = "上傳EXCEL"
+    action = "/transport_log/uploadexcel/"
+    columns = [
+        "日期",
+        "出入料",
+        "工地編號",
+        "單據編號",
+        "物料編號",
+        "實際米數",
+        "出(入)庫量",
+        "出(入)米數",
+        "施工層別",
+        "車號" ,
+        "人員",
+    ]
+
+    def insertDB(self, actual_columns):
+        whse = WhseList.objects.get(id=1)
+        constn = Construction.objects
+        carlist = CarInfo.objects
+        Trans_all = TransportLog.objects
+        for item in actual_columns:
+            if item[0] is None:
+                break
+            trancode = str(item[3])
+
+            constn_code = (
+                str(item[2])
+                if isinstance(item[2], (int, str))
+                else "{:.0f}".format(item[2])
+            )
+            car_id=(
+                str(item[9])
+                if isinstance(item[9], (int, str))
+                else "{:.0f}".format(item[9])
+            )
+            
+            build_date = datetime.strptime(str(item[0]), '%Y-%m-%d %H:%M:%S')
+        
+            try:
+                tran = Trans_all.filter(code=trancode).first()
+                if not tran :  
+                    tran = Trans_all.create(
+                        code = trancode,
+                        whse = whse,
+                        construction = constn.get(code=constn_code),
+                        build_date = build_date,
+                        car = carlist.get(car_number=car_id),
+                        transaction_type ='IN' if "入" in str( item[1]) else 'OUT',
+                        level = item[8] if item[8] else 0,
+                        member= item[10]
+                    )
+                self.build_detial(tran ,item,("入" in item[1]),whse, constn.get(code=constn_code) )
+
+            except Exception as e:
+                # 处理可能的异常情况
+                print("insertDB An error occurred:", e)
+                self.response_data["error_list"].append((trancode,str(e)))
 
 
-def getMatrtialData(request):
-    if request.method == "GET":
-        context = {}
-        matrtials = MatList.objects.all().select_related("specification")
-        context["matrtials"] = serializers.serialize("json", matrtials)
-        context["matcats"] = serializers.serialize("json", MatCat.objects.all())
-        context["spec"] = serializers.serialize("json", MatSpec.objects.all())
-        context["success"] = True
-        return JsonResponse(context)
+    def build_detial(self ,tran:TransportLog, item:[],log_type: bool,whse:WhseList,constn:Construction) :
+        try:
+            unit_req = item[5]
+            unit = Decimal(unit_req) if unit_req else Decimal(0)
+            quantity = Decimal(item[6]) 
+            mat_code = (
+                    str(item[4])
+                    if isinstance(item[4], (int, str))
+                    else "{:.0f}".format(item[4])
+                )
+            mat_object = Materials.objects
+            if  unit_req:
+                spec = MatSpec.objects.get(id = round(unit))
+                mat = mat_object.get(mat_code=mat_code,specification=spec)
+            else :
+                mat = mat_object.get(mat_code=mat_code)
+            print( f"'{mat.name}'")
+            
+            TransportDetailLog.objects.create(
+                    logistics = tran,
+                    material = mat,
+                    quantity =quantity,
+                    all_quantity = quantity,
+                    unit = unit,
+                    all_unit = unit* quantity if unit else unit,
+                    remark = item,
+            )
+        except Exception as e:
+            # 处理可能的异常情况
+            print("build_detial An error occurred:", item,e)
+
+
+        

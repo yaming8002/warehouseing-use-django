@@ -2,7 +2,7 @@
   {{ title }} {{ '' }}
 {% endblock %} {% block javascript %}
   <script>
-    function addgroup(event) {
+    function addMaterial(event) {
       // 向後端發送 AJAX 請求
       $.ajax({
         url: '/material/add/',
@@ -72,7 +72,7 @@
       </select>
     </p>
     <input type="submit" value="查詢" />
-    <button type="button" onclick="addgroup(event)">新增</button>
+    <button type="button" onclick="addMaterial(event)">新增</button>
     <button type="button" onclick="upload(event)">上傳EXCEL</button>
   </form>
   <div id="modalContainer"></div>
@@ -80,7 +80,7 @@
   <caption>權限</caption>
   <thead>
     <tr>
-      <th scope="col">#</th>
+      <!--<th scope="col">#</th>-->
       <th scope="col">物料編號</th>
       <th scope="col">料名</th>
       <th scope="col">分類</th>
@@ -93,9 +93,9 @@
   </thead>
   <tbody>
     <!-- Corrected the template variables with double curly braces -->
-    {% for mat in matList %}
+    {% for mat in pagelist %}
       <tr>
-        <td>{{ mat.id }}</td>
+        <!-- <td>{{ mat.id }}</td>-->
         <td>{{ mat.mat_code }}</td>
         <td>{{ mat.name }}</td>
         <td>{{ mat.category }}</td>

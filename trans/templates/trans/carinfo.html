@@ -5,14 +5,14 @@
 </script>
 {% endblock %} {% block form %}
 <!-- Corrected form tag and added trailing slash to action attribute -->
-<form id="search" action="/whse/list/" method="GET">
+<form id="search" action="/carinfo/list/" method="GET">
   {% csrf_token %}
   <p>
     <label for="car_number">車牌號</label>
     <input type="text" id="car_number" name="car_numer" value="{{request.GET.car_number}}"/>
     <label for="firm"> 公司</label>
     <input type="text" id="firm" name="firm" value ="{{request.GET.firm}}"/>
-    <input for="patload">噸數</label>
+    <label for="patload">噸數</label>
     <input type="text" id="patload" name="patload" value="{{request.GET.patload}}"/>
 
 </p>

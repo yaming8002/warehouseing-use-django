@@ -8,7 +8,8 @@ class ImportDataGeneric(View):
     title = ""
     action = ""
     columns = []
-    
+    response_data ={"success":False,"msg":"","error_list":[]}
+
     def post(self, request, *args, **kwargs):
         try:
             excel_file = request.FILES.get("excel_file")
@@ -17,17 +18,20 @@ class ImportDataGeneric(View):
                 worksheet = workbook.active
                 # 检查列名是否符合预期
                 actual_columns = [cell.value for cell in worksheet[1]]
+                print(actual_columns)
+                print(self.columns)
                 if actual_columns == self.columns:
                     self.insertDB(worksheet.iter_rows(min_row=2, values_only=True))
-                    response_data = {"success": True, "msg": "成功"}
+                    self.response_data["success"] = True
+                    self.response_data["msg"] =  "成功"
                 else:
-                    response_data = {"success": False, "msg": "Excel 文件格式不正确"}
+                    self.response_data["msg"] =  "文件格式不正确"
             else:
-                response_data = {"success": False, "msg": "未上传 Excel 文件"}
+                self.response_data["msg"] =  "未上传 Excel 文件"
         except Exception as e:
-            response_data = {"success": False, "msg": str(e)}
+            self.response_data["msg"] =  str(e)
 
-        return JsonResponse(response_data)
+        return JsonResponse( self.response_data)
 
     def insertDB(self, actual_columns):
         raise NotImplementedError("Subclasses must implement insertDB method")

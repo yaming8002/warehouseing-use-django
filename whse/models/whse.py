@@ -1,6 +1,6 @@
 from django.db import models
 
-from .material import MatList
+from .material import Materials
 
 
 class WhseList(models.Model):
@@ -10,13 +10,17 @@ class WhseList(models.Model):
 
 class StockBase(models.Model):
     materiel = models.ForeignKey(
-        MatList, on_delete=models.CASCADE, verbose_name="物料編號"
+        Materials, on_delete=models.CASCADE, verbose_name="物料編號"
     )
     quantity = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="數量"
     )
+    
     unit = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="單位量"
+    )
+    total_unit = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="總單位量"
     )
 
     class Meta:

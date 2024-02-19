@@ -22,7 +22,7 @@ class MatSpec(models.Model):
 
 
 # 物料清單
-class MatList(models.Model):
+class Materials(models.Model):
     mat_code = models.CharField(max_length=12, verbose_name="物料編號")
     name = models.CharField(max_length=100, verbose_name="料名")
     category = models.ForeignKey(MatCat, on_delete=models.CASCADE, verbose_name="分類")

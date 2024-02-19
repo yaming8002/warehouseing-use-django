@@ -49,12 +49,15 @@ def home(request):
     i = -1
 
     for menu in menu_list:
+        if not menu.url:
+            continue
         if group < menu.category:
             allmenu.append({"name": menu_category[menu.category], "list": []})
             group = menu.category
             i += 1
+        
         allmenu[i]["list"].append(menu)
-
+    
     context = {"allmenu": allmenu}
     # 渲染模板并返回响应
     return render(request, "home.html", context)
