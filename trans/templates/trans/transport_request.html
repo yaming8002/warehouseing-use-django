@@ -170,7 +170,7 @@
 {% endblock %}
 {% block styles %}
     <style>
-.formStyle {
+  .formStyle {
     background-color: {% if 'out' in request.path %}salmon{% else %} #83D182 {% endif %};
   }
 
@@ -178,6 +178,13 @@
     background-color: {% if 'out' in request.path %}salmon{% else %} #83D182 {% endif %};
   }
 
+  div.p-3{
+    
+        display: inline-block; /* 或者使用 inline-flex，取決於內部布局 */
+        width: auto; /* 確保容器寬度根據內容自動調整 */
+        min-width: 100%; /* 確保至少與父元素同寬，根據需要調整 */
+    
+  }
     </style>
 {% endblock %}
 {% block form %}

@@ -195,8 +195,6 @@ def transport_log_from(request, log_type):
 
         return JsonResponse(context)
 
-import sys 
-
 class ImportTransportView(ImportDataGeneric):
     title = "上傳EXCEL"
     action = "/transport_log/uploadexcel/"
@@ -291,7 +289,6 @@ class ImportTransportView(ImportDataGeneric):
                 print(item)
                 print("insertDB An error occurred:", e)
                 self.error_list.append((item, e))
-                sys.exit()
 
     def build_detial(self, tran: TransportLog, item: list):
         if item[5] is None :
@@ -329,4 +326,3 @@ class ImportTransportView(ImportDataGeneric):
             # 处理可能的异常情况
             print("build_detial An error occurred:", item, e)
             self.error_list.append((item, e))
-            sys.exit()
