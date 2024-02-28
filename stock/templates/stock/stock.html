@@ -1,0 +1,69 @@
+{% extends 'base/base_table.html' %}{{ '' }} {% block title %}
+{{ title }} {{ '' }}
+{% endblock %} {% block javascript %}
+<script>
+</script>
+{% endblock %} {% block form %}
+<!-- Corrected form tag and added trailing slash to action attribute -->
+<form id="search" action="/stock/list/" method="GET">
+  {% csrf_token %}
+  <p>
+    <label for="siteinfo">倉庫:</label>
+    <select id="siteinfo" name="siteinfo">
+      <option value> 全部 </option>
+      {% for siteinfo in siteInfos %}
+      <option value="{{siteinfo.id}}" 
+        {% if request.GET.siteinfo and request.GET.siteinfo|stringformat:"s" == siteinfo.id|stringformat:"s" %}
+        selected 
+        {% endif%}>
+        {{siteinfo.name}}</option>
+      {% endfor %}
+    </select>
+        <label for="code">料號:</label>
+        <input type="text" id="code" name="code" value="{{ request.GET.code }}" />
+        <label for="name">料名:</label>
+        <input type="text" id="name" name="name" value="{{ request.GET.name }}" />
+        <label for="category_id">分類 :</label>
+        <select id="category_id" name="category_id">
+          <option value> 全部 </option>
+          {% for category in categorys %}
+          <option value="{{ category.id }}" 
+          {% if request.GET.category_id and request.GET.category_id|stringformat:"s" == category.id|stringformat:"s" %} selected {% endif %}>
+            {{ category.name }}</option>
+          {% endfor %}
+        </select>
+  </p>
+  <input type="submit" value="查詢" />
+
+</form>
+<div id="modalContainer"></div>
+{% endblock %} {% block table %}
+<caption>權限</caption>
+<thead>
+  <tr>
+    <th scope="col">倉庫 </th>
+    <th scope="col">料號</th>
+    <th scope="col">料名</th>
+    <th scope="col">類型</th>
+    <th scope="col">規格</th>
+    <th scope="col">數量</th>
+    <th scope="col">單位量</th>
+    <th scope="col">單位</th>
+  </tr>
+</thead>
+<tbody>
+  <!-- Corrected the template variables with double curly braces -->
+  {% for item in pagelist %}
+  <tr>
+    <td><!--{{item.id}}-->{{ item.siteinfo.name }}</td>
+    <td>{{ item.material.mat_code }}</td>
+    <td>{{ item.material.name }}</td>
+    <td>{{ item.material.category.name }}</td>
+    <td>{{ item.material.specification.name }}</td>
+    <td>{{ item.quantity }}</td>
+    <td>{% if item.material.is_divisible %}{{ item.unit }}{% else %}---{% endif %}</td>
+    <td>{% if item.material.is_divisible %}{{ item.material.unit_of_division }}{% else %}---{% endif %}</td>
+  </tr>
+  {% endfor %}
+</tbody>
+{% endblock %}

@@ -16,13 +16,15 @@ class SaveControlView(FormView):
             modeldata = get_object_or_404(self.model, pk=id)
             form = self.form_class(instance=modeldata)
             title = '編輯' +self.name
+            action_id = f"?id={id}"
         else:  # 如果是新增操作
             form = self.form_class()
             title = '新增' +self.name
+            action_id = ""
 
         context = {
             'title': title,
-            'action': request.path,  # 设置 action 为当前 URL
+            'action':request.path +action_id ,  # 设置 action 为当前 URL
             'form': form
         }
         return render(request, 'base/model_edit.html', context)
@@ -39,9 +41,13 @@ class SaveControlView(FormView):
         else:  # 如果是新增操作
             form = self.form_class(request.POST)
         
+
+        print(id)
         if form.is_valid():
             self.form_is_valid(form)
             form.save()
             # 处理保存后的逻辑，例如重定向到列表页面
             return JsonResponse({"success": True, "msg": "成功"})
-        return JsonResponse({"success": False, "msg": "資料不齊全"})
+        
+        errors = form.errors
+        return JsonResponse({"success": False, "msg": f"{errors}"})

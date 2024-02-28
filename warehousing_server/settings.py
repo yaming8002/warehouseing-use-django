@@ -17,18 +17,30 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+os_environ = os.environ
+
+
+ALLOWED_HOSTS_VALUE = [origin.strip() for origin in os_environ['MY_ALLOWED_HOSTS'].split(',') if origin]
+print(f"ALLOWED_HOSTS_VALUE{ALLOWED_HOSTS_VALUE}")
+
+CSRF_TRUSTED_ORIGINS_VALUE = [origin.strip() for origin in os_environ['MY_CSRF_TRUSTED_ORIGINS'].split(',') if origin]
+print(f"CSRF_TRUSTED_ORIGINS_VALUE{CSRF_TRUSTED_ORIGINS_VALUE}")
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "Dv*4JqwxMSClY$x2lVzy!yAeBkX5ZVF0*qbGnCYZI@T#T4CIxA@p&GgeiRhrLhC4"
 
+
+
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
-
+ALLOWED_HOSTS = ALLOWED_HOSTS_VALUE
+CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_VALUE  # 使用環境變數的值
 # Application definition
 
 INSTALLED_APPS = [
@@ -39,9 +51,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "wcommon",
-    "whse",
+    "stock",
     "trans",
-    "constn",
+    "report",
 ]
 
 MIDDLEWARE = [
@@ -97,10 +109,10 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "warehousingDB",  # DB名稱
-        "USER": "root",  # 使用者帳號
-        "PASSWORD": "1qaz2wsx",  # 使用者密碼
-        "HOST": "localhost",
-        "PORT": "3306",
+        "USER": os_environ['MYSQL_USERNAME'],  # 使用者帳號
+        "PASSWORD": os_environ['MYSQL_PASSWORD'],  # 使用者密碼 os_environ['MY_DB_PASSWORD']
+        "HOST": os_environ['MYSQL_HOST'],
+        "PORT": os_environ['MYSQL_PORT'],
         "OPTIONS": {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
         },

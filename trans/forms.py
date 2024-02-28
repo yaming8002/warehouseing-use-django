@@ -1,25 +1,65 @@
+from decimal import Decimal
+from django import forms
+
+from django import forms
+from .models import CarInfo, TransportDetailLog, TransportLog
 
 
-# from django import forms
-# from constn.models import Construction
+class CarinfoFrom(forms.ModelForm):
+    class Meta:
+        model = CarInfo
+        fields = ["car_number", "driver", "firm", "patload", "value", "remark"]
 
-# from trans.models import TransportLog
-# from whse.models.whse import WhseList
 
-# from django import forms
-# from .models import TransportDetailLog, TransportLog, Construction, WhseList
+    car_number = forms.CharField(
+        label="車號",
+        widget=forms.TextInput(attrs={"class": "form-control required"}),
+    )
+
+    driver = forms.CharField(
+        label="駕駛",
+        required=False,
+        initial='',
+        widget=forms.TextInput(attrs={"class": "form-control required"}),
+    )
+
+    firm = forms.CharField(
+        label="公司",
+        required=False,
+        initial='',
+        widget=forms.TextInput(attrs={"class": "form-control required"}),
+    )
+
+    patload = forms.CharField(
+        label="噸數",
+        required=False,
+        initial='',
+        widget=forms.TextInput(attrs={"class": "form-control required"}),
+    )
+
+    value = forms.DecimalField(
+        label="基本台金額",
+        required=False,
+        initial=Decimal(0),
+        widget=forms.TextInput(attrs={"class": "form-control required"}),
+    )
+
+    remark = forms.CharField(
+        label="備註",
+        required=False,
+        initial='',
+        widget=forms.Textarea(attrs={"class": "form-control required", "rows": 3})
+    )
+
 
 # class TransportLogFrom(forms.ModelForm):
 #     class Meta:
 #         model = TransportDetailLog
 #         ....
-    
-#     TransportDetailLog.logistics.code = forms.CharField(
+
+#     TransportDetailLog.transportlog.code = forms.CharField(
 #         label="單號", widget=forms.TextInput(attrs={"class": "form-control required"})
 #     )
-
-
-
 
 
 # class AddMuserForm(UserCreationForm):

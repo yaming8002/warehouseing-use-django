@@ -1,7 +1,54 @@
 {% extends 'base/base_table.html' %}{{ '' }} {% block title %}
 {{ title }} {{ '' }}
-{% endblock %} {% block javascript %}
+{% endblock %}  {% block javascript %}
 <script>
+  function addMaterial(event) {
+    // 向後端發送 AJAX 請求
+    $.ajax({
+      url: '/carinfo/save/',
+      method: 'GET',
+      success: function (data) {
+        $('#modalContainer').html(data)
+        $('#createModal').modal('show')
+      },
+      error: function (error) {
+        console.error('Error loading modal content: ', error)
+      }
+    })
+  }
+  
+  function upload(event) {
+    // 向後端發送 AJAX 請求
+    $.ajax({
+      url: '/carinfo/uploadexcel/',
+      method: 'GET',
+      success: function (data) {
+        console.log(data)
+        $('#modalContainer').html(data)
+        $('#createModal').modal('show')
+      },
+      error: function (error) {
+        console.error('Error loading modal content: ', error)
+      }
+    })
+  }
+  
+  function editRow(id) {
+    // 轉換姓名欄位
+  
+    $.ajax({
+      url: '/carinfo/save/',
+      method: 'GET',
+      data: { id: id },
+      success: function (data) {
+        $('#modalContainer').html(data)
+        $('#createModal').modal('show')
+      },
+      error: function (error) {
+        console.error('Error loading modal content: ', error)
+      }
+    })
+  }
 </script>
 {% endblock %} {% block form %}
 <!-- Corrected form tag and added trailing slash to action attribute -->
@@ -9,7 +56,7 @@
   {% csrf_token %}
   <p>
     <label for="car_number">車牌號</label>
-    <input type="text" id="car_number" name="car_numer" value="{{request.GET.car_number}}"/>
+    <input type="text" id="car_number" name="car_number" value="{{request.GET.car_number}}"/>
     <label for="firm"> 公司</label>
     <input type="text" id="firm" name="firm" value ="{{request.GET.firm}}"/>
     <label for="patload">噸數</label>
@@ -17,6 +64,8 @@
 
 </p>
   <input type="submit" value="查詢" />
+  <button type="button" onclick="addMaterial(event)">新增</button>
+  <button type="button" onclick="upload(event)">上傳EXCEL</button>
 </form>
 <div id="modalContainer"></div>
 {% endblock %} {% block table %}
@@ -29,6 +78,7 @@
     <th scope="col">噸數</th>
     <th scope="col">基本台金額</th>
     <th scope="col">備註</th>
+    <th scope="col">編輯</th>
   </tr>
 </thead>
 <tbody>
@@ -37,11 +87,14 @@
   <tr>
 
     <td><!--{{item.id}}-->{{ item.car_number }}</td>
-    <td>{% if item.driver %}{{ item.driver }} {%else%} --- {%endif%}</td>
+    <td>{% if item.driver %}{{ item.driver }} {%endif%}</td>
     <td>{{ item.firm }}</td>
-    <td>{% if item.patload %}{{item.patload}} {%else%} --- {%endif%}</td>
-    <td>{% if item.value %}{{item.value}} {%else%} --- {%endif%}</td>
-    <td>{% if item.remark %}{{item.remark}} {%else%} --- {%endif%}</td>
+    <td>{% if item.patload %}{{item.patload}}  {%endif%}</td>
+    <td>{% if item.value %}{{item.value}} {%endif%}</td>
+    <td>{% if item.remark %} {{item.remark}} {%endif%}</td>
+    <td>
+      <a href="#" onclick="editRow({{ item.id }})">編輯</a>
+    </td>
   </tr>
   {% endfor %}
 </tbody>

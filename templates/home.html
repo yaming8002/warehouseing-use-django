@@ -25,8 +25,14 @@
             url: mainUrl,
             method: 'GET',
             success: function (data) {
-              // console.log(data);
-              $('#main').html(data) // 将加载的内容放入main区块
+              if (data.includes("login")) {
+                // 在此可以添加处理登录情况的逻辑，比如跳转到登录页面等
+                console.log("User not logged in.");
+                window.location.href = '/login/'; 
+              } else {
+                // console.log(data);
+                $('#main').html(data); // 将加载的内容放入main区块
+              }
             }
           })
         })

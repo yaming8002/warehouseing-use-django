@@ -1,33 +1,35 @@
 from decimal import Decimal
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from constn.models import ConStock, Construction
+from stock.models.site import SiteInfo
+from stock.models.stock import ConStock, MainStock, StockBase
+
 from trans.models import TransportDetailLog, TransportLog
-from whse.models.material import Materials
-from whse.models.whse import Stock, StockBase, WhseList
+from stock.models.material import Materials
+
 
 
 @receiver(post_save, sender=TransportDetailLog)
 def stock_post_save_receiver(sender, instance, created, **kwargs):
     if created:
         # 这里执行的操作将在新的 MyModel 实例被创建时触发
-        translog = instance.logistics
+        translog = instance.transportlog
         # translog = TransportLog.objects.get(id =translog_id)
-        constn = Construction.objects.get(code= translog.construction)
         mat = instance.material
-        stock_obj= Stock.objects.filter(whse=translog.whse)
-        con_stock_obj = ConStock.objects.filter(construction=translog.construction,materiel=mat)
-
-        stock = stock_obj.get(materiel=mat) # 預設倉庫裡應該都有對應的資料，暫且不管數量
+        # print(mat.id,mat.name,mat.specification)
+        stock_obj= MainStock.objects.filter(siteinfo=translog.form_site)
+        con_stock_obj = ConStock.objects.filter(siteinfo=translog.to_site,material=mat)
+        # print(str(stock_obj.filter(material=mat).all().query))
+        stock = stock_obj.get(material=mat) # 預設倉庫裡應該都有對應的資料，暫且不管數量
         if con_stock_obj.count() > 0 :
             constock = con_stock_obj.first()
         else: 
             constock = con_stock_obj.create(
-                construction=constn,
-                materiel=mat,
+                siteinfo=translog.to_site,
+                material=mat,
             )
 
-        if "入" in translog.transaction_type :
+        if "IN" in translog.transaction_type :
             chang_quantity_util(True, stock, instance.quantity,instance.unit)
             chang_quantity_util(False, constock, instance.quantity,instance.unit)
         else:

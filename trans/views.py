@@ -8,12 +8,14 @@ from django.shortcuts import render
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from datetime import datetime, timedelta
-from constn.models import ConStock, Construction
+from stock.models.site import SiteInfo
+from trans.forms import CarinfoFrom
 from trans.models import CarInfo, TransportDetailLog, TransportLog
 from wcommon.utils.excel_tool import ImportDataGeneric
 from wcommon.utils.pagelist import PageListView
-from whse.models.material import MatCat, Materials, MatSpec
-from whse.models.whse import Stock, StockBase, WhseList
+from stock.models.material import MatCat, Materials, MatSpec
+from wcommon.utils.save_control import SaveControlView
+from wcommon.utils.uitls import excel_value_to_str
 
 
 class CarListView(PageListView):
@@ -41,20 +43,53 @@ class CarListView(PageListView):
         return context
 
 
+class CarInfoControlView(SaveControlView):
+    name = "車輛資訊"
+    model = CarInfo
+    form_class = CarinfoFrom
+
+
+class ImportCarInfoView(ImportDataGeneric):
+    title = "上傳EXCEL"
+    action = "/carinfo/uploadexcel/"
+    columns = ["車牌號碼", "駕駛員", "吊卡車公司", "噸數", "基本台金", "備註"]
+
+    def insertDB(self, actual_columns):
+        for item in actual_columns:
+            if item[0] is None:
+                break
+            code = excel_value_to_str(item[0])
+            
+            try:
+                if CarInfo.objects.filter(car_number=code).exists():
+                    print(f"{code} is exists")
+                else :
+                    CarInfo.objects.create(
+                        car_number=code,
+                        driver=item[1],
+                        firm= item[2] if item[2] else '',
+                        patload=item[3],
+                        value=Decimal(item[4]) if item[4] else Decimal(0),
+                        remark=item[5],
+                    )   
+            except Exception as e:
+                # 处理可能的异常情况
+                print(f"{item} insertDB An error occurred:{e}")
+                self.error_list.append((item, e))
+
+
 class TrandportView(PageListView):
     model = TransportDetailLog
     template_name = "trans/trandport_log.html"
 
     def get_queryset(self):
-        
         detail = TransportDetailLog.objects
         log = TransportLog.objects
         material = Materials.objects
         car = CarInfo.objects
-        construction = Construction.objects
+        construction = SiteInfo.objects
 
         begin, end = self.get_month_range()
-        print([begin, end])
         whse = self.request.GET.get("whse")
         code = self.request.GET.get("code")
         constn = self.request.GET.get("constn")
@@ -70,7 +105,7 @@ class TrandportView(PageListView):
         if begin and end:
             log = log.filter(build_date__range=[begin, end])
         if whse:
-            log = log.filter(whse=whse)
+            log = log.filter(form_site=construction.get(id=whse))
         if code:
             log = log.filter(code__istartswith=code)
         if member:
@@ -79,13 +114,13 @@ class TrandportView(PageListView):
             log = log.filter(transaction_type=tran_type)
 
         if constn:
-            construction = construction.filter(id=constn)
+            construction = construction.get(id=constn)
 
         # 过滤 Materials
         if matinfo_core:
             material = material.filter(mat_code=matinfo_core)
         if matinfo_cat:
-            material = material.filter(category= MatCat.objects.get(name=matinfo_cat))
+            material = material.filter(category=MatCat.objects.get(name=matinfo_cat))
         if matinfo_name:
             material = material.filter(name__istartswith=matinfo_name)
 
@@ -96,15 +131,15 @@ class TrandportView(PageListView):
             car = car.filter(car_number__istartswith=car_number)
 
         # 使用过滤后的 log 过滤 detail
-        log = log.filter(construction__in=construction.all(), car__in=car.all())
-        detail = detail.filter(material__in=material.all(), logistics__in=log.all())
+        log = log.filter(to_site__in=construction.all(), car__in=car.all())
+        detail = detail.filter(material__in=material.all(), transportlog__in=log.all())
 
         return detail.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "出入總表"
-        context["whses"] = WhseList.objects.all()
+        context["whses"] = SiteInfo.objects.filter(genre=0).all()
         context["matinfo_cats"] = MatCat.objects.all()
 
         return context
@@ -113,8 +148,8 @@ class TrandportView(PageListView):
 def transport_log_from(request, log_type):
     if request.method == "GET":
         context = {}
-        context["constructions"] = Construction.objects.all()
-        context["whses"] = WhseList.objects.all()
+        context["constructions"] = SiteInfo.objects.filter(genre=1).all()
+        context["whses"] = SiteInfo.objects.filter(genre=0).all()
         context["cars"] = CarInfo.objects.all()
         context["title"] = "出料單" if "out" in request.path else "入料單"
         context["action"] = (
@@ -125,9 +160,9 @@ def transport_log_from(request, log_type):
 
         return render(request, "trans/transport_request.html", context)
     else:
-        constn = Construction.objects.get(id=request.POST.get("construction"))
-        print(request.POST.get("whse")) 
-        whse=WhseList.objects.get(id=request.POST.get("whse"))
+        constn = SiteInfo.objects.get(id=request.POST.get("construction"))
+
+        whse = SiteInfo.objects.get(id=request.POST.get("whse"))
         tran = TransportLog.objects.create(
             code=request.POST.get("code"),
             construction=constn,
@@ -147,7 +182,7 @@ def transport_log_from(request, log_type):
 
             mat = Materials.objects.get(id=mat_id)
             TransportDetailLog.objects.create(
-                logistics=tran,
+                transportlog=tran,
                 material=mat,
                 quantity=quantity,
                 all_quantity=quantity,
@@ -155,125 +190,143 @@ def transport_log_from(request, log_type):
                 all_unit=unit * quantity if unit else unit,
             )
 
-            # stock = Stock.objects.get(whse=whse, materiel=mat)
-            # chang_quantity_util("in" in log_type, stock, quantity, unit)
-            # print(mat.id)
-            # print(constn.code)
-            # con_stock_fifter = ConStock.objects.filter(
-            #     construction=constn, materiel=mat
-            # )
-            # stock.save()
-            # print(f"con_stock_fifter.count(){con_stock_fifter.count()}")
-            # if con_stock_fifter.count() > 0:
-            #     con_stock = con_stock_fifter.get()
-            #     chang_quantity_util("out" in log_type, con_stock, quantity, unit)
-            #     con_stock.save()
-            # else:
-            #     print("data not find")
-            #     new_con_stock = ConStock.objects.create(
-            #         construction=constn,
-            #         materiel=mat,
-            #     )
-            #     chang_quantity_util(True, new_con_stock, quantity, unit)
-            #     new_con_stock.save()
             index += 1
         context = {"success": True, "msg": "成功"}
 
         return JsonResponse(context)
 
-
+import sys 
 
 class ImportTransportView(ImportDataGeneric):
     title = "上傳EXCEL"
     action = "/transport_log/uploadexcel/"
     columns = [
         "日期",
-        "出入料",
-        "工地編號",
+        "來源工地編號",
+        "目的工地編號",
+        "轉單",
         "單據編號",
         "物料編號",
         "實際米數",
         "出(入)庫量",
         "出(入)米數",
         "施工層別",
-        "車號" ,
+        "車號",
         "人員",
+        "備註",
     ]
 
     def insertDB(self, actual_columns):
-        whse = WhseList.objects.get(id=1)
-        constn = Construction.objects
+
+        main_site_obj = SiteInfo.objects.filter(genre=0)
+        consite_obj = SiteInfo.objects.filter(genre=1)
+        turn_site_obj = SiteInfo.objects
         carlist = CarInfo.objects
         Trans_all = TransportLog.objects
         for item in actual_columns:
-            if item[0] is None:
-                break
-            trancode = str(item[3])
+            # print(item)
+            if item[0] is None and item[4] is None:
+                break 
+            if item[1] is None and item[2] is None:
+                continue
+            from_site = excel_value_to_str(item[1])
+            to_site = excel_value_to_str(item[2])
+            turn_site = excel_value_to_str(item[3])
+   
+            if (
+                main_site_obj.filter(code=from_site).exists()
+                and main_site_obj.filter(code=to_site).exists()
+            ):
+                transaction_type = "OUT"
+                form_site = main_site_obj.get(code=from_site)
+                to_site = main_site_obj.get(code=from_site)
+                turn_site = None
+            elif (
+                main_site_obj.filter(code=from_site).exists()
+                and consite_obj.filter(code=to_site).exists()
+            ):
+                transaction_type = "OUT"
+                form_site = main_site_obj.get(code=from_site)
+                to_site = consite_obj.get(code=to_site)
+                turn_site = turn_site_obj.get(code=turn_site) if turn_site else None 
+            else:
+                transaction_type = "IN"
+                form_site = main_site_obj.get(code=to_site)
+                to_site = consite_obj.get(code=from_site)
+                turn_site = turn_site_obj.get(code=turn_site) if turn_site else None 
 
-            constn_code = (
-                str(item[2])
-                if isinstance(item[2], (int, str))
-                else "{:.0f}".format(item[2])
-            )
-            car_id=(
-                str(item[9])
-                if isinstance(item[9], (int, str))
-                else "{:.0f}".format(item[9])
-            )
-            
-            build_date = datetime.strptime(str(item[0]), '%Y-%m-%d %H:%M:%S')
-        
+            trancode = excel_value_to_str(item[4])
+            car_id = excel_value_to_str(item[10])
+            if carlist.filter(car_number=car_id).exists():
+                carinfo = carlist.get(car_number=car_id) 
+            elif  car_id :
+                carinfo = carlist.create(
+                    car_number=car_id,
+                    remark=f"{item}"
+                )
+            else : 
+                carinfo = None 
             try:
-                tran = Trans_all.filter(code=trancode).first()
-                if not tran :  
+                # transaction_type 轉單必須進單與出單分別列出
+                tran = Trans_all.filter(code=trancode,transaction_type=transaction_type).first()
+                if not tran:
                     tran = Trans_all.create(
-                        code = trancode,
-                        whse = whse,
-                        construction = constn.get(code=constn_code),
-                        build_date = build_date,
-                        car = carlist.get(car_number=car_id),
-                        transaction_type ='IN' if "入" in str( item[1]) else 'OUT',
-                        level = item[8] if item[8] else 0,
-                        member= item[10]
+                        code=trancode,
+                        form_site=form_site,
+                        to_site=to_site,
+                        turn_site = turn_site,
+                        build_date=item[0],
+                        car=carinfo,
+                        transaction_type=transaction_type,
+                        member=item[11],
                     )
-                self.build_detial(tran ,item,("入" in item[1]),whse, constn.get(code=constn_code) )
+
+                self.build_detial(
+                    tran,
+                    item,
+                )
 
             except Exception as e:
                 # 处理可能的异常情况
+                print(item)
                 print("insertDB An error occurred:", e)
-                self.response_data["error_list"].append((trancode,str(e)))
+                self.error_list.append((item, e))
+                sys.exit()
 
-
-    def build_detial(self ,tran:TransportLog, item:[],log_type: bool,whse:WhseList,constn:Construction) :
+    def build_detial(self, tran: TransportLog, item: list):
+        if item[5] is None :
+            self.error_list.append(f"{item}: 沒有物料資訊")
+            print(f"{item}: 沒有物料資訊")
+            return 
         try:
-            unit_req = item[5]
+            unit_req = item[6]
             unit = Decimal(unit_req) if unit_req else Decimal(0)
-            quantity = Decimal(item[6]) 
-            mat_code = (
-                    str(item[4])
-                    if isinstance(item[4], (int, str))
-                    else "{:.0f}".format(item[4])
-                )
+            quantity = Decimal(item[7])
+            mat_code = excel_value_to_str(item[5])
             mat_object = Materials.objects
-            if  unit_req:
-                spec = MatSpec.objects.get(id = round(unit))
-                mat = mat_object.get(mat_code=mat_code,specification=spec)
-            else :
-                mat = mat_object.get(mat_code=mat_code)
-            print( f"'{mat.name}'")
+            if unit_req:
+                spec = MatSpec.objects.get(id=round(unit))
+                mat = mat_object.get(
+                    ( Q(mat_code=mat_code) | Q(mat_code2=mat_code) | Q(mat_code3=mat_code))
+                    & Q(specification=spec)
+                )
+            else:
+                mat = mat_object.get(
+                    Q(mat_code=mat_code) | Q(mat_code2=mat_code) | Q(mat_code3=mat_code)
+                )
             
             TransportDetailLog.objects.create(
-                    logistics = tran,
-                    material = mat,
-                    quantity =quantity,
-                    all_quantity = quantity,
-                    unit = unit,
-                    all_unit = unit* quantity if unit else unit,
-                    remark = item,
+                transportlog=tran,
+                material=mat,
+                level=item[9] if item[9] else None,
+                quantity=quantity,
+                all_quantity=quantity,
+                unit=unit,
+                all_unit=unit * quantity if unit else unit,
+                remark=item[12],
             )
         except Exception as e:
             # 处理可能的异常情况
-            print("build_detial An error occurred:", item,e)
-
-
-        
+            print("build_detial An error occurred:", item, e)
+            self.error_list.append((item, e))
+            sys.exit()

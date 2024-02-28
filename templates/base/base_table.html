@@ -24,17 +24,15 @@
       .formStyle {
         background-color: burlywood;
       }
+
+      caption {
+        position: static;
+        caption-side: top;
+    }
     </style>
     {% block styles %}<style></style>{% endblock %}
     <style>
-      caption {
-        position: absolute;
-        left: -9999px;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-        clip: rect(1px, 1px, 1px, 1px); /* 將元素裁剪為1x1像素並隱藏 */
-      }
+
     </style>
   </head>
   <body>
@@ -43,8 +41,9 @@
         {% block form %}<!-- 放置對應的表單-->{% endblock %}
       </div>
       <br />
+
       <div class="tableStyle">
-        <table class="table table-primary table-striped rounded">
+        <table id="base_table" class="table table-primary table-striped rounded">
           {% block table %}
             <caption></caption>
             <thead>

@@ -24,11 +24,14 @@ class AccountLogin(LoginView):
         password = self.request.POST["password"]
 
         account = authenticate(request, username=username, password=password)
+        
         if account is not None:
             login(request, account)  # 登錄用戶
             return redirect("home")
-        else:
-            return self.form_invalid(self.get_form())
+        elif Muser.objects.filter(username=username).exists():
+            return render(request, "login.html", {"success": False, "msg": "密碼錯誤"}) 
+        else :
+            return render(request, "login.html", {"success": False, "msg": "帳號不存在"}) 
 
 
 # @login_required(login_url="/login/")  # 改用攔截器處裡
@@ -256,3 +259,45 @@ def group_edit(request):
 
         response_data = {"success": True, "msg": "成功"}
         return JsonResponse(response_data)
+
+from openpyxl import Workbook
+from bs4 import BeautifulSoup
+
+def export_html_table_to_excel(request):
+    html_content = request.GET.get('html_content')
+    output_file = request.GET.get('output_file')
+    # 解析HTML内容
+    soup = BeautifulSoup(html_content, 'html.parser')
+    table = soup.find('table')
+
+    # 创建一个新的Excel工作簿
+    wb = Workbook()
+    ws = wb.active
+
+    # 遍历HTML表格中的行和单元格，并将数据写入Excel工作表
+    for i, row in enumerate(table.find_all('tr')):
+        for j, cell in enumerate(row.find_all(['th', 'td'])):
+            ws.cell(row=i + 1, column=j + 1, value=cell.get_text())
+
+    # 保存Excel文件
+    wb.save(output_file)
+
+import csv
+from django.http import HttpResponse
+
+def export_data_to_excel(data, output_file, column_names):
+    # 创建一个HttpResponse对象，指定内容类型为Excel
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{output_file}"'
+
+    # 使用csv库将数据写入HttpResponse对象
+    writer = csv.writer(response)
+
+    # 写入列标题
+    writer.writerow(column_names)
+
+    # 写入数据
+    for row in data:
+        writer.writerow(row)
+
+    return response
