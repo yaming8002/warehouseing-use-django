@@ -165,9 +165,8 @@ def transport_log_from(request, log_type):
         whse = SiteInfo.objects.get(id=request.POST.get("whse"))
         tran = TransportLog.objects.create(
             code=request.POST.get("code"),
-            construction=constn,
-            whse=whse,
-            level=request.POST.get("level"),
+            to_site=constn,
+            form_site=whse,
             car=CarInfo.objects.get(car_number=request.POST.get("car_number")),
             transaction_type="IN" if "in" in log_type else "OUT",
             member=request.POST.get("member"),
@@ -184,6 +183,7 @@ def transport_log_from(request, log_type):
             TransportDetailLog.objects.create(
                 transportlog=tran,
                 material=mat,
+                level = request.POST.get("level"),
                 quantity=quantity,
                 all_quantity=quantity,
                 unit=unit,
