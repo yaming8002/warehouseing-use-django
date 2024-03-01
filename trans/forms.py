@@ -8,7 +8,7 @@ from .models import CarInfo, TransportDetailLog, TransportLog
 class CarinfoFrom(forms.ModelForm):
     class Meta:
         model = CarInfo
-        fields = ["car_number", "driver", "firm", "patload", "value", "remark"]
+        fields = ["car_number", "firm", "is_not_count", "value", "remark"]
 
 
     car_number = forms.CharField(
@@ -16,12 +16,6 @@ class CarinfoFrom(forms.ModelForm):
         widget=forms.TextInput(attrs={"class": "form-control required"}),
     )
 
-    driver = forms.CharField(
-        label="駕駛",
-        required=False,
-        initial='',
-        widget=forms.TextInput(attrs={"class": "form-control required"}),
-    )
 
     firm = forms.CharField(
         label="公司",
@@ -30,11 +24,18 @@ class CarinfoFrom(forms.ModelForm):
         widget=forms.TextInput(attrs={"class": "form-control required"}),
     )
 
-    patload = forms.CharField(
-        label="噸數",
+
+    is_not_count = forms.BooleanField(
+        label="不報價",
+        initial=False,
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+    )
+
+    remark = forms.CharField(
+        label="噸數(備註)",
         required=False,
         initial='',
-        widget=forms.TextInput(attrs={"class": "form-control required"}),
+        widget=forms.Textarea(attrs={"class": "form-control required", "rows": 3})
     )
 
     value = forms.DecimalField(
@@ -42,13 +43,6 @@ class CarinfoFrom(forms.ModelForm):
         required=False,
         initial=Decimal(0),
         widget=forms.TextInput(attrs={"class": "form-control required"}),
-    )
-
-    remark = forms.CharField(
-        label="備註",
-        required=False,
-        initial='',
-        widget=forms.Textarea(attrs={"class": "form-control required", "rows": 3})
     )
 
 

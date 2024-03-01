@@ -8,7 +8,6 @@ class SiteInfo(models.Model):
     code = models.CharField(max_length=10, verbose_name="工地代號")
     owner = models.CharField(max_length=50, verbose_name="業主")
     name = models.CharField(max_length=50, default="", verbose_name="工程名稱" ,null=True)
-    address = models.TextField(verbose_name="地點",null=True)
     crate_date = models.DateField(default=timezone.now, verbose_name="發案日期")
     genre = models.IntegerField(default=2, choices=site_genre)
     """
@@ -28,8 +27,8 @@ class SiteInfo(models.Model):
     remark = models.TextField(null=True, verbose_name="備註")
 
     class Meta:
-        unique_together = ("code", "name", "address")
+        unique_together = ("code", "name")
         ordering = ["code"]  # 按照 id 升序排序
 
     def __str__(self):
-        return f"{self.name},{self.address}" if self.name else f"{self.address}"
+        return f"{self.owner},{self.name}" 

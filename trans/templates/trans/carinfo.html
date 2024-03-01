@@ -59,13 +59,13 @@
     <input type="text" id="car_number" name="car_number" value="{{request.GET.car_number}}"/>
     <label for="firm"> 公司</label>
     <input type="text" id="firm" name="firm" value ="{{request.GET.firm}}"/>
-    <label for="patload">噸數</label>
-    <input type="text" id="patload" name="patload" value="{{request.GET.patload}}"/>
+    <label for="isnotcount">非報價</label>
+    <input type="checkbox" id="isnotcount" name="isnotcount" {% if request.GET.isnotcount %} checked{% endif %}/>
 
 </p>
   <input type="submit" value="查詢" />
   <button type="button" onclick="addMaterial(event)">新增</button>
-  <button type="button" onclick="upload(event)">上傳EXCEL</button>
+  <button type="button" onclick="upload(event)" hidden >上傳EXCEL</button>
 </form>
 <div id="modalContainer"></div>
 {% endblock %} {% block table %}
@@ -73,11 +73,9 @@
 <thead>
   <tr>
     <th scope="col">車牌</th>
-    <th scope="col">駕駛人員</th>
     <th scope="col">公司</th>
-    <th scope="col">噸數</th>
+    <th scope="col">噸數(備註)</th>
     <th scope="col">基本台金額</th>
-    <th scope="col">備註</th>
     <th scope="col">編輯</th>
   </tr>
 </thead>
@@ -87,11 +85,9 @@
   <tr>
 
     <td><!--{{item.id}}-->{{ item.car_number }}</td>
-    <td>{% if item.driver %}{{ item.driver }} {%endif%}</td>
-    <td>{{ item.firm }}</td>
-    <td>{% if item.patload %}{{item.patload}}  {%endif%}</td>
-    <td>{% if item.value %}{{item.value}} {%endif%}</td>
+    <td>{% if item.firm %}{{ item.firm }} {%endif%}</td>
     <td>{% if item.remark %} {{item.remark}} {%endif%}</td>
+    <td>{% if item.value %}{{item.value}} {%endif%}</td>
     <td>
       <a href="#" onclick="editRow({{ item.id }})">編輯</a>
     </td>

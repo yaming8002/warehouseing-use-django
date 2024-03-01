@@ -25,9 +25,10 @@
             url: mainUrl,
             method: 'GET',
             statusCode: {
-              401: function() {
+              401: function(data) {
+                alert("以離線，請重新登入") ;
                   // 如果后端返回401未授权状态码，则重定向到登录页面
-                  window.location.href = '/logout/';
+                  window.location.href = '/login/';
               }
             },
             success: function (data) {

@@ -21,7 +21,8 @@ class ImportDataGeneric(View):
                 # 检查列名是否符合预期
                 actual_columns = [cell.value for cell in worksheet[1]]
                 print(actual_columns)
-                print(self.columns)
+                print(f"actual_columns:{actual_columns}")
+                print(f"self.columns:{self.columns}")
                 if actual_columns == self.columns:
                     self.insertDB(worksheet.iter_rows(min_row=2, values_only=True))
                     self.response_data["success"] = True

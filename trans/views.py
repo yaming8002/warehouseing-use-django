@@ -26,14 +26,14 @@ class CarListView(PageListView):
         result = CarInfo.objects
         car_number = self.request.GET.get("car_number")
         firm = self.request.GET.get("firm")
-        patload = self.request.GET.get("patload")
+        isnotcount = self.request.GET.get("isnotcount")
 
         if car_number:
             result = result.filter(car_number__istartswith=car_number)
-        if firm:
+        if isnotcount :
+            result = result.filter(firm="")
+        elif firm:
             result = result.filter(firm__startswith=firm)
-        if patload:
-            result = result.filter(patload=patload)
 
         return result.all()
 
@@ -52,30 +52,29 @@ class CarInfoControlView(SaveControlView):
 class ImportCarInfoView(ImportDataGeneric):
     title = "上傳EXCEL"
     action = "/carinfo/uploadexcel/"
-    columns = ["車牌號碼", "駕駛員", "吊卡車公司", "噸數", "基本台金", "備註"]
+    columns = ["車牌號碼",  "吊卡車公司", "噸數(備註)", "基本台金"]
 
     def insertDB(self, actual_columns):
         for item in actual_columns:
             if item[0] is None:
                 break
             code = excel_value_to_str(item[0])
+            firm = item[1]
             
             try:
-                if CarInfo.objects.filter(car_number=code).exists():
-                    print(f"{code} is exists")
+                if CarInfo.objects.filter(car_number=code, firm=firm).exists():
+                    print(f"{code},{firm} is exists")
                 else :
-                    CarInfo.objects.create(
+                    CarInfo.create(
                         car_number=code,
-                        driver=item[1],
-                        firm= item[2] if item[2] else '',
-                        patload=item[3],
-                        value=Decimal(item[4]) if item[4] else Decimal(0),
-                        remark=item[5],
+                        firm= firm,
+                        remark=item[2],
+                        value=item[3],
                     )   
             except Exception as e:
                 # 处理可能的异常情况
                 print(f"{item} insertDB An error occurred:{e}")
-                self.error_list.append((item, e))
+                self.error_list.append((item, '資料異常'))
 
 
 class TrandportView(PageListView):
