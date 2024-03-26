@@ -1,17 +1,42 @@
-<!-- modal_create.html -->
-{% extends 'base/base.html' %} {% block styles %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0"
+    />
+
+    <title>{% block title %}model_edit{% endblock %}</title>
   <style>
 .hide-this{
   display: none;
+}
+
+.modal-content {
+  width: auto ;
+  display:inline-block ;
 }
 
 .helptext{
   color:red ;
   display:inline-block ;
 }
-  </style>
-{% endblock %} {% block javascript %}
-  <script type="text/javascript">
+
+th, td {
+  border: 1px solid black; /* 設置單元格邊框 */
+  padding: 8px; /* 設置內邊距 */
+  text-align: center; /* 文字居中 */
+}
+
+th {
+  background-color: #f2f2f2; /* 設置表頭背景顏色 */
+}
+</style>
+{% block styles %}
+{% endblock %}
+
+  <script>
     $(document).ready(function () {
       // 綁定保存按鈕的點擊事件
       $('#createModal').on('click', '.btn-primary', function (event) {
@@ -44,8 +69,16 @@
       })
     })
   </script>
-{% endblock %} {% block content %}
-  <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+{% block javascript %}{% endblock %}
+</head>
+<body>
+
+  <div class="modal fade"
+       id="createModal"
+       tabindex="-1"
+       role="dialog"
+       aria-labelledby="createModalLabel"
+       aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -61,7 +94,6 @@
             {% endblock %}
           </div>
         </div>
-
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
           <button type="submit" class="btn btn-primary">儲存</button>
@@ -69,6 +101,4 @@
       </div>
     </div>
   </div>
-{% endblock %}
-{% block other %}
-{% endblock %}
+</body>

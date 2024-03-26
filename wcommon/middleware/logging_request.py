@@ -10,5 +10,10 @@ class LoggingMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         # 在这里记录响应信息
-        # print(f"Response {response.status_code}: {response.content}")
+        if hasattr(response, 'context'):
+            context_data = response.context
+            # 在这里处理 context_data，例如打印
+            print(f"Context data: {context_data}")
+        else:
+            print("No context data available.")
         return response

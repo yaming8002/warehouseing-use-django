@@ -1,16 +1,16 @@
+import logging
+
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
+from django.core import serializers
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
-
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
-from django.core import serializers
+
 from wcommon.forms.accountform import AddMuserForm
 from wcommon.models import Menu, Muser, UserGroup
 from wcommon.templatetags import menu_category
-import logging
-
 from wcommon.utils.pagelist import PageListView
 
 logger = logging.getLogger(__name__)
@@ -32,6 +32,12 @@ class AccountLogin(LoginView):
             return render(request, "login.html", {"success": False, "msg": "密碼錯誤"}) 
         else :
             return render(request, "login.html", {"success": False, "msg": "帳號不存在"}) 
+
+
+class AccountLogout(LogoutView):
+    def post(self, request, *args, **kwargs):
+        
+        return redirect("login") 
 
 
 # @login_required(login_url="/login/")  # 改用攔截器處裡
@@ -62,6 +68,7 @@ def home(request):
         allmenu[i]["list"].append(menu)
     
     context = {"allmenu": allmenu}
+    context['topic'] ="國廣林口倉庫系統"
     # 渲染模板并返回响应
     return render(request, "home.html", context)
 
@@ -69,6 +76,7 @@ def home(request):
 class MuserListView(PageListView):
     model = Muser
     template_name = "wcommmon/muser_list.html"
+    title_name = "帳號"
 
     def get_queryset(self):
         result = Muser.objects
@@ -91,7 +99,6 @@ class MuserListView(PageListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "車輛清單"
         context["group_list"] = serializers.serialize(
             "json", UserGroup.objects.filter(is_active=True)
         )
@@ -156,6 +163,7 @@ class MuserCreateView(CreateView):
 class GroupListView(PageListView):
     model = UserGroup
     template_name = "wcommon/group_list.html"
+    title_name = "群組六表"
     # context_object_name = "groups"
 
     def get_queryset(self):
@@ -260,8 +268,9 @@ def group_edit(request):
         response_data = {"success": True, "msg": "成功"}
         return JsonResponse(response_data)
 
-from openpyxl import Workbook
 from bs4 import BeautifulSoup
+from openpyxl import Workbook
+
 
 def export_html_table_to_excel(request):
     html_content = request.GET.get('html_content')
@@ -283,7 +292,9 @@ def export_html_table_to_excel(request):
     wb.save(output_file)
 
 import csv
+
 from django.http import HttpResponse
+
 
 def export_data_to_excel(data, output_file, column_names):
     # 创建一个HttpResponse对象，指定内容类型为Excel

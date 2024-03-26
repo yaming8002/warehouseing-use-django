@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 class MaterialsView(PageListView):
     model = Materials
     template_name = "stock/materials.html"
+    title_name = "物料清單"
 
     def get_queryset(self):
         result = Materials.objects
@@ -40,7 +41,6 @@ class MaterialsView(PageListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "物料清單"
         # 将查询条件传递到模板
         context["mat_code"] = self.request.GET.get("mat_code", "")
         context["name"] = self.request.GET.get("name", "")

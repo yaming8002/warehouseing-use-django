@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 class StockView(PageListView):
     model = MainStock 
     template_name = "stock/stock.html"
+    title_name = "庫存"
     
     def get_queryset(self):
         stock_obj = MainStock.objects
@@ -49,8 +50,6 @@ class StockView(PageListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "庫存"
-        # 将查询条件传递到模板
         context["categorys"] = MatCat.objects.all()
         context["siteInfos"] = SiteInfo.objects.filter(genre=0).all()
 
@@ -69,6 +68,7 @@ def getMatrtialData(request):
 class ConstnStockViewList(PageListView):
     model = ConStock
     template_name = "constn/constn_stock.html"
+    title_name = "工地庫存"
 
     def get_queryset(self):
         constn = SiteInfo.objects.filter(genre=1)
@@ -93,7 +93,6 @@ class ConstnStockViewList(PageListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "工地庫存"
         return context
     
 def split_mat_constn(request):

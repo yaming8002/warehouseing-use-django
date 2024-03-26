@@ -68,18 +68,18 @@
 {% block form %}
   {% load strmap %}
   <!-- Corrected form tag and added trailing slash to action attribute -->
-  <form id="search" action="/steel_pile/" method="GET">
+  <form id="search" action="/constn/pile/" method="GET">
     {% csrf_token %}
     <p>
-      <label for="owner">業主</label>
-      <input type="text" id="owner" name="owner" value="{{ request.GET.owner }}" />
       <label for="code">工地編號</label>
       <input type="text" id="code" name="code" value ="{{ request.GET.code }}" />
-      <label for="address">地址</label>
+      <label for="owner">業主</label>
+      <input type="text" id="owner" name="owner" value="{{ request.GET.owner }}" />
+      <label for="name">名稱</label>
       <input type="text"
-             id="address"
-             name="address"
-             value="{{ request.GET.address }}" />
+             id="name"
+             name="name"
+             value="{{ request.GET.name }}" />
     </p>
     <input type="submit" value="查詢" />
     <input type="button" id="exceloutput" value="匯出EXCEL" />
@@ -87,45 +87,15 @@
 {% endblock %}
 {% block table %}
   <caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}</caption>
+  <!--{{steel_pile_table }}-->
+
   {% for key, tran_map in steel_pile_table.items %}
-    {% if tran_map.max_length > 2 %}
+    
       <tbody>
         <tr>
           <th class="s2" dir="ltr">規格:</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第一層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第一層入料</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第二層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第二層入料</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第三層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第三層入料</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第四層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第四層入料</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第五層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第五層入料</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第六層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第六層入料</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第七層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第七層入料</th>
-          <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
-            出支
-            <br>
-            合計
-          </th>
-          <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
-            出M
-            <br>
-            合計
-          </th>
-          <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
-            入支
-            <br>
-            合計
-          </th>
-          <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
-            入M
-            <br>
-            合計
-          </th>
+          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">出料</th>
+          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">入料</th>
           <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">支差異</th>
           <th class="s2" dir="ltr" rowspan="2" style="border-left: 1px solid black">M差異</th>
         </tr>
@@ -160,15 +130,12 @@
               {% endif %}
             {% endfor %}
             {% if forloop.first %}
-              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.count_out|floatformat:"2" }}</th>
-              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.unit_out|floatformat:"2" }}</th>
-              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.count_in|floatformat:"2" }}</th>
-              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.unit_in|floatformat:"2" }}</th>
               <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_count |floatformat:"2" }}</th>
               <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_unit |floatformat:"2" }}</th>
             {% endif %}
           </tr>
         {% endfor %}
+ 
         <tr style="height: 20px" class="ttttt">
           {% for row in tran_map.level_summary %}
             <td style=" border-left: 1px solid black;" class="ttttt">總計:</td>
@@ -177,8 +144,13 @@
             <td></td>
             <td></td>
           {% endfor %}
+          {% if not tran_map.table %}
+            <th rowspan="{{ tran_map.summary.max_length }}">0</th>
+              <th rowspan="{{ tran_map.summary.max_length }}">0</th>
+          {% endif %}
         </tr>
+   
       </tbody>
-    {% endif %}
+   
   {% endfor %}
 {% endblock %}

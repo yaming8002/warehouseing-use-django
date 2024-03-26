@@ -50,6 +50,15 @@
     </style>
 
     <script>
+      
+      $(document).ready(function () {
+        // 检查页面是否存在 <h1>My Website</h1>
+        if ($('h1:contains("My Website")').length > 0) {
+            // 如果存在，则重新加载页面
+            location.reload();
+        }
+    });
+
       function validateForm() {
         var username = document.getElementById("username").value;
         var password = document.getElementById("password").value;

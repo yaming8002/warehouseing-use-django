@@ -34,20 +34,53 @@
         caption-side: top;
     }
 
+    .tableStyle {
+      overflow-x: auto;
+      white-space: nowrap;
+    }
   
+    .tableStyle table{
+      font-size: 13px;
+      table-layout: auto;
+      min-width: 100%;  /* 可以根据需要调整 */
+      min-height: 100% ;
+      width: auto;      /* 允许表格根据内容自动调整宽度 */
+    }  
+  
+    .tableStyle table th {
+      font-weight:bolder ;
+      white-space: nowrap; /* 防止内容换行 */
+      border: 1px solid black;
+      text-align: center;
+      vertical-align: middle;
+    }
+  
+    .tableStyle table td{
+      white-space: nowrap; /* 防止内容换行 */
+      border: 1px solid black;
+      text-align: center;
+      vertical-align: middle;
+    }  
+
+    .separator {
+      height: 20px !important;
+      background-color: #fff !important;
+      border-left: none !important;
+      border-right: none !important;
+      --bs-table-color-type: : none !important;
+      --bs-table-bg-type: none !important;
+  }
     </style>
     {% block styles %}<style></style>{% endblock %}
-    <style>
-
-    </style>
+    <style></style>
   </head>
   <body>
     <div class="m-3 p-3">
       <div class="formStyle p-3 rounded">
         {% block form %}<!-- 放置對應的表單-->{% endblock %}
       </div>
+      <div id="modalContainer"></div>
       <br />
-
       <div class="tableStyle">
         <table id="base_table" class="table table-primary table-striped rounded">
           {% block table %}
@@ -61,7 +94,7 @@
           <tfoot>
             {% if is_paginated %}
               <tr>
-                <td colspan="30" >
+                <td colspan="30">
                   <div class="pagination ">
                     <span class="step-links">
                       {% if page_obj.has_previous %}

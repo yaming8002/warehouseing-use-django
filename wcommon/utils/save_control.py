@@ -41,8 +41,6 @@ class SaveControlView(FormView):
         else:  # 如果是新增操作
             form = self.form_class(request.POST)
         
-
-        print(id)
         if form.is_valid():
             self.form_is_valid(form)
             form.save()

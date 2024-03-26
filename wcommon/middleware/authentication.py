@@ -13,6 +13,7 @@ class AuthenticationMiddleware:
         
         # 检查用户是否已登录，如果未登录则重定向到登录页面
         if not request.user.is_authenticated:
-            return JsonResponse({'error': '您未登录，请先登录。'}, status=401) # 根据您的登录视图的URL名称调整
+            return redirect('/login/')
+            # return JsonResponse({'error': '您未登录，请先登录。'}, status=401) # 根据您的登录视图的URL名称调整
 
         return self.get_response(request)

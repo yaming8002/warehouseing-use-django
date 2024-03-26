@@ -1,0 +1,233 @@
+{% extends 'base/base_table.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}
+  <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Adjusting the style of the caption in the table with id 'base_table'
+      $("#base_table caption").each(function () {
+        $(this).css({
+          "position": "static",
+          "left": "auto",
+          "width": "auto",
+          "height": "auto",
+          "overflow": "visible",
+          "clip": "auto",
+          "caption-side": "top"
+        });
+      });
+  
+
+      hideEditRowIfEarlier();
+
+    });
+
+    function hideEditRowIfEarlier() {
+      var yearMonthInput = $('#yearMonthInput').val(); // 從輸入欄位獲得年月值
+      var currentDate = new Date();
+      var currentYearMonth = currentDate.toISOString().slice(0, 7); // 獲取當前年月
+  
+      if (yearMonthInput < currentYearMonth) {
+        // 如果輸入的年月早於當前年月，尋找並隱藏結案連結
+        $('.editRow_select').hide(); // 隱藏包含結案連結的<td>元素
+      }
+    }
+
+    function editRow(id) {
+      // 結案選單
+      console.log({ 'id': id })
+      $.ajax({
+        url: '/rail_control/edit/',
+        method: 'GET',
+        data: { 'id': id },
+        success: function (data) {
+          $('#modalContainer').html(data)
+          $('#createModal').modal('show')
+        },
+        error: function (error) {
+          console.error('Error loading modal content: ', error)
+        }
+      })
+    }
+  </script>
+  
+{% endblock %}
+{% block styles %}
+  <style>
+
+  .tableStyle table{
+    table-layout: auto;
+    min-width: auto !important;  /* 可以根据需要调整 */
+    min-height: auto !important;
+    width: auto;      /* 允许表格根据内容自动调整宽度 */
+  }  
+
+ 
+  </style>
+{% endblock %}
+{% block form %}
+  <form id="search" action="/rail_control/" method="GET">
+    {% csrf_token %}
+    <p>
+      <label for="yearMonthInput">選擇年月:</label>
+      <input type="month" id="yearMonthInput" name="yearMonth" value='{{yearMonth}}'>
+    </p>
+    <input type="submit" value="查詢" />
+    <input type="button" id="exceloutput" value="匯出EXCEL" />
+  </form>
+  <div id="modalContainer"></div>
+
+{% endblock %}
+{% block table %}
+  <caption></caption>
+  <tr>
+    <th colspan='5'>工地 </th>
+    <th colspan='13'>出料</th>
+
+    <th colspan='4'>工地 </th>
+    <th colspan='13'>入料</th>
+    <th rowspan='2'>廢料</th>
+    <th rowspan='2'>編輯</th>
+  </tr>
+
+  <tr>
+    <th>項次</th>
+    <th>工地代號</th>
+    <th>業主</th>
+    <th>名稱</th>
+    <th>是否買斷</th>
+    <th>5M</th>
+    <th>6M</th>
+    <th>7M</th>
+    <th>8M</th>
+    <th>9M</th>
+    <th>10M</th>
+    <th>11M</th>
+    <th>12M</th>
+    <th>13M</th>
+    <th>14M</th>
+    <th>15M</th>
+    <th>16M</th>
+    <th>總支數</th>
+    <th>項次</th>
+    <th>工地代號</th>
+    <th>業主</th>
+    <th>名稱</th>
+    <th>5M</th>
+    <th>6M</th>
+    <th>7M</th>
+    <th>8M</th>
+    <th>9M</th>
+    <th>10M</th>
+    <th>11M</th>
+    <th>12M</th>
+    <th>13M</th>
+    <th>14M</th>
+    <th>15M</th>
+    <th>16M</th>
+    <th>總支數</th>
+  </tr>
+  
+  {% for item in list %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ item.siteinfo.code }}</td>
+    <td>{{ item.siteinfo.owner }}</td>
+    <td>{{ item.siteinfo.name }}</td>
+    <td>{% if item.done_type == 1 %} 是 {% endif %}</td>
+    <td>{{ item.out_5 }}</td>
+    <td>{{ item.out_6 }}</td>
+    <td>{{ item.out_7 }}</td>
+    <td>{{ item.out_8 }}</td>
+    <td>{{ item.out_9 }}</td>
+    <td>{{ item.out_10 }}</td>
+    <td>{{ item.out_11 }}</td>
+    <td>{{ item.out_12 }}</td>
+    <td>{{ item.out_13 }}</td>
+    <td>{{ item.out_14 }}</td>
+    <td>{{ item.out_15 }}</td>
+    <td>{{ item.out_16 }}</td>
+    <td>{{ item.out_total }}</td>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ item.siteinfo.code }}</td>
+    <td>{{ item.siteinfo.owner }}</td>
+    <td>{{ item.siteinfo.name }}</td>
+    <td>{{ item.in_5 }}</td>
+    <td>{{ item.in_6 }}</td>
+    <td>{{ item.in_7 }}</td>
+    <td>{{ item.in_8 }}</td>
+    <td>{{ item.in_9 }}</td>
+    <td>{{ item.in_10 }}</td>
+    <td>{{ item.in_11 }}</td>
+    <td>{{ item.in_12 }}</td>
+    <td>{{ item.in_13 }}</td>
+    <td>{{ item.in_14 }}</td>
+    <td>{{ item.in_15 }}</td>
+    <td>{{ item.in_16 }}</td>
+    <td>{{ item.in_total }}</td>
+    <td>{{ item.rail_ng }}</td>
+    <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a></td>
+  </tr>
+  {% endfor %}
+  <tr class="separator" ><td colspan="33" class="separator" ></td></tr>
+  <tr>
+    <th colspan="5" rowspan=2>倉庫數量</th>
+    <th>5M</th>
+    <th>6M</th>
+    <th>7M</th>
+    <th>8M</th>
+    <th>9M</th>
+    <th>10M</th>
+    <th>11M</th>
+    <th>12M</th>
+    <th>13M</th>
+    <th>14M</th>
+    <th>15M</th>
+    <th>16M</th>
+    <th>總支數</th>
+    <th colspan="4" rowspan=2>國廣總數量</th>
+    <th>5M</th>
+    <th>6M</th>
+    <th>7M</th>
+    <th>8M</th>
+    <th>9M</th>
+    <th>10M</th>
+    <th>11M</th>
+    <th>12M</th>
+    <th>13M</th>
+    <th>14M</th>
+    <th>15M</th>
+    <th>16M</th>
+    <th>總支數</th>
+  </tr>
+  <tr>
+    <td>{{ lk_report.in_5 }}</td>
+    <td>{{ lk_report.in_6 }}</td>
+    <td>{{ lk_report.in_7 }}</td>
+    <td>{{ lk_report.in_8 }}</td>
+    <td>{{ lk_report.in_9 }}</td>
+    <td>{{ lk_report.in_10 }}</td>
+    <td>{{ lk_report.in_11 }}</td>
+    <td>{{ lk_report.in_12 }}</td>
+    <td>{{ lk_report.in_13 }}</td>
+    <td>{{ lk_report.in_14 }}</td>
+    <td>{{ lk_report.in_15 }}</td>
+    <td>{{ lk_report.in_16 }}</td>
+    <td>{{ lk_report.in_total }}</td>
+    
+    <td>{{ total_report.in_5 }}</td>
+    <td>{{ total_report.in_6 }}</td>
+    <td>{{ total_report.in_7 }}</td>
+    <td>{{ total_report.in_8 }}</td>
+    <td>{{ total_report.in_9 }}</td>
+    <td>{{ total_report.in_10 }}</td>
+    <td>{{ total_report.in_11 }}</td>
+    <td>{{ total_report.in_12 }}</td>
+    <td>{{ total_report.in_13 }}</td>
+    <td>{{ total_report.in_14 }}</td>
+    <td>{{ total_report.in_15 }}</td>
+    <td>{{ total_report.in_16 }}</td>
+    <td>{{ total_report.in_total }}</td>
+  </tr>
+{% endblock %}

@@ -1,6 +1,7 @@
 {% extends 'base/base_table.html' %}{{ '' }}
 {% block title %}{{ title }} {{ '' }}{% endblock %}
-{% block javascript %}<script>
+{% block javascript %}
+  <script>
   function constn_edit(event) {
     // 向後端發送 AJAX 請求
     url = '/constn/edit/'
@@ -36,7 +37,8 @@
     })
   }
 
-</script>{% endblock %}
+  </script>
+{% endblock %}
 {% block form %}
   {% load strmap %}
   <!-- Corrected form tag and added trailing slash to action attribute -->
@@ -65,7 +67,7 @@
                   {% if request.GET.state == state.0|stringformat:"s" %}selected{% endif %}>{{ state.1 }}</option>
         {% endfor %}
       </select>
-      {% get_site_genre as site_genre %}  
+      {% get_site_genre as site_genre %}
       <label for="genre">類別</label>
       <select id="genre" name="genre">
         <option value>全部</option>
@@ -89,8 +91,9 @@
       <th scope="col">工地編號</th>
       <th scope="col">業主</th>
       <th scope="col">工程名稱</th>
-      <th scope="col">地點</th>
       <th scope="col">發案日期</th>
+      <th scope="col">鋼樁結算</th>
+      <th scope="col">鋼軌結算</th>
       <th scope="col">狀態</th>
       <th scope="col">結案日期</th>
       <th scope="col">編輯</th>
@@ -107,31 +110,53 @@
           <!--{{item.id}}-->{{ item.owner }}
         </td>
         <td>
-          <!--{{item.id}}-->{% if item.name %}{{ item.name }} {% endif %}
-        </td>
-        <td>
-          <!--{{item.id}}-->{% if item.address %}{{ item.address }} {% endif %}
+          <!--{{item.id}}-->
+          {{ item.name }}
         </td>
         <td>
           {% if item.crate_date %}
-            {{ item.crate_date | date:'Y-m-d' }} {% else %} --- {% endif %}
-          </td>
-          <td>
-            {% get_constn_state as constn_state %}
-            {% for state in constn_state %}
-              <!-- 迭代 constn_state 变量 -->
-              {% if state.0|stringformat:"s" == item.state|stringformat:"s" %}{{ state.1 }}{% endif %}
-            {% endfor %}
-          </td>
-          <td>
-            {% if item.done_date %}
-              {{ item.done_date | date:'Y-m-d' }} {% else %} --- {% endif %}
-            </td>
-          
-          <td>
-            <a href="#" onclick="constn_edit('{{ item.pk }}')">編輯</a>  
-          </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    {% endblock %}
+            {{ item.crate_date | date:'Y-m-d' }}
+          {% else %}
+            ---
+          {% endif %}
+        </td>
+        <td>
+
+        {% if "1" != item.genre|stringformat:"s" %}
+          ---
+        {% elif item.poling_done %}
+          是
+        {% else %}
+          否
+        {% endif %}
+        </td>
+        <td>
+          {% if "1" != item.genre|stringformat:"s" %}
+            ---
+          {% elif item.rail_done %}
+            是
+          {% else %}
+            否
+          {% endif %}
+        </td>
+        <td>
+          {% get_constn_state as constn_state %}
+          {% for state in constn_state %}
+            <!-- 迭代 constn_state 变量 -->
+            {% if state.0|stringformat:"s" == item.state|stringformat:"s" %}{{ state.1 }}{% endif %}
+          {% endfor %}
+        </td>
+        <td>
+          {% if item.done_date %}
+            {{ item.done_date | date:'Y-m-d' }}
+          {% else %}
+            ---
+          {% endif %}
+        </td>
+        <td>
+          <a href="#" onclick="constn_edit('{{ item.pk }}')">編輯</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock %}

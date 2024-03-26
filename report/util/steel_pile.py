@@ -1,28 +1,43 @@
 import decimal
 import math
 from decimal import Decimal
-from typing import Dict, List
-
-from django.db.models import F, Sum
+from typing import Any, Dict, List
+from django.db import models
+from django.db.models.functions import Coalesce
+from django.db.models import Case, F, Sum, Value, When
 from django.shortcuts import render
 
 from stock.models.material import Materials
 from stock.models.site import SiteInfo
-from trans.models import TransportDetailLog, TransportLog
+from trans.models import TransLog, TransLogDetail
+
+support_list = {"351-0": "中\nH350", "351-1": "中\nH350構台樑", "401-0": "中\nH400","401-1": "中\nH400構台樑"}
+# 初始化查询所用的字段字典
+values_dict = {
+    "code": F("translog__code"),
+    "build_date": F("translog__build_date"),
+    "transaction_type": F("translog__transaction_type"),
+    "name": F("material__name"),
+    "level_annotation": F("level"),
+}
+
 
 
 def build_steel_pile_table(constn) -> Dict[str, Dict[str, any]]:
-    translog = TransportLog.objects.filter(to_site__in=constn)
+    translog = TransLog.objects.filter(constn_site=constn)
     mats = Materials.objects.filter(specification__lt=23)
-    mat_codes = list(mats.values_list("mat_code", "name").distinct())
-    transdefaullog = TransportDetailLog.objects.filter(
-        transportlog__in=translog, material__in=mats
+    transdefaullog = TransLogDetail.objects.filter(
+        translog__in=translog, material__in=mats
     )
-    
+
     steel_map = {}
-    for mat_code, name in mat_codes:
+    for key, name in support_list.items():
+        # name = f"m_{mat_code}"
+        mat_code = key.split('-')[0]
+        construct_case =  key.split('-')[1] =='1'
+        print(construct_case)
         steel_map[name] = {}
-        tr_list = [[] for _ in range(len(mat_codes) + 1)]
+        tr_list: List[List[Any]] = [[] for _ in range(2)]
         max_length = 0
         summary = {
             "count_in": Decimal(0),
@@ -31,40 +46,45 @@ def build_steel_pile_table(constn) -> Dict[str, Dict[str, any]]:
             "unit_out": Decimal(0),
         }
 
-        for seat in range(7):
-            total_quantity_and_unit = (
-                transdefaullog.filter(material__mat_code=mat_code, level=(seat + 1))
-                .values(
-                    code=F("transportlog__code"),  # 将物流编号包含在结果中
-                    build_date=F("transportlog__build_date"),  # 将物流建立日期包含在结果中
-                    transaction_type=F(
-                        "transportlog__transaction_type"
-                    ),  # 将物流交易类型包含在结果中
-                    name=F("material__name"),  # 将物流交易类型包含在结果中
-                    level_annotation=F("level"),
-                )
-                .annotate(
-                    total_quantity=Sum("quantity"),
-                    total_unit=Sum("all_unit"),
-                )
+
+        # 根据条件动态构建查询
+        if construct_case:
+            # 选择remark为"中構台"的项目
+            queryset = transdefaullog.filter(
+                material__mat_code=mat_code,
+                remark__icontains="構台樑"
             )
-            site_in = (seat * 2) + 1
-            site_out = seat * 2
-            for item in total_quantity_and_unit:
-                # print(item)
-                if item["transaction_type"] == "IN":
-                    tr_list[site_in].append(item)
-                    summary["count_in"] += Decimal(item["total_quantity"])
-                    summary["unit_in"] += Decimal(item["total_unit"])
-                else:
-                    tr_list[site_out].append(item)
-                    summary["count_out"] += Decimal(item["total_quantity"])
-                    summary["unit_out"] += Decimal(item["total_unit"])
-            max_length = max(max_length, len(tr_list[site_in]), len(tr_list[site_out]))
+        else:
+            # 选择remark不为"中構台"的项目
+            queryset = transdefaullog.filter(
+                material__mat_code=mat_code
+            ).exclude(
+                remark__icontains="構台樑"
+            )
+
+        total_quantity_and_unit = (
+            queryset.values(**values_dict)
+            .annotate(
+                total_quantity=Sum("quantity"),
+                total_unit=Sum("all_unit"),
+            )
+        )
+
+        for item in total_quantity_and_unit:
+            # print(item)
+            if item["transaction_type"] == "IN":
+                tr_list[1].append(item)
+                summary["count_in"] += Decimal(item["total_quantity"])
+                summary["unit_in"] += Decimal(item["total_unit"])
+            else:
+                tr_list[0].append(item)
+                summary["count_out"] += Decimal(item["total_quantity"])
+                summary["unit_out"] += Decimal(item["total_unit"])
+        max_length = max(max_length, len(tr_list[0]), len(tr_list[1]))
 
         summary["diff_count"] = summary["count_in"] - summary["count_out"]
         summary["diff_unit"] = summary["unit_in"] - summary["unit_out"]
-        summary["max_length"] = max_length+1
+        summary["max_length"] = max_length + 1
         steel_map[name]["summary"] = summary
         steel_map[name]["max_length"] = max_length + 2
         steel_map[name]["table"] = transpose_list_of_lists(tr_list)
@@ -91,14 +111,15 @@ def transpose_list_of_lists(input_list):
 
     return transposed_list
 
-def level_summary_of_lists(input_list) :
+
+def level_summary_of_lists(input_list):
     # 确定最大长度
     level_list: List[Dict[str, Decimal]] = []
     for row in input_list:
-        summary = {'count':Decimal(0),'unit':Decimal(0)}
+        summary = {"count": Decimal(0), "unit": Decimal(0)}
         for item in row:
-            summary['count'] += item['total_quantity']
-            summary['unit'] += item['total_unit']
+            summary["count"] += item["total_quantity"]
+            summary["unit"] += item["total_unit"]
         level_list.append(summary)
 
     # print(level_list)

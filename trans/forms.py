@@ -1,14 +1,11 @@
 from decimal import Decimal
 from django import forms
-
-from django import forms
-from .models import CarInfo, TransportDetailLog, TransportLog
-
+from .models import CarInfo
 
 class CarinfoFrom(forms.ModelForm):
     class Meta:
         model = CarInfo
-        fields = ["car_number", "firm", "is_not_count", "value", "remark"]
+        fields = ["car_number", "firm", "is_count", "value", "remark"]
 
 
     car_number = forms.CharField(
@@ -19,15 +16,14 @@ class CarinfoFrom(forms.ModelForm):
 
     firm = forms.CharField(
         label="公司",
-        required=False,
         initial='',
         widget=forms.TextInput(attrs={"class": "form-control required"}),
     )
 
 
-    is_not_count = forms.BooleanField(
-        label="不報價",
-        initial=False,
+    is_count = forms.BooleanField(
+        label="報價",
+        initial=True,
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
     )
 

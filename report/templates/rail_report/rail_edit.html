@@ -1,0 +1,91 @@
+{% extends 'base/model_edit.html' %}
+{% block form %}
+  <!-- 修改了 form 的 id 以便直接选中 -->
+  <form style="with:100%" method="post" action="/rail_control/edit/">
+    {% csrf_token %}
+    <input type='hidden' name="site_id" value="{{report.siteinfo.id}}">
+    <div>工地 : {{ report.siteinfo.name }} </div>
+    <div>業主 : {{ report.siteinfo.owner }}</div>
+    <div>
+      <table>
+        <tr>
+          <th>項目</th>
+          <th>5M</th>
+          <th>6M</th>
+          <th>7M</th>
+          <th>8M</th>
+          <th>9M</th>
+          <th>10M</th>
+          <th>11M</th>
+          <th>12M</th>
+          <th>13M</th>
+          <th>14M</th>
+          <th>15M</th>
+          <th>16M</th>
+          <th>總支數</th>
+        </tr>
+        <tr>
+          <td>出料</td>
+          <td>{{ report.out_5 }}</td>
+          <td>{{ report.out_6 }}</td>
+          <td>{{ report.out_7 }}</td>
+          <td>{{ report.out_8 }}</td>
+          <td>{{ report.out_9 }}</td>
+          <td>{{ report.out_10 }}</td>
+          <td>{{ report.out_11 }}</td>
+          <td>{{ report.out_12 }}</td>
+          <td>{{ report.out_13 }}</td>
+          <td>{{ report.out_14 }}</td>
+          <td>{{ report.out_15 }}</td>
+          <td>{{ report.out_16 }}</td>
+          <td>{{ report.out_total }}</td>
+        </tr>
+        <tr>
+          <td>入料</td>
+          <td>{{ report.in_5 }}</td>
+          <td>{{ report.in_6 }}</td>
+          <td>{{ report.in_7 }}</td>
+          <td>{{ report.in_8 }}</td>
+          <td>{{ report.in_9 }}</td>
+          <td>{{ report.in_10 }}</td>
+          <td>{{ report.in_11 }}</td>
+          <td>{{ report.in_12 }}</td>
+          <td>{{ report.in_13 }}</td>
+          <td>{{ report.in_14 }}</td>
+          <td>{{ report.in_15 }}</td>
+          <td>{{ report.in_16 }}</td>
+          <td>{{ report.in_total }}</td>
+        </tr>
+        <tr>
+          <td>總計</td>
+          <td>{{ sum.sum_5 }}</td>
+          <td>{{ sum.sum_6 }}</td>
+          <td>{{ sum.sum_7 }}</td>
+          <td>{{ sum.sum_8 }}</td>
+          <td>{{ sum.sum_9 }}</td>
+          <td>{{ sum.sum_10 }}</td>
+          <td>{{ sum.sum_11 }}</td>
+          <td>{{ sum.sum_12 }}</td>
+          <td>{{ sum.sum_13 }}</td>
+          <td>{{ sum.sum_14 }}</td>
+          <td>{{ sum.sum_15 }}</td>
+          <td>{{ sum.sum_16 }}</td>
+          <td>{{ sum.sum_total }}</td>
+        </tr>
+      </table>
+    </div>
+    <div>
+      <label for='selled'>是否賣斷</label>
+      <input id="selled" name="selled" type='checkbox' {% if report.done_type == 1 %} checked {% endif %}>
+    </div>
+    <div>
+      <label for='isdone'>是否結案</label>
+      <input id="isdone" name="isdone" type='checkbox'>
+    </div>
+    <div style="with:100%">
+      <label for="remark">說明</label>
+      <br>
+      <textarea style="with:100%" id="remark" name="remark" row="5" >{{report.remark}}</textarea>
+    </div>
+  </form>
+{% endblock %}

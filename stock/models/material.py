@@ -1,5 +1,9 @@
+from decimal import Decimal
 from django.db import models
+from django.db.models import Q
 
+
+ng_spec_name =['鋼軌','中H300','中H350','中H400']
 
 # 物料分類
 class MatCat(models.Model):
@@ -36,6 +40,30 @@ class Materials(models.Model):
     unit_of_division = models.CharField(
         max_length=5, blank=True, verbose_name="拆分單位"
     )
+
+    @classmethod
+    def get_item_by_code(cls,code:str,remark:str,unit):
+        
+        quest =(   Q(mat_code=code)
+                        | Q(mat_code2=code)
+                        | Q(mat_code3=code)
+        )
+  
+        # print(f"code{code},remark:{remark},unit:{unit}")
+        if code=='999' :
+            if remark is None or "出售" in remark or remark not in ng_spec_name :
+                remark = "無"
+            spec = MatSpec.objects.get(name=remark)
+            quest &= Q(specification=spec)  
+        elif unit is None and cls.objects.filter(quest).count() >1  :
+            spec = MatSpec.objects.get(id=23)
+            quest &= Q(specification=spec)
+        elif unit :
+            spec = MatSpec.objects.get(id=round(unit))
+            quest &= Q(specification=spec)
+
+        # print(cls.objects.filter(quest).query)
+        return cls.objects.get(quest)
 
     class Meta:
         unique_together = ["mat_code", "category", "specification"]

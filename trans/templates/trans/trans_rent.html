@@ -117,7 +117,7 @@
       <th rowspan="2">備註</th>
       <th rowspan="2">施工層別</th>
       <th colspan="2">吊卡車公司</th>
-      <th colspan="2">經手人</th>
+      <th colspan="1">經手人</th>
       <th rowspan="2">倉庫</th>
     </tr>
     <tr>
@@ -133,7 +133,7 @@
       <th>出(入)米數</th>
       <th>公司</th>
       <th>車號</th>
-      <th>編號</th>
+      <!--<th>編號</th>-->
       <th>姓名</th>
     </tr>
   </thead>
@@ -141,28 +141,30 @@
     <!-- Corrected the template variables with double curly braces -->
     {% for item in pagelist %}
       <tr>
-        <td>{{ item.transportlog.build_date|date:"Y/m/d" }}</td>
-        <td>{{ item.transportlog.to_site.code }}</td>
+        <td>{{ item }}{{ item.transportlog.build_date|date:"Y/m/d" }}</td>
+        <td>{{ item.transportlog.constn_site.code }}</td>
         <td>{{ item.transportlog.turn_site.name }}</td>
-        <td>{{ item.transportlog.to_site.owner }}</td>
-        <td>{{ item.transportlog.to_site.name }}</td>
+        <td>{{ item.transportlog.constn_site.owner }}</td>
+        <td>{{ item.transportlog.constn_site.name }}</td>
         <td>{{ item.transportlog.code }}</td>
         <td>{{ item.material.name }}</td>
-        <td>{{ item.all_unit }}</td>
+        <td> {% if item.remark %} {{ item.all_unit }} {% endif %}</td>
         <td>{{ item.material.unit_of_division }}</td>
         <td {% if item.transportlog.transaction_type == "OUT" %}style='color:red;'{% endif %}>
           {% if item.transportlog.transaction_type == "OUT" %}-{% endif %}
           {{ item.quantity }}
         </td>
         <td {% if item.transportlog.transaction_type == "OUT" %}style='color:red;'{% endif %}>
-          {% if item.transportlog.transaction_type == "OUT" %}-{% endif %}
-          {{ item.all_unit }}
+          {% if item.all_unit %}
+            {% if item.transportlog.transaction_type == "OUT" %}-{% endif %}
+            {{ item.all_unit }}
+          {% endif %}
         </td>
-        <td>---</td>
-        <td>{{ item.level }}</td>
-        <td>{{ item.transportlog.car.firm }}</td>
-        <td>{{ item.transportlog.car.car_number }}</td>
-        <td>{{ item.transportlog.member }}</td>
+        <td> {% if item.remark %}{{ item.remark }}{% endif %}</td>
+        <td>{% if item.level %}{{ item.level }}{% endif %}</td>
+        <td>{{ item.transportlog.carinfo.firm }}</td>
+        <td>{{ item.transportlog.carinfo.car_number }}</td>
+         <!--<td>{{ item.transportlog.member }}</td>-->
         <td>{{ item.transportlog.member }}</td>
         <td>{{ item.transportlog.form_site.name }}</td>
       </tr>

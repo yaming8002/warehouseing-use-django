@@ -1,0 +1,309 @@
+{% extends 'base/base_table.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}
+  <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+  <script type="text/javascript"
+          src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Adjusting the style of the caption in the table with id 'base_table'
+      $("#base_table caption").each(function () {
+        $(this).css({
+          "position": "static",
+          "left": "auto",
+          "width": "auto",
+          "height": "auto",
+          "overflow": "visible",
+          "clip": "auto",
+          "caption-side": "top"
+        });
+      });
+  
+
+    });
+
+    function editRow(id) {
+      // 結案選單
+      console.log({ 'id': id })
+      $.ajax({
+        url: '/rail_control/editdoen/',
+        method: 'GET',
+        data: { 'id': id },
+        success: function (data) {
+          $('#modalContainer').html(data)
+          $('#createModal').modal('show')
+        },
+        error: function (error) {
+          console.error('Error loading modal content: ', error)
+        }
+      })
+    }
+  </script>
+{% endblock %}
+{% block styles %}
+  <style>
+  .tableStyle table{
+    table-layout: auto;
+    min-width: auto !important;  /* 可以根据需要调整 */
+    min-height: auto !important;
+    width: auto;      /* 允许表格根据内容自动调整宽度 */
+  }  
+
+ 
+  </style>
+{% endblock %}
+{% block form %}
+  <form id="search" action="/steel_done/" method="GET">
+    {% csrf_token %}
+    <p>
+      <label for="yearMonthInput">選擇年月:</label>
+      <input type="month"
+             id="yearMonthInput"
+             name="yearMonth"
+             value='{{ yearMonth }}'>
+    </p>
+    <input type="submit" value="查詢" />
+    <input type="button" id="exceloutput" value="匯出EXCEL" />
+  </form>
+  <div id="modalContainer"></div>
+{% endblock %}
+{% block table %}
+  <caption></caption>
+  <tr>
+    <th>工地代號</th>
+    <th>業主</th>
+    <th>名稱</th>
+    <th>
+      H300
+      <br>
+      支撐(m)
+    </th>
+    <th>
+      H300
+      <br>
+      中柱(m)
+    </th>
+    <th>
+      H350
+      <br>
+      支撐(m)
+    </th>
+    <th>
+      H350
+      <br>
+      中柱(m)
+    </th>
+    <th>
+      H390
+      <br>
+      支撐(m)
+    </th>
+    <th>
+      H400
+      <br>
+      支撐(m)
+    </th>
+    <th>
+      H400
+      <br>
+      中柱(m)
+    </th>
+    <th>
+      H408
+      <br>
+      支撐(m)
+    </th>
+    <th>
+      H414
+      <br>
+      支撐(m)
+    </th>
+    <th>
+      H414
+      <br>
+      中柱(m)
+    </th>
+    <th>
+      1M *2M
+      <br>
+      覆工板(片)
+    </th>
+    <th>
+      1M *3M
+      <br>
+      覆工板(片)
+    </th>
+    <th>
+      水泥
+      <br>
+      覆工板(片)
+    </th>
+    <th>千斤頂(個)</th>
+    <th>土壓計(個)</th>
+    <th colspan='8' rowspan='2'>差       異      數      說       明</th>
+  </tr>
+  <tr>
+    <td colspan='3'>上期之總計</td>
+    <td>{{ befote_total_report.m_300 }}</td>
+    <td>{{ befote_total_report.m_301 }}</td>
+    <td>{{ befote_total_report.m_350 }}</td>
+    <td>{{ befote_total_report.m_351 }}</td>
+    <td>{{ befote_total_report.m_390 }}</td>
+    <td>{{ befote_total_report.m_400 }}</td>
+    <td>{{ befote_total_report.m_401 }}</td>
+    <td>{{ befote_total_report.m_408 }}</td>
+    <td>{{ befote_total_report.m_414 }}</td>
+    <td>{{ befote_total_report.m_4141 }}</td>
+    <td>{{ befote_total_report.m_11 }}</td>
+    <td>{{ befote_total_report.m_84 }}</td>
+    <td>{{ befote_total_report.m_88 }}</td>
+    <td>{{ befote_total_report.m_13 }}</td>
+    <td>{{ befote_total_report.m_14 }}</td>
+  </tr>
+  {% load strmap %}
+  {% load custom_filters %}
+  {% define 0 as encountered_done_type %}
+  {% for item in list %}
+    {% if item.done_type|check_done_type:encountered_done_type %}
+    {% define item.done_type as encountered_done_type %}
+      <tr><th colspan='24' class="table-warning"> {% get_done_type_value encountered_done_type %}</th></tr>
+    {% endif  %}
+    <tr>
+      <td>{{ item.siteinfo.code }}</td>
+      <td>{{ item.siteinfo.owner }}</td>
+      <td>{{ item.siteinfo.name }}</td>
+      <td>{{ item.m_300 }}</td>
+      <td>{{ item.m_301 }}</td>
+      <td>{{ item.m_350 }}</td>
+      <td>{{ item.m_351 }}</td>
+      <td>{{ item.m_390 }}</td>
+      <td>{{ item.m_400 }}</td>
+      <td>{{ item.m_401 }}</td>
+      <td>{{ item.m_408 }}</td>
+      <td>{{ item.m_414 }}</td>
+      <td>{{ item.m_4141 }}</td>
+      <td>{{ item.m_11 }}</td>
+      <td>{{ item.m_84 }}</td>
+      <td>{{ item.m_88 }}</td>
+      <td>{{ item.m_13 }}</td>
+      <td>{{ item.m_14 }}</td>
+      <td colspan='6' >{{ item.remark }}</td>
+    </tr>
+  {% endfor %}
+
+  <tr>
+    <td colspan='3'>總計</td>
+    <td>{{ total_report.m_300 }}</td>
+    <td>{{ total_report.m_301 }}</td>
+    <td>{{ total_report.m_350 }}</td>
+    <td>{{ total_report.m_351 }}</td>
+    <td>{{ total_report.m_390 }}</td>
+    <td>{{ total_report.m_400 }}</td>
+    <td>{{ total_report.m_401 }}</td>
+    <td>{{ total_report.m_408 }}</td>
+    <td>{{ total_report.m_414 }}</td>
+    <td>{{ total_report.m_4141 }}</td>
+    <td>{{ total_report.m_11 }}</td>
+    <td>{{ total_report.m_84 }}</td>
+    <td>{{ total_report.m_88 }}</td>
+    <td>{{ total_report.m_13 }}</td>
+    <td>{{ total_report.m_14 }}</td>
+    <td colspan='6' ></td>
+  </tr>
+  <tr>
+    <td colspan=3>本期與上期之差異(({{ yearMonth }})-({{ before_yearMonth }})=差異數)</td>
+    {% for d in diff %}<td>{{ d }}</td>{% endfor %}
+    
+    <td colspan='6' ></td>
+  </tr>
+  <tr>
+    <td colspan="33" class="separator"></td>
+  </tr>
+  <tr>
+    <th colspan="33" class="table-warning">倉庫{{ yearMonth }}中間樁樁體庫存規格</th>
+  </tr>
+  <tr>
+    <th colspan="6">米數規格</th>
+    <th>0~1m</th>
+    <th>1.01~2m</th>
+    <th>2.01-3m</th>
+    <th>3.01-4m</th>
+    <th>4.01-5m</th>
+    <th>5.01-6m</th>
+    <th>6.01-7M</th>
+    <th>7.01-8m</th>
+    <th>8.01-9m</th>
+    <th>9.01-10m</th>
+    <th>10.01-11m</th>
+    <th>11.01-12m</th>
+    <th>12.01-13m</th>
+    <th>13.01-14m</th>
+    <th>14.01-15m</th>
+    <th>15.01-16m</th>
+    <th>16.01-17m</th>
+    <th>總計</th>
+  </tr>
+  <tr>
+    <th colspan="6">H300(中)</th>
+    <th>{{h301.l_1}}</th>
+    <th>{{h301.l_2}}</th>
+    <th>{{h301.l_3}}</th>
+    <th>{{h301.l_4}}</th>
+    <th>{{h301.l_5}}</th>
+    <th>{{h301.l_6}}</th>
+    <th>{{h301.l_7}}</th>
+    <th>{{h301.l_8}}</th>
+    <th>{{h301.l_9}}</th>
+    <th>{{h301.l_10}}</th>
+    <th>{{h301.l_11}}</th>
+    <th>{{h301.l_12}}</th>
+    <th>{{h301.l_13}}</th>
+    <th>{{h301.l_14}}</th>
+    <th>{{h301.l_15}}</th>
+    <th>{{h301.l_16}}</th>
+    <th>{{h301.l_17}}</th>
+    <th>{{h301.total}}</th>
+  </tr>
+  <tr>
+    <th colspan="6">H350(中)</th>
+    <th>{{h351.l_1}}</th>
+    <th>{{h351.l_2}}</th>
+    <th>{{h351.l_3}}</th>
+    <th>{{h351.l_4}}</th>
+    <th>{{h351.l_5}}</th>
+    <th>{{h351.l_6}}</th>
+    <th>{{h351.l_7}}</th>
+    <th>{{h351.l_8}}</th>
+    <th>{{h351.l_9}}</th>
+    <th>{{h351.l_10}}</th>
+    <th>{{h351.l_11}}</th>
+    <th>{{h351.l_12}}</th>
+    <th>{{h351.l_13}}</th>
+    <th>{{h351.l_14}}</th>
+    <th>{{h351.l_15}}</th>
+    <th>{{h351.l_16}}</th>
+    <th>{{h351.l_17}}</th>
+    <th>{{h351.total}}</th>
+  </tr>
+  <tr>
+    <th colspan="6">H400(中)</th>
+    <th>{{h401.l_1}}</th>
+    <th>{{h401.l_2}}</th>
+    <th>{{h401.l_3}}</th>
+    <th>{{h401.l_4}}</th>
+    <th>{{h401.l_5}}</th>
+    <th>{{h401.l_6}}</th>
+    <th>{{h401.l_7}}</th>
+    <th>{{h401.l_8}}</th>
+    <th>{{h401.l_9}}</th>
+    <th>{{h401.l_10}}</th>
+    <th>{{h401.l_11}}</th>
+    <th>{{h401.l_12}}</th>
+    <th>{{h401.l_13}}</th>
+    <th>{{h401.l_14}}</th>
+    <th>{{h401.l_15}}</th>
+    <th>{{h401.l_16}}</th>
+    <th>{{h401.l_17}}</th>
+    <th>{{h401.total}}</th>
+  </tr>
+{% endblock %}

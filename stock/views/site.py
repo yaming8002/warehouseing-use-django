@@ -25,12 +25,12 @@ logger = logging.getLogger(__name__)
 class SiteViewList(PageListView):
     model = SiteInfo
     template_name = "constn/constn.html"
+    title_name = "工地列表"
 
     def get_queryset(self):
         result = SiteInfo.objects
         owner = self.request.GET.get("owner")
         code = self.request.GET.get("code")
-        address = self.request.GET.get("address")
         state = self.request.GET.get("state")
         genre = self.request.GET.get("genre")
 
@@ -38,8 +38,6 @@ class SiteViewList(PageListView):
             result = result.filter(code=code)
         if owner:
             result = result.filter(owner__istartswith=owner)
-        if address:
-            result = result.filter(address__istartswith=address)
         if state:
             state_int = int(state)
             result = result.filter(state=state_int)
@@ -51,18 +49,17 @@ class SiteViewList(PageListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "車輛清單"
         return context
 
 
 class ImportConstnView(ImportDataGeneric):
     title = "上傳EXCEL"
     action = "/constn/uploadexcel/"
+    min_row = 2
     columns = [
         "工地編號",
         "業主",
         "工程名稱",
-        "地點",
         "發案日期",
         "分類",
         "狀態",
@@ -79,14 +76,14 @@ class ImportConstnView(ImportDataGeneric):
                 break
             crate_date = datetime.now()
             done_date = datetime.now()
-            if item[4]:
-                crate_date = datetime.strptime(item[4], "%Y-%m-%d")
-            if item[9]:
-                done_date = datetime.strptime(item[9], "%Y-%m-%d")
+            if item[3]:
+                crate_date = datetime.strptime(item[3], "%Y-%m-%d")
+            if item[8]:
+                done_date = datetime.strptime(item[8], "%Y-%m-%d")
             
             code = excel_value_to_str(item[0])
-            genre = tup_map_get_index(site_genre, item[5])  # noqa: F821
-            state = tup_map_get_index(constn_state, item[6])
+            genre = tup_map_get_index(site_genre, item[4])  # noqa: F821
+            state = tup_map_get_index(constn_state, item[5])
             done_date = None if state >0 else done_date
 
             try:
@@ -97,14 +94,13 @@ class ImportConstnView(ImportDataGeneric):
                         code=code,
                         owner=str(item[1]),
                         name=item[2],
-                        address=item[3],
                         crate_date=crate_date,
                         genre=genre,
                         state=state,
-                        member=item[7],
-                        counter=item[8],
+                        member=item[6],
+                        counter=item[7],
                         done_date=done_date,
-                        remark=item[10],
+                        remark=item[9],
                     )
             except Exception as e:
                 # 处理可能的异常情况

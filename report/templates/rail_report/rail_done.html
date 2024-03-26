@@ -1,0 +1,176 @@
+{% extends 'base/base_table.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}
+  <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+  <script type="text/javascript"
+          src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Adjusting the style of the caption in the table with id 'base_table'
+      $("#base_table caption").each(function () {
+        $(this).css({
+          "position": "static",
+          "left": "auto",
+          "width": "auto",
+          "height": "auto",
+          "overflow": "visible",
+          "clip": "auto",
+          "caption-side": "top"
+        });
+      });
+
+      summaryColorUpdate() ;
+
+
+    });
+
+    function summaryColorUpdate(){
+      $('.table-success').children().each(function() {
+        var text = $(this).html();
+        var num = parseInt(text);
+    
+        if (!isNaN(num) && num < 0) {
+                $(this).css('color', 'red'); // 将文字颜色改为红色
+        }
+    });
+    
+    }
+
+    function editRow(id) {
+      // 退回
+      if (confirm("您确定要退回此信息吗？")) {
+        $.ajax({
+            url: '/rail_done/withdraw/',
+            method: 'GET',
+            data: { 'site_id': id },
+            success: function(data) {
+              alert('已取消結案') ;
+              $('#search').submit() ;
+            },
+            error: function(error) {
+                console.error('Error loading modal content: ', error);
+            }
+        });
+      } 
+     
+    }
+  </script>
+{% endblock %}
+{% block styles %}
+  <style>
+  .tableStyle table{
+    table-layout: auto;
+    min-width: auto !important;  /* 可以根据需要调整 */
+    min-height: auto !important;
+    width: auto;      /* 允许表格根据内容自动调整宽度 */
+  }  
+
+  #summary td{
+
+  }
+ 
+  </style>
+{% endblock %}
+{% block form %}
+  <form id="search" action="/rail_done/" method="GET">
+    {% csrf_token %}
+    <p>
+      <label for="yearMonthInput">選擇年月:</label>
+      <input type="month"
+             id="yearMonthInput"
+             name="yearMonth"
+             value='{{ yearMonth }}'>
+    </p>
+    <input type="submit" value="查詢" />
+    <input type="button" id="exceloutput" value="匯出EXCEL" />
+  </form>
+  <div id="modalContainer"></div>
+{% endblock %}
+{% block table %}
+  <caption></caption>
+  <tr>
+    <th>項次</th>
+    <th>工地代號</th>
+    <th>業主</th>
+    <th>名稱</th>
+    <th>是否買斷</th>
+    <th>出/入</th>
+    <th>5M</th>
+    <th>6M</th>
+    <th>7M</th>
+    <th>8M</th>
+    <th>9M</th>
+    <th>10M</th>
+    <th>11M</th>
+    <th>12M</th>
+    <th>13M</th>
+    <th>14M</th>
+    <th>15M</th>
+    <th>16M</th>
+    <th>總支數</th>
+    <th>編輯</th>
+  </tr>
+  {% for item in list %}
+    <tr>
+      <td rowspan='3'>{{ forloop.counter }}</td>
+      <td>{{ item.siteinfo.code }}</td>
+      <td>{{ item.siteinfo.owner }}</td>
+      <td>{{ item.siteinfo.name }}</td>
+      <td>
+        {% if item.done_type == 1 %} 是 {% endif %}
+      </td>
+      <td>出</td>
+      <td>{{ item.out_5|default:"" }}</td>
+      <td>{{ item.out_6|default:"" }}</td>
+      <td>{{ item.out_7|default:"" }}</td>
+      <td>{{ item.out_8|default:"" }}</td>
+      <td>{{ item.out_9|default:"" }}</td>
+      <td>{{ item.out_10|default:"" }}</td>
+      <td>{{ item.out_11|default:"" }}</td>
+      <td>{{ item.out_12|default:"" }}</td>
+      <td>{{ item.out_13|default:"" }}</td>
+      <td>{{ item.out_14|default:"" }}</td>
+      <td>{{ item.out_15|default:"" }}</td>
+      <td>{{ item.out_16|default:"" }}</td>
+      <td>{{ item.out_total|default:"" }}</td>
+      <td rowspan='3'>
+        <a href="#" onclick="editRow({{ item.siteinfo.id }})">退回</a>
+      </td>
+    </tr>
+    <tr>
+      <td rowspan='2'>結案說明</td>
+      <td rowspan='2' colspan='3' style="white-space: pre-line;">{{ item.remark }}</td>
+      <td>入料</td>
+      <td>{{ item.in_5|default:"" }}</td>
+      <td>{{ item.in_6|default:"" }}</td>
+      <td>{{ item.in_7|default:"" }}</td>
+      <td>{{ item.in_8|default:"" }}</td>
+      <td>{{ item.in_9|default:"" }}</td>
+      <td>{{ item.in_10|default:"" }}</td>
+      <td>{{ item.in_11|default:"" }}</td>
+      <td>{{ item.in_12|default:"" }}</td>
+      <td>{{ item.in_13|default:"" }}</td>
+      <td>{{ item.in_14|default:"" }}</td>
+      <td>{{ item.in_15|default:"" }}</td>
+      <td>{{ item.in_16|default:"" }}</td>
+      <td>{{ item.in_total|default:"" }}</td>
+    </tr>
+    <tr class="table-success">
+      {% load custom_filters %}
+      <td>出入差</td>
+      <td>{{ item.out_5|custom_subtract:item.in_5 }}</td>
+      <td>{{ item.out_6|custom_subtract:item.in_6 }}</td>
+      <td>{{ item.out_7|custom_subtract:item.in_7 }}</td>
+      <td>{{ item.out_8|custom_subtract:item.in_8 }}</td>
+      <td>{{ item.out_9|custom_subtract:item.in_9 }}</td>
+      <td>{{ item.out_10|custom_subtract:item.in_10 }}</td>
+      <td>{{ item.out_11|custom_subtract:item.in_11 }}</td>
+      <td>{{ item.out_12|custom_subtract:item.in_12 }}</td>
+      <td>{{ item.out_13|custom_subtract:item.in_13 }}</td>
+      <td>{{ item.out_14|custom_subtract:item.in_14 }}</td>
+      <td>{{ item.out_15|custom_subtract:item.in_15 }}</td>
+      <td>{{ item.out_16|custom_subtract:item.in_16 }}</td>
+      <td>{{ item.out_total|custom_subtract:item.in_total }}</td>
+    </tr>
+  {% endfor %}
+{% endblock %}

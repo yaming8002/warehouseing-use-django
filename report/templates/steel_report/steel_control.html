@@ -1,0 +1,226 @@
+{% extends 'base/base_table.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}
+  <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Adjusting the style of the caption in the table with id 'base_table'
+      $("#base_table caption").each(function () {
+        $(this).css({
+          "position": "static",
+          "left": "auto",
+          "width": "auto",
+          "height": "auto",
+          "overflow": "visible",
+          "clip": "auto",
+          "caption-side": "top"
+        });
+      });
+      hideEditRowIfEarlier();
+
+    });
+
+    function hideEditRowIfEarlier() {
+      var yearMonthInput = $('#yearMonthInput').val(); // 從輸入欄位獲得年月值
+      var currentDate = new Date();
+      var currentYearMonth = currentDate.toISOString().slice(0, 7); // 獲取當前年月
+  
+      if (yearMonthInput < currentYearMonth) {
+        // 如果輸入的年月早於當前年月，尋找並隱藏結案連結
+        $('.editRow_select').hide(); // 隱藏包含結案連結的<td>元素
+      }
+    }
+
+    function editRow(id) {
+      // 結案選單
+      console.log({ 'id': id })
+      $.ajax({
+        url: '/steel_control/edit/',
+        method: 'GET',
+        data: { 'id': id },
+        success: function (data) {
+          $('#modalContainer').html(data)
+          $('#createModal').modal('show')
+        },
+        error: function (error) {
+          console.error('Error loading modal content: ', error)
+        }
+      })
+    }
+  </script>
+  
+{% endblock %}
+{% block styles %}
+  <style>
+
+  .tableStyle table{
+    font-size: 13px;
+    table-layout: auto;
+    min-width: auto !important;  /* 可以根据需要调整 */
+    min-height: auto !important;
+    width: auto;      /* 允许表格根据内容自动调整宽度 */
+  }  
+
+ 
+  </style>
+{% endblock %}
+{% block form %}
+  <form id="search" action="/steel_control/" method="GET">
+    {% csrf_token %}
+    <p>
+      <label for="yearMonthInput">選擇年月:</label>
+      <input type="month"
+             id="yearMonthInput"
+             name="yearMonth"
+             value='{{ yearMonth }}'>
+    </p>
+    <input type="submit" value="查詢" />
+    <input type="button" id="exceloutput" value="匯出EXCEL" />
+  </form>
+
+
+{% endblock %}
+{% block table %}
+  <caption></caption>
+  <tr>
+    <th>項次</th>
+    <th>工地代號</th>
+    <th>業主</th>
+    <th>名稱</th>
+    <th>H300 <br>
+      支撐(m)</th>
+    <th>H300 <br>
+      中柱(m)</th>
+    <th>H350 <br>
+      支撐(m)</th>
+    <th>H350 <br>
+      中柱(m)</th>
+    <th>H390 <br>
+        支撐(m)</th>
+    <th>H400 <br>
+      支撐(m)</th>
+    <th>H400 <br>
+      中柱(m)</th>
+    <th>H408 <br>
+      支撐(m)</th>
+    <th>H414 <br>
+      支撐(m)</th>
+    <th>H414 <br>
+      中柱(m)</th>
+    <th>覆工板 1M *2M <br> 覆工板(片)</th>      
+    <th>覆工板 1M *3M <br> 覆工板(片)</th>     
+    <th>水泥覆工板  <br> 覆工板(片)</th>     
+    <th>千斤頂(個)</th>
+    <th>土壓計(個)</th>
+    <th>結案</th>
+  </tr>
+
+  {% for item in list %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ item.siteinfo.code }}</td>
+    <td>{{ item.siteinfo.owner }}</td>
+    <td>{{ item.siteinfo.name }}</td>
+    <td>{{ item.m_300 }}</td>
+    <td>{{ item.m_301 }}</td>
+    <td>{{ item.m_350 }}</td>
+    <td>{{ item.m_351 }}</td>
+    <td>{{ item.m_390 }}</td>
+    <td>{{ item.m_400 }}</td>
+    <td>{{ item.m_401 }}</td>
+    <td>{{ item.m_408 }}</td>
+    <td>{{ item.m_414 }}</td>
+    <td>{{ item.m_4141 }}</td>
+    <td>{{ item.m_11 }}</td>
+    <td>{{ item.m_84 }}</td>
+    <td>{{ item.m_88 }}</td>
+    <td>{{ item.m_13 }}</td>
+    <td>{{ item.m_14 }}</td>
+    <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a></td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td colspan=4>高雄倉庫</td>
+    <td>{{ kh_report.m_300 }}</td>
+    <td>{{ kh_report.m_301 }}</td>
+    <td>{{ kh_report.m_350 }}</td>
+    <td>{{ kh_report.m_351 }}</td>
+    <td>{{ kh_report.m_390 }}</td>
+    <td>{{ kh_report.m_400 }}</td>
+    <td>{{ kh_report.m_401 }}</td>
+    <td>{{ kh_report.m_408 }}</td>
+    <td>{{ kh_report.m_414 }}</td>
+    <td>{{ kh_report.m_4141 }}</td>
+    <td>{{ kh_report.m_11 }}</td>
+    <td>{{ kh_report.m_84 }}</td>
+    <td>{{ kh_report.m_88 }}</td>
+    <td>{{ kh_report.m_13 }}</td>
+    <td>{{ kh_report.m_14 }}</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td colspan=4>林口倉庫</td>
+    <td>{{ lk_report.m_300 }}</td>
+    <td>{{ lk_report.m_301 }}</td>
+    <td>{{ lk_report.m_350 }}</td>
+    <td>{{ lk_report.m_351 }}</td>
+    <td>{{ lk_report.m_390 }}</td>
+    <td>{{ lk_report.m_400 }}</td>
+    <td>{{ lk_report.m_401 }}</td>
+    <td>{{ lk_report.m_408 }}</td>
+    <td>{{ lk_report.m_414 }}</td>
+    <td>{{ lk_report.m_4141 }}</td>
+    <td>{{ lk_report.m_11 }}</td>
+    <td>{{ lk_report.m_84 }}</td>
+    <td>{{ lk_report.m_88 }}</td>
+    <td>{{ lk_report.m_13 }}</td>
+    <td>{{ lk_report.m_14 }}</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td colspan=4>總計</td>
+    <td>{{ total_report.m_300 }}</td>
+    <td>{{ total_report.m_301 }}</td>
+    <td>{{ total_report.m_350 }}</td>
+    <td>{{ total_report.m_351 }}</td>
+    <td>{{ total_report.m_390 }}</td>
+    <td>{{ total_report.m_400 }}</td>
+    <td>{{ total_report.m_401 }}</td>
+    <td>{{ total_report.m_408 }}</td>
+    <td>{{ total_report.m_414 }}</td>
+    <td>{{ total_report.m_4141 }}</td>
+    <td>{{ total_report.m_11 }}</td>
+    <td>{{ total_report.m_84 }}</td>
+    <td>{{ total_report.m_88 }}</td>
+    <td>{{ total_report.m_13 }}</td>
+    <td>{{ total_report.m_14 }}</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td colspan=4>上期之總計</td>
+    <td>{{ befote_total_report.m_300 }}</td>
+    <td>{{ befote_total_report.m_301 }}</td>
+    <td>{{ befote_total_report.m_350 }}</td>
+    <td>{{ befote_total_report.m_351 }}</td>
+    <td>{{ befote_total_report.m_390 }}</td>
+    <td>{{ befote_total_report.m_400 }}</td>
+    <td>{{ befote_total_report.m_401 }}</td>
+    <td>{{ befote_total_report.m_408 }}</td>
+    <td>{{ befote_total_report.m_414 }}</td>
+    <td>{{ befote_total_report.m_4141 }}</td>
+    <td>{{ befote_total_report.m_11 }}</td>
+    <td>{{ befote_total_report.m_84 }}</td>
+    <td>{{ befote_total_report.m_88 }}</td>
+    <td>{{ befote_total_report.m_13 }}</td>
+    <td>{{ befote_total_report.m_14 }}</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td colspan=4>本月與上期之差異(({{yearMonth}})-({{before_yearMonth}})=差異數)</td>
+    {% for d in diff %}
+      <td>{{d}}</td>
+    {% endfor %}
+    <td></td>
+  </tr>
+{% endblock %}

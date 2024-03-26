@@ -1,0 +1,76 @@
+{% extends 'base/base_table.html' %}
+{% block javascript %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // 修改为按钮的点击事件
+            $('#upload_button').on('click', function (event) {
+              event.preventDefault();
+              var form = $('#upload_excel_form'); // 直接通过 form 的 ID 选中
+              var formData = new FormData(form[0]);
+          
+              $('#loadingSpinner').show();
+        $.ajax({
+          url: form.attr('action'), // 或者指定提交到的 URL
+          method: 'POST',
+          processData: false, // 防止 jQuery 处理数据
+          contentType: false, // 防止 jQuery 设置 Content-Type 请求头
+          data: formData, // 序列化表單數據
+          success: function (response) {
+            var error_list = response.error_list;
+            var errorMessage = response.msg;
+            if (error_list.length > 0) {
+              errorMessage += "\nErrors:\n";
+              for (var i = 0; i < error_list.length; i++) {
+                  errorMessage += "- " + error_list[i] + "\n";
+              }
+            }
+            console.log(error_list) ;
+            alert(errorMessage)
+            reLoadMainPage()
+          },
+          error: function (response) {
+            alert('Error:' + response.error)
+          },
+        })
+      })
+    
+
+    })
+    </script>
+{% endblock %}
+{% block form %}
+    <h2>{{ titles }}上傳EXCEL檔案</h2>
+<!-- 修改了 form 的 id 以便直接选中 -->
+<form id="upload_excel_form" method="post" action="/transport_log/uploadexcel/" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="excel_file" accept=".xlsx" />
+    <!-- 修改了按钮的 ID 以防止与 form 的 ID 混淆 -->
+    <button type="button" id="upload_button">資料整理</button>
+</form>
+    <div id="loadingSpinner"
+         style="display: none;
+                position: relative;
+                width: 80px;
+                height: 80px">
+        <div style="width: 100%;
+                    height: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center">
+            <span class="sr-only"
+                  style="position: absolute;
+                         top: 50%;
+                         left: 50%;
+                         transform: translate(-50%, -50%);
+                         font-size: 80%">上傳中</span>
+            <div class="spinner-border text-primary"
+                 role="status"
+                 style="position: relative;
+                        width: 100%;
+                        height: 100%">
+                <!-- 使用自动宽度和高度 -->
+            </div>
+        </div>
+    </div>
+{% endblock %}

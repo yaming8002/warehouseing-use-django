@@ -35,7 +35,6 @@ SECRET_KEY = "Dv*4JqwxMSClY$x2lVzy!yAeBkX5ZVF0*qbGnCYZI@T#T4CIxA@p&GgeiRhrLhC4"
 
 
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -108,7 +107,7 @@ WSGI_APPLICATION = "warehousing_server.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "warehousingDB",  # DB名稱
+        "NAME": "warehousingdb",  # DB名稱
         "USER": os_environ['MYSQL_USERNAME'],  # 使用者帳號
         "PASSWORD": os_environ['MYSQL_PASSWORD'],  # 使用者密碼 os_environ['MY_DB_PASSWORD']
         "HOST": os_environ['MYSQL_HOST'],
@@ -169,10 +168,17 @@ APPEND_SLASH = False
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'detailed': {
+            'format': '{asctime} {module} {levelname} [In function: {funcName}] {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'console': {
-            'level': 'DEBUG',  # 设置日志级别为DEBUG
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
+            'formatter': 'detailed',
         },
     },
     'root': {
