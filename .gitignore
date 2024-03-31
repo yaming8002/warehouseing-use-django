@@ -1,4 +1,6 @@
-.vscode/PythonImportHelper-v2-Completion.json
+.vscode/
 migrations/
+.mypy_cache/
+.venv/
 *.pyc
 config_json.json
