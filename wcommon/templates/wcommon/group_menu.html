@@ -1,0 +1,119 @@
+{% extends "base/base.html" %} {% block title %} {{ title }} {% endblock %} 
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function () {
+    // 綁定保存按鈕的點擊事件
+    $("#createModal").on("click", ".btn-primary", function (event) {
+      event.preventDefault();
+      var form = $("#createModal form");
+ 
+      // 提交表單
+      $.ajax({
+        url: form.attr("action"), // 或者指定提交到的 URL
+        method: "POST",
+        data: form.serialize(), // 序列化表單數據
+        success: function (response) {
+          alert(response.msg);
+          $("#createModal").modal("hide"); // 隱藏模態框
+          reLoadMainPage();
+        },
+        error: function (response) {
+          alert("Error:" + response.error);
+        },
+      });
+    });
+    $("#createModal").on("click", ".btn-secondary", function (event) {
+      // TODO: 添加取消按鈕的額外邏輯
+      console.log("取消操作");
+
+      // 關閉模態框，這行代碼是可選的，因為 `data-dismiss="modal"` 已經處理了關閉行為
+      $("#createModal").modal("hide");
+    });
+  });
+</script>
+{% endblock %} {% block content %}
+<div
+  class="modal fade"
+  id="createModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="createModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createModalLabel">{{title}}</h5>
+      </div>
+      <div class="modal-body">
+        <!-- 表單內容將會透過 jQuery 載入 -->
+        <div class="modal-body">
+          <form action="{{action}}" method="POST">
+            {% csrf_token %}
+            <div class="row">
+              <input
+                  type="hidden"
+                  name="group_id"
+                  id="group_id"
+                  value="{{group.id}}"
+                />
+              <!-- 权限名称输入框 -->
+              <div class="col-md-6 text-left">
+                <label for="group_name">權限名稱</label>
+                <input
+                  type="text"
+                  name="group_name"
+                  id="group_name"
+                  value="{{group.name}}"
+                  class="form-control"
+                />
+              </div>
+
+              <!-- 启用复选框 -->
+              <div class="col-md-6 text-right">
+                {%if "edit" in action %}
+                <label for="group_active" class="d-block">啟用</label>
+                <input
+                  type="checkbox"
+                  name="group_active"
+                  id="group_active"
+                  {% if  group.is_active  %}  checked {% endif %}
+                />
+                {% endif %}
+              </div>
+            </div>
+            <table>
+              <caption></caption>
+              <thead>
+                <th>功能名稱</th>
+                <th>功能分類</th>
+                <th>啟用</th>
+              </thead>
+              {% load strmap %} {% for menu in menus %}
+              <tr>
+                <td>{{ menu.name }}</td>
+                <td>{% get_category_name menu.category %}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    name="menu_{{ menu.id }}"
+                    id="menu_{{ menu.id }}"
+                    {% if  menu.name in menus_acvite  %}  checked {% endif %}
+                  />
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          關閉
+        </button>
+        <button type="submit" class="btn btn-primary">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

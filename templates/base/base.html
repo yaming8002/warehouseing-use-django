@@ -7,31 +7,27 @@
       name="viewport"
       content="width=device-width, height=device-height, initial-scale=1.0"
     />
+
     <title>{% block title %}base{% endblock %}</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
-    />
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
-    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
-    {% block javascript %}
-    <script></script>
+
+    {% block javascript_base %}
+    <script type="text/javascript">
+    </script>
     {% endblock %}
 
-    {% block styles %}
-    <style></style>
+    {% block javascript %}
+    <script type="text/javascript">
+    </script>
     {% endblock %}
-    <style>
-      caption {
-          position: absolute;
-          left: -9999px;
-          width: 1px;
-          height: 1px;
-          overflow: hidden;
-          clip: rect(1px, 1px, 1px, 1px); /* 將元素裁剪為1x1像素並隱藏 */
-      }
-    </style>
+  
+    {% block styles_base %}
+    <style> </style>
+    {% endblock %}
+
+    {% block styles%}
+    <style> </style>
+    {% endblock %}
+
   </head>
   <body>
        {% block content %}

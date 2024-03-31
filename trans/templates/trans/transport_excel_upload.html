@@ -1,0 +1,232 @@
+{% extends 'base/base_table.html' %}
+{% block javascript %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+  <script type="text/javascript">
+    var columns3 = {{ columns3|safe }}
+    var columns4 = {{ columns4|safe }}
+    var url ="{{ action }}"
+    $(document).ready(function () {
+      // 綁定保存按鈕的點擊事件
+      $('#upload_button').on('click', function (event) {
+        event.preventDefault();
+        var fileInput = document.getElementById('excelFile');
+        var file = fileInput.files[0];
+        if (file) {
+            // 如果文件存在，则处理文件
+            handleFileProcessing(file);
+            // 显示加载指示器
+            $('#loadingSpinner').show();
+        } else {
+            // 如果没有选择文件，则提示用户
+            alert("请先选择一个文件。");
+        }
+        alert("完成");
+        $('#loadingSpinner').modal('hide') ;
+      });
+    } );
+      
+    function handleFileProcessing(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = e.target.result;
+            const workbook = XLSX.read(data, {
+                type: 'binary'
+            });
+            
+            const worksheet = workbook.Sheets["總表"];
+            // 转换工作表数据为JSON
+            const total_rows = XLSX.utils.sheet_to_json(workbook.Sheets["總表"], {header:1});
+            const rent_rows = XLSX.utils.sheet_to_json(workbook.Sheets["租賃"], {header:1});
+            if (total_rows.length > 0|| rent_rows.length > 1) {
+                // 验证列名
+                if (checkColumns(columns3,total_rows[2])&checkColumns(columns4,total_rows[3])) {
+                    // 如果验证通过，则处理并分批上传数据
+                    processAndUploadData(total_rows.slice(4),false); // 移除列名行
+                } else if (checkColumns(columns3,total_rows[2])&checkColumns(columns4,total_rows[3])) {
+                    processAndUploadData(rent_rows.slice(4),true); // 移除列名行
+                } else {
+                  alert( "文件格式不正确");
+                }
+            }
+
+        };
+        reader.readAsBinaryString(file);
+    }
+  
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // 判断这个cookie的名称是否等于所查找的名称
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function checkColumns(columns,input) {
+        const cleanedColumns = columns.filter(item => item !== null && item.trim() !== "").map(item => item.replace(/\s+/g, ''));
+        return columns.length === cleanedColumns.length && columns.every((col, index) => col === cleanedColumns[index]);
+    }
+      
+    // 处理并分批上传数据
+    function processAndUploadData(rows,is_rent) {
+        // 假设每批上传10行数据
+        const batchSize = 100;
+        console.info(rows.length) ;
+        for (let i = 0; i < rows.length; i += batchSize) {
+            const batchData = rows.slice(i, i + batchSize);
+            if (batchData[0].length < 2  || typeof batchData[0][6] === 'undefined'){
+              uploadDataBatch([],is_rent,true);
+            }
+            uploadDataBatch(batchData,is_rent,false);
+        }
+    }
+        
+        // 上传数据批次到后台
+        function uploadDataBatch(batchData, is_rent,is_end) {
+          const csrftoken = getCookie('csrftoken');
+          const payload = {
+              jsonData: batchData,
+              is_rent: is_rent,
+              is_end:is_end
+          };
+      
+          fetch(url, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json; charset=utf-8',
+                  'X-CSRFToken': csrftoken
+              },
+              body: JSON.stringify(payload)
+          })
+          .then(response => {
+              if (!response.ok) {
+                  throw response;  // 如果响应状态不是 2xx, 抛出响应对象
+              }
+              return response.json();  // 正常响应
+          })
+          .then(data => {
+              console.log(data);
+          })
+          .catch(errorResponse => {
+              // 首先确保错误响应是JSON格式
+              errorResponse.json().then(errorData => {
+                  // 假设错误信息在 errorData.error_list 中
+                  if (errorData.error_list) {
+                      errorData.error_list.forEach(item => {
+                          const tr = $('<tr></tr>');
+                          tr.append("<td>"+item.e+"</td>");  // 假设每个错误对象有 'e' 属性
+                          item.item[1].forEach(col => {  // 假设 'item' 属性是一个数组
+                              tr.append("<td>"+col+"</td>");
+                          });
+                          $("#base_table tbody").append(tr);  // 确保您的表格有 <tbody> 标签
+                      });
+                  } else {
+                      console.error("未知的错误格式：", errorData);
+                  }
+              }).catch(jsonError => {
+                  console.error("解析错误详情失败：", jsonError);
+              });
+          });
+      }
+        
+
+  </script>
+{% endblock %}
+{% block form %}
+  <h2>{{ titles }}上傳EXCEL檔案</h2>
+  <!-- 修改了 form 的 id 以便直接选中 -->
+  <form id="upload_excel_form"
+        method="post"
+        action="/transport_log/uploadexcel/"
+        enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" id="excelFile" name="excel_file" accept=".xlsx" />
+    <!-- 修改了按钮的 ID 以防止与 form 的 ID 混淆 -->
+    <button type="button" id="upload_button">上傳</button>
+  </form>
+  <div id="loadingSpinner"
+       style="display: none;
+              position: relative;
+              width: 80px;
+              height: 80px">
+    <div style="width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center">
+      <span class="sr-only"
+            style="position: absolute;
+                   top: 50%;
+                   left: 50%;
+                   transform: translate(-50%, -50%);
+                   font-size: 80%">上傳中</span>
+      <div class="spinner-border text-primary"
+           role="status"
+           style="position: relative;
+                  width: 100%;
+                  height: 100%">
+        <!-- 使用自动宽度和高度 -->
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block table %}
+  <caption>匯入異常</caption>
+  <thead>
+    <tr>
+      <th rowspan="2">異常</th>
+      <th rowspan="2">日期</th>
+      <th colspan="4">工 地</th>
+      <th colspan="5">材料規格</th>
+      <th colspan="6">倉庫</th>
+      <th colspan="3">月報表</th>
+      <th rowspan="2">備註</th>
+      <th colspan="2">施工層別</th>
+      <th colspan="2">吊卡車公司</th>
+      <th colspan="2">經手人</th>
+      <th rowspan="2">key單日期</th>
+    </tr>
+    <tr>
+      <th>工地編號</th>
+      <th>轉單工地</th>
+      <th>業主</th>
+      <th>工地名稱</th>
+      <th>單據編號</th>
+      <th>產品編號</th>
+      <th>品名</th>
+      <th>單位(米)</th>
+      <th>米數規格</th>
+      <th>入庫量</th>
+      <th>出庫量</th>
+      <th>入庫米數</th>
+      <th>出庫米數</th>
+      <th>入出庫淨額</th>
+      <th>總米數淨額</th>
+      <th>入料</th>
+      <th>出料</th>
+      <th>數量</th>
+      <th>層碼</th>
+      <th>層數</th>
+      <th>公司</th>
+      <th>車號</th>
+      <th>編號</th>
+      <th>姓名</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for x in error_list %}
+      <tr>
+        <td>{{ x.e }}</td>
+        <!-- 修正了这里 -->
+        {% for item in x.item %}<td>{{ item }}</td>{% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'base/base_table.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}
+  <script>
+  $(document).ready(function () {
+    // 選擇所有具有id="report"的表格，位於class="col-md-9 m-0"的div內
+    $(".col-md-9.m-0 table").not('.emptytable').each(function () {
+      // 添加所需的CSS類
+      $(this).addClass("table table-primary table-striped");
+    });
+
+  });
+  
+  function upload(event) {
+    // 向後端發送 AJAX 請求
+    $.ajax({
+      url: '/transport_log/uploadexcel/',
+      method: 'GET',
+      success: function (data) {
+        console.log(data)
+        $('#modalContainer').html(data)
+        $('#createModal').modal('show')
+      },
+      error: function (error) {
+        console.error('Error loading modal content: ', error)
+      }
+    })
+  }
+  </script>
+{% endblock %}
+{% block styles %}
+  <style>
+  .tableStyle {
+    overflow-x: auto;
+    white-space: nowrap;
+    overflow: auto; /* 控制外部div出现滚动条 */
+  }
+
+  .tableStyle table{
+    table-layout: auto;
+    min-width: 100%;  /* 可以根据需要调整 */
+    width: auto;      /* 允许表格根据内容自动调整宽度 */
+  }  
+
+  .tableStyle table td{
+    white-space: nowrap; /* 防止内容换行 */
+  }  
+  </style>
+{% endblock %}
+{% block form %}
+  <!-- Corrected form tag and added trailing slash to action attribute -->
+  <form id="search" action="/tran_turn/list/" method="GET">
+    {% csrf_token %}
+    <p>
+      <label for="begin">開始時間</label>
+      <input type="date" id="begin" name="begin" value="{{begin|date:'Y-m-d'}}" />
+      <label for="end">結束時間</label>
+      <input type="date" id="end" name="end" value="{{end|date:'Y-m-d'}}" />
+      <label for="code">單號</label>
+      <input type="text" id="code" name="code" value="{{request.GET.code}}" />
+      <label for="matinfo_core">物料編號</label>
+      <input type="text" id="matinfo_core" name="matinfo_core" value="{{request.GET.matinfo_core}}" />
+      <label for="matinfo_id">物料名稱</label>
+      <input type="text" id="matinfo_name" name="matinfo_name" value="{{request.GET.matinfo_name}}" />
+      <label for="matinfo_cat">物料類型</label>
+      <select id="matinfo_cat" name="matinfo_cat">
+        <option value>全部</option>
+        {% for cat in matinfo_cats %}
+          <option vlaue="{{ cat.pk }}"
+                  {% if cat.name == request.GET.matinfo_cat %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+    </p>
+    <p>
+      <label for="from_constn_id">來源工地代號</label>
+      <input type="text" id="from_constn_id" name="from_constn_id" value="{{request.GET.from_constn_id}}" />
+      <label for="from_constn_owner">來源工地業主</label>
+      <input type="text" id="from_constn_owner" name="from_constn_owner" value="{{request.GET.from_constn_owner}}" />
+      <label for="from_constn_name">來源工地名稱</label>
+      <input type="text" id="from_constn_name" name="from_constn_name" value="{{request.GET.from_constn_name}}" />
+    </p>
+    <p>
+      <label for="to_constn_id">目的工地代號</label>
+      <input type="text" id="to_constn_id" name="to_constn_id" value="{{request.GET.to_constn_id}}" />
+      <label for="to_constn_owner">目的工地業主</label>
+      <input type="text" id="to_constn_owner" name="to_constn_owner" value="{{request.GET.to_constn_owner}}" />
+      <label for="to_constn_name">目的工地名稱</label>
+      <input type="text" id="to_constn_name" name="to_constn_name" value="{{request.GET.to_constn_name}}" />
+    </p>
+    <input type="submit" value="查詢" />
+    <!--<button type="button" onclick="upload(event)">上傳EXCEL</button>-->
+  </form>
+  <div id="modalContainer"></div>
+{% endblock %}
+{% block table %}
+  <caption>{{title}}</caption>
+  <thead>
+    <tr>
+      <th rowspan="2">日期</th>
+      <th colspan="3">來源工地</th>
+      <th colspan="3">目的工地</th>
+      <th colspan="4">材料規格</th>
+      <th colspan="2">月報表</th>
+      <th colspan="2">吊卡車公司</th>
+      <th colspan="1">經手人</th>
+    </tr>
+    <tr>
+      <th>工地編號</th>
+      <th>業主</th>
+      <th>工地名稱</th>
+      <th>工地編號</th>
+      <th>業主</th>
+      <th>工地名稱</th>
+      <th>單據編號</th>
+      <th>品名</th>
+      <th>單位(米)</th>
+      <th>米數規格</th>
+      <th>數量</th>
+      <th>米數</th>
+      <th>公司</th>
+      <th>車號</th>
+      <th>姓名</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Corrected the template variables with double curly braces -->
+    {% for item in pagelist %}
+      <tr>
+        <td>{{ item.translog.build_date|date:"Y/m/d" }}</td>
+        <td>{{ item.translog.constn_site.code }}</td>
+        <td>{{ item.translog.constn_site.owner }}</td>
+        <td>{{ item.translog.constn_site.name }}</td>
+        <td>{{ item.translog.turn_site.code }}</td>
+        <td>{{ item.translog.turn_site.owner }}</td>
+        <td>{{ item.translog.turn_site.name }}</td>
+        <td>{{ item.translog.code }}</td>
+        <td>{{ item.material.name }}</td>
+        <td> {% if item.all_unit %} {{ item.all_unit }} {% endif %}</td>
+        <td>{{ item.material.unit_of_division }}</td>
+        <td >
+          {{ item.quantity }}
+        </td>
+        <td >
+          {% if item.all_unit %}
+            {{ item.all_unit }}
+          {% endif %}
+        </td>
+        <td>{{ item.translog.carinfo.firm }}</td>
+        <td>{{ item.translog.carinfo.car_number }}</td>
+         <!--<td>{{ item.transportlog.member }}</td>-->
+        <td>{{ item.translog.member }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock %}

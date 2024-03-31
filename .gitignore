@@ -1,9 +1,4 @@
 .vscode/PythonImportHelper-v2-Completion.json
-warehousing_server/__pycache__/settings.cpython-310.pyc
-wcommon/__pycache__/urls.cpython-310.pyc
-wcommon/forms/__pycache__/accountform.cpython-310.pyc
-wcommon/middleware/__pycache__/__init__.cpython-310.pyc
-wcommon/middleware/__pycache__/authentication.cpython-310.pyc
-wcommon/__pycache__/urls.cpython-310.pyc
-wcommon/__pycache__/views.cpython-310.pyc
-wcommon/middleware/__pycache__/__init__.cpython-310.pyc
+migrations/
+*.pyc
+config_json.json

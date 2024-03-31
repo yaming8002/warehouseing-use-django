@@ -1,106 +1,122 @@
 {% load static %}
+{% load strmap %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, height=device-height, initial-scale=1.0"
-    />
-    <title>{% block title %}base table{% endblock %}</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
-    />
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
-    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+    <meta name="viewport"
+          content="width=device-width, height=device-height, initial-scale=1.0" />
+    <title>
+      {% block title %}base table{% endblock %}
+    </title>
     <script>
       $(document).ready(function () {
         // 選擇所有具有id="report"的表格，位於class="col-md-9 m-0"的div內
-        $(".col-md-9.m-0 table").each(function () {
+        $(".col-md-9.m-0 table").not('.emptytable').each(function () {
           // 添加所需的CSS類
           $(this).addClass("table table-primary table-striped");
         });
+
       });
     </script>
-    {% block javascript %}
-    <script></script>
-    {% endblock %}
+    {% block javascript %}<script></script>{% endblock %}
     <style>
       .formStyle {
         background-color: burlywood;
       }
-    </style>
-    {% block styles %}
-    <style></style>
-    {% endblock %}
-    <style>
-      caption {
-        position: absolute;
-        left: -9999px;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-        clip: rect(1px, 1px, 1px, 1px); /* 將元素裁剪為1x1像素並隱藏 */
+
+      .modal-body > form > div {
+        margin-bottom: 15px;  
       }
+
+      caption {
+        position: static;
+        caption-side: top;
+    }
+
+    .tableStyle {
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  
+    .tableStyle table{
+      font-size: 13px;
+      table-layout: auto;
+      min-width: 100%;  /* 可以根据需要调整 */
+      min-height: 100% ;
+      width: auto;      /* 允许表格根据内容自动调整宽度 */
+    }  
+  
+    .tableStyle table th {
+      font-weight:bolder ;
+      white-space: nowrap; /* 防止内容换行 */
+      border: 1px solid black;
+      text-align: center;
+      vertical-align: middle;
+    }
+  
+    .tableStyle table td{
+      white-space: nowrap; /* 防止内容换行 */
+      border: 1px solid black;
+      text-align: center;
+      vertical-align: middle;
+    }  
+
+    .separator {
+      height: 20px !important;
+      background-color: #fff !important;
+      border-left: none !important;
+      border-right: none !important;
+      --bs-table-color-type: : none !important;
+      --bs-table-bg-type: none !important;
+  }
     </style>
+    {% block styles %}<style></style>{% endblock %}
+    <style></style>
   </head>
   <body>
-    <div class="m-3 p-3" style="width: 95%">
-      <div class="formStyle p-3 rounded">{% block form %} <!-- 放置對應的表單--> {% endblock %}</div>
+    <div class="m-3 p-3">
+      <div class="formStyle p-3 rounded">
+        {% block form %}<!-- 放置對應的表單-->{% endblock %}
+      </div>
+      <div id="modalContainer"></div>
       <br />
       <div class="tableStyle">
-        <table class="table table-primary table-striped rounded">
+        <table id="base_table" class="table table-primary table-striped rounded">
           {% block table %}
-          <caption></caption>
-          <thead>
-            <th></th>
-          </thead>
-          <tbody></tbody>
+            <caption></caption>
+            <thead>
+              <th></th>
+            </thead>
+            <tbody>
+            </tbody>
           {% endblock %}
+          <tfoot>
+            {% if is_paginated %}
+              <tr>
+                <td colspan="30">
+                  <div class="pagination ">
+                    <span class="step-links">
+                      {% if page_obj.has_previous %}
+                        <a href="#" onclick="changePage(event, 1)">&laquo; 第一頁</a>
+                        <a href="#"
+                           onclick="changePage(event, {{ page_obj.previous_page_number }})">上一頁</a>
+                      {% endif %}
+                      <span class="current">頁 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+                      {% if page_obj.has_next %}
+                        <a href="#" onclick="changePage(event, {{ page_obj.next_page_number }})">下一頁</a>
+                        <a href="#"
+                           onclick="changePage(event, {{ page_obj.paginator.num_pages }})">最後一頁 &raquo;</a>
+                      {% endif %}
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            {% endif %}
+          </tfoot>
         </table>
       </div>
     </div>
-
-    <div
-      class="modal fade"
-      id="editFrom"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="muserModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="muserModalLabel">Create Muser</h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="modal-body">
-              <form method="post">{% csrf_token %} {{ form.as_p }}</form>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              取消
-            </button>
-            <button type="button" class="btn btn-primary">存檔</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </body>
+  </div>
+</body>
 </html>

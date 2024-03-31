@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, height=device-height, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script type="text/javascript">
+    var column_name = {{ column_name|safe }}
+    var url ="{{ action }}"
+    $(document).ready(function () {
+      // 綁定保存按鈕的點擊事件
+      $('#createModal').on('click', '.btn-primary', function (event) {
+        event.preventDefault();
+        var fileInput = document.getElementById('excelFile');
+        console.log(fileInput)
+        var file = fileInput.files[0];
+    
+        if (file) {
+            // 如果文件存在，则处理文件
+            handleFileProcessing(file);
+            // 显示加载指示器
+            $('#loadingSpinner').show();
+        } else {
+            // 如果没有选择文件，则提示用户
+            alert("请先选择一个文件。");
+        }
+        $('#createModal').modal('hide')
+    });
+    
+      $('#createModal').on('click', '.btn-secondary', function (event) {
+        // TODO: 添加取消按鈕的額外邏輯
+        console.log('取消操作')
+    
+        // 關閉模態框，這行代碼是可選的，因為 `data-dismiss="modal"` 已經處理了關閉行為
+        $('#createModal').modal('hide')
+      })
+      function handleFileProcessing(file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              const data = e.target.result;
+              const workbook = XLSX.read(data, {
+                  type: 'binary'
+              });
+              
+              const worksheetName = workbook.SheetNames[0];
+              const worksheet = workbook.Sheets[worksheetName];
+              console.info(worksheetName)
+              // 转换工作表数据为JSON
+              const rows = XLSX.utils.sheet_to_json(worksheet, {header:1});
+              console.info(rows.length) ;
+              if (rows.length > 0) {
+                  // 验证列名
+                  if (checkColumns(rows[0])) {
+                      // 如果验证通过，则处理并分批上传数据
+                      processAndUploadData(rows.slice(1)); // 移除列名行
+                  } else {
+                      alert( "文件格式不正确");
+                  }
+              }
+  
+          };
+          reader.readAsBinaryString(file);
+      }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // 判断这个cookie的名称是否等于所查找的名称
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    const csrftoken = getCookie('csrftoken');
+      // 验证列名
+      function checkColumns(columns) {
+          return column_name.every((col, index) => columns[index] && columns[index].replace(/\s+/g, '') === col);
+      }
+      
+      // 处理并分批上传数据
+      function processAndUploadData(rows) {
+          // 假设每批上传10行数据
+          const batchSize = 10;
+          console.info(rows.length) ;
+          for (let i = 0; i < rows.length; i += batchSize) {
+              const batchData = rows.slice(i, i + batchSize);
+              if (batchData[0].length < 2  || typeof batchData[0][0] === 'undefined'){
+                return ;
+              }
+              uploadDataBatch(batchData);
+          }
+      }
+      
+      // 上传数据批次到后台
+      function uploadDataBatch(batchData) {
+          // 将数据转换为JSON字符串
+          const jsonData = JSON.stringify(batchData);
+          // 使用AJAX或Fetch API上传数据
+          fetch(url, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json; charset=utf-8','X-CSRFToken': csrftoken},
+              body: jsonData
+          })
+          .then(response => response.json())
+          .then(data => console.log(data))
+          .catch(error => console.error('錯誤：', error));
+      }
+      
+
+    })
+    </script>
+  </head>
+    <body>
+      <div class="modal fade"
+           id="createModal"
+           tabindex="-1"
+           role="dialog"
+           aria-labelledby="createModalLabel"
+           aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="createModalLabel">{{ title }}</h5>
+            </div>
+            <div class="modal-body">
+              <!-- 表單內容將會透過 jQuery 載入 -->
+              <div class="modal-body">
+                <h2>{{ titles }}上傳EXCEL檔案</h2>
+                <form method="post" action="{{ action }}" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <input type="file" id="excelFile" name="excel_file" accept=".xlsx" />
+                </form>
+                <div id="loadingSpinner"
+                     style="display: none;
+                            position: relative;
+                            width: 80px;
+                            height: 80px">
+                  <div style="width: 100%;
+                              height: 100%;
+                              display: flex;
+                              justify-content: center;
+                              align-items: center">
+                    <span class="sr-only"
+                          style="position: absolute;
+                                 top: 50%;
+                                 left: 50%;
+                                 transform: translate(-50%, -50%);
+                                 font-size: 80%">上傳中</span>
+                    <div class="spinner-border text-primary"
+                         role="status"
+                         style="position: relative;
+                                width: 100%;
+                                height: 100%">
+                      <!-- 使用自动宽度和高度 -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+              <button type="submit" class="btn btn-primary">儲存</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>

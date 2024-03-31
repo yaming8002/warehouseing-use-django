@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Page</title>
-<style>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
   body, html {
     height: 100%;
     margin: 0;
@@ -46,26 +47,54 @@
     border-radius: 3px;
     cursor: pointer;
   } 
-</style>
-</head>
-<body>
+    </style>
 
-<div class="login-container">
-  <div class="login-header">
-    倉儲系統
-  </div>
-  <form action="/login/" method="post">
-    {% csrf_token %}
-  <div class="input-group">
-    <label for="username">帳號:</label>
-    <input type="text" id="username" name="username" value="admin">
-  </div>
-  <div class="input-group">
-    <label for="password">密碼:</label>
-    <input type="password" id="password" name="password" value="1qaz2wsx">
-  </div>
-  <button class="submit">登入</button>
-</div>
-</form>
-</body>
+    <script>
+      
+      $(document).ready(function () {
+        // 检查页面是否存在 <h1>My Website</h1>
+        if ($('.bi-person-circle').length > 0) {
+            // 如果存在，则重新加载页面
+            location.reload();
+        }
+    });
+
+      function validateForm() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+        
+        // 检查用户名和密码是否为空
+        if (username.trim() === "" || password.trim() === "") {
+          alert("帳號和密碼不能為空");
+          return false; // 阻止表单提交
+        
+        return true; // 允许表单提交
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-header">倉儲系統</div>
+      <form action="/login/" method="post">
+        {% csrf_token %}
+        <div class="input-group">
+          <label for="username">帳號:</label>
+          <input type="text"
+                 id="username"
+                 name="username"
+                 value="{{ request.POST.username }}">
+        </div>
+        <div class="input-group">
+          <label for="password">密碼:</label>
+          <input type="password"
+                 id="password"
+                 name="password"
+                 value="{{ request.POST.password }}">
+        </div>
+        <button class="submit">登入</button>
+        <div id="error-message" style="color:red;">{{ msg }}</div>
+      </div>
+    </form>
+  </body>
 </html>

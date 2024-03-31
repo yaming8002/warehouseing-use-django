@@ -1,0 +1,354 @@
+{% comment %} {% extends 'base/base_table.html' %}{{ '' }}
+{% block title %}
+    {{ title }} {{ '' }}
+    {% load strmap %}
+{% endblock %}
+{% block javascript %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"
+          rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script type="text/javascript">
+    var matrtialData ;
+    var divisibleData =[]  ;
+    var spec  ;
+    var material_row = 0 ;
+    $(document).ready(function() {
+        cleanMaterial() ;
+
+        $('#editFrom').on('click', '.btn-secondary', function (event) {
+            $('#editFrom').modal('hide')
+          }) ;
+        $('#editFrom').on('click', '.close', function (event) {
+         $('#editFrom').modal('hide')
+        }) ;
+
+    });
+    
+    function addTransport(){
+        var form = $('#transport')
+        // TODO: 添加表單驗證邏輯
+        console.log(form)
+        $.ajax({
+            url: form.attr('action'), // 或者指定提交到的 URL
+            method: 'POST',
+            data: form.serialize(), // 序列化表單數據
+            success: function (response) {
+              alert(response.msg)
+              $('#createModal').modal('hide') // 隱藏模態框
+              reLoadMainPage('/constn_stock/list/')
+            },
+            error: function (response) {
+              alert('Error:' + response.error)
+            }
+        }) ;
+
+    }
+
+
+    $("#matcat").change(function() {
+        var cat = parseInt($(this).val());
+        $('#matlist').children().hide();
+
+        if (cat > 0) {
+            $('#matlist').children('option[category="' + cat + '"]').show();
+        } else {
+            $('#matlist').children().show();
+        }
+    });
+
+    $("#matlist").change(function() {
+        var option =  $(this).find(':selected') ;
+        var divisible =  option.attr('is_divisible') ;
+        var division =  option.attr('unit_of_division') ;
+        if (divisible =='true' ){
+            $('#unitspan').html(division) ;
+            $('#unitdiv').show();
+        } else{
+            $('#unitdiv').hide();
+           
+        }
+    });
+    
+    function showAddMaterial() {
+        $('#editFrom').modal('show');
+    }
+    
+    function cleanMaterial(){
+        $.ajax({
+            url :'/getMatrtialData/',
+            modal:'GET',
+            success: function(data){
+                console.log(data)
+                var matcats = JSON.parse(data.matcats);
+                $("#matcat").empty();
+                $("#matcat").append('<option value="0">全部</option>');
+                matcats.forEach(function(item){
+                    var option = $('<option>').attr('value',item.pk).html(item.fields.name);
+                    $('#matcat').append(option) ;
+                })
+
+                matrtialData = JSON.parse(data.matrtials);
+                $("#matlist").empty();
+                $("#matlist").append(' <option value="">---</option>');
+                matrtialData.forEach(function(item) {
+                    if (item.fields.specification > "22") {
+                        var $newOption = $('<option>', {
+                            value: item.pk,
+                            text: item.fields.name,
+                            'category': item.fields.category,
+                            'is_divisible': item.fields.is_divisible,
+                            'unit_of_division': item.fields.unit_of_division,
+                            // 可以继续添加其他所需的属性
+                        });
+            
+                        $('#matlist').append($newOption);
+                    }else{
+                        divisibleData.push(item) ;
+                    }
+                });
+                spec = JSON.parse(data.spec);
+            }
+
+        })
+        $("#unit").val('');
+        $("#quantity").val('');
+        $('#unitdiv').hide();
+    }
+
+
+    function addMaterial() {
+        var mat_id = $('#matlist').val();
+        var mat_json = matrtialData[mat_id - 1];
+        var tr = $('<tr>');
+        console.log(mat_json.fields.is_divisible) ;
+        if ( !mat_json.fields.is_divisible ) {
+            var specif = '---';
+            var unit = '---';
+        } else {
+            var unit = $('#unit').val();
+            var specification = Math.ceil(unit);
+    
+            // 在可拆分物料中查找匹配的规格
+            var matchingItem = divisibleData.find(function(item) {
+                return item.fields.mat_code == mat_json.fields.mat_code &&
+                    item.fields.specification == specification;
+            });
+    
+            // 如果找到匹配的规格，则使用匹配的物料信息
+            if (matchingItem) {
+                mat_json = matchingItem;
+                var specif = spec[specification] ? spec[specification].fields.name : '---';
+            } else {
+                console.error('Matching specification not found for divisible material:', mat_json.fields.mat_code, specification);
+                return;
+            }
+        }
+    
+        var quantity = +$('#quantity').val();
+        var totalunit=  quantity*unit ? quantity*unit : '---'  ;
+        var input_id = $('<input type="hidden" id="mat_item['+material_row+'].id" name="mat_item['+material_row+'].id" value="'+mat_json.pk+'"> ')
+        var input_unit = $('<input type="hidden" id="mat_item['+material_row+'].unit" name="mat_item['+material_row+'].unit" value="'+unit+'"> ')
+        var input_quantity = $('<input type="hidden" id="mat_item['+material_row+'].quantity" name="mat_item['+material_row+'].quantity" value="'+quantity+'"> ')
+        var first_td = $('<td>').append(input_id).append(input_unit).append(input_quantity).append(mat_json.fields.mat_code) ;
+        // 构建表格行
+        tr.append(first_td)
+            .append('<td>' + mat_json.fields.name + '</td>')
+            .append('<td>' + specif + '</td>')
+            .append('<td>' + quantity + '</td>')
+            .append('<td>' + unit + '</td>')
+            .append('<td>' + totalunit + '</td>')
+            .append('<td><a href="#" onclick="editRow('+material_row+')">編輯</a></td>');
+    
+        // 将表格行添加到表格中
+        $('#matertialList tbody').prepend(tr);
+        material_row += 1 ;
+        // 关闭模态框并清空输入框
+        $('#editFrom').modal('hide');
+        cleanMaterial() ;
+    }
+    </script>
+{% endblock %}
+{% block styles %}
+    <style>
+  .formStyle {
+    background-color: {% if 'out' in request.path %}salmon{% else %} #83D182 {% endif %};
+  }
+
+  .formStyle td {
+    background-color: {% if 'out' in request.path %}salmon{% else %} #83D182 {% endif %};
+  }
+
+  div.p-3{
+    
+        display: inline-block; /* 或者使用 inline-flex，取決於內部布局 */
+        width: auto; /* 確保容器寬度根據內容自動調整 */
+        min-width: 100%; /* 確保至少與父元素同寬，根據需要調整 */
+    
+  }
+    </style>
+{% endblock %}
+{% block form %}
+    <h1 style="text-align:center;">{{ title }}</h1>
+    <div class="modal-body">
+        <form id='transport' action="{{request.path}}" method="post">
+            {% csrf_token %}
+            <table class='table emptytable '>
+                <tr>
+                    <td>
+                        <label for="code">單號</label>
+                    </td>
+                    <td>
+                        <input type="text" id="code" name="code" value="" />
+                    </td>
+                    <td>
+                        <label for="whse">倉庫</label>
+                    </td>
+                    <td>
+                        <select id="whse" name="whse">
+                            {% for whse in whses %}<option value="{{ whse.id }}">{{ whse.name }}</option>{% endfor %}
+                        </select>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="construction">工地</label>
+                    </td>
+                    <td>
+                        <select id="construction" name="construction">
+                            {% for construction in constructions %}
+                                <option value="{{ construction.pk }}">{{ construction.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <label for="construction_id">工地編號</label>
+                    </td>
+                    <td>
+                        <input type="text" id="construction_id"  value="" />
+                    </td>
+                    <td>
+                        <label for="construction_owner">業主</label>
+                    </td>
+                    <td>
+                        <input type="text"
+                               id="construction_owner"
+                               value="" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="level">施工層別</label>
+                    </td>
+                    <td>
+                        <select id="level" name="level">
+                            {% get_level as levels %}
+                            {% for level in levels %}<option value="{{ level.0 }}">{{ level.1 }}</option>{% endfor %}
+                        </select>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="car_number">車牌號</label>
+                    </td>
+                    <td>
+                        <input type="text"
+                               id="car_number"
+                               name="car_number"
+                               value="" />
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="member">經手人</label>
+                    </td>
+                    <td>
+                        <input type="text" id="member" name="member" value="" />
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+            <table id='matertialList' class="table table-primary table-striped">
+                <thead>
+                    <tr>
+                        <th>物料編號</th>
+                        <th>物料名稱</th>
+                        <th>物料規格</th>
+                        <th>數量</th>
+                        <th>單位</th>
+                        <th>總計單位</th>
+                        <th>編輯</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="addtd">
+                        <td colspan="7" style="text-align: center;">
+                            <button type="button" onclick="showAddMaterial()">新增</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+            <button type="button" class="btn btn-primary" onclick="addTransport()">儲存</button>
+        </div>
+    </div>
+{% endblock %}
+{% block table %}
+    <div class="modal fade"
+         id="editFrom"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="muserModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="muserModalLabel">新增項目</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-body">
+                        <label for="matcat">分類</label>
+                        <select id="matcat" name = "matcat">
+                            <option value="0">全部</option>
+                        </select>
+                        <label for="matlist">物料</label>
+                        <select id="matlist" name="matlist">
+                            <option value="">---</option>
+                        </select>
+                        <span id="unitdiv" style="display:none;">
+                            <br />
+                            <br />
+                            <label id="unitlabel" for="unit">單位量</label>
+                            <input type="text" id="unit" name="unit" value="" />
+                            <span id="unitspan"></span>
+                        </span>
+                        <br />
+                        <br />
+                        <label for="quantity">數量</label>
+                        <input type="text" id="quantity" name="quantity" value="" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" onclick="addMaterial()">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %} {% endcomment %}

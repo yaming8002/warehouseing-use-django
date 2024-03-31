@@ -1,0 +1,62 @@
+{% extends "base/base.html" %}{{""}}
+{% block title %}關於系統 {{""}}{% endblock %}
+{% block styles %}<style></style>{% endblock %}
+{% block content %}
+    <div width="80%">
+        <h1>關於系統</h1>
+        <h2>版本:0.8.1</h2>
+        <h2>開發人員：張陽明</h2>
+        <h2>電子信箱：yamingworking@gmail.com</h2>
+        <h2>說明</h2>
+        <p>本系統所包含的所有開源軟體包均根據其各自的許可證發布。我們感謝這些專案的貢獻者和維護者，他們的工作使得本系統的開發成為可能。</p>
+        <p>本系統是基於 Django 框架建置。提供進銷存以及物流相關的功能及報表。Django 是一個高級 Python Web 框架，它鼓勵快速開發和乾淨、實用的設計。</p>
+        <h2>開源軟體包及其許可證資訊</h2>
+        <div class="package">
+            <div class="package-header">Django 5.0.1 (BSD License)</div>
+            <p>用於整個網站的後端邏輯和結構。</p>
+        </div>
+        <div class="package">
+            <div class="package-header">asgiref 3.7.2 (BSD License)</div>
+            <p>ASGI相容性層，用於非同步功能。</p>
+        </div>
+        <div class="package">
+            <div class="package-header">beautifulsoup4 4.12.3 (MIT License)</div>
+            <p>用於解析HTML和XML文件。</p>
+        </div>
+        <div class="package">
+            <div class="package-header">click 8.1.7, colorama 0.4.6 (BSD License):</div>
+            <p>提供命令列介面的功能。</p>
+        </div>
+        <div class="package">
+            <div class="package-header">cssbeautifier 1.14.11, jsbeautifier 1.14.11 (MIT License)</div>
+            <p>CSS和JS檔案的格式化。</p>
+        </div>
+        <div class="package">
+            <div class="package-header">defusedxml 0.7.1 (Python Software Foundation License)</div>
+            <p>XML解析的安全性增強。</p>
+        </div>
+        <div class="package">
+            <div class="package-header">diff-match-patch 20230430 (Apache 2.0 License)</div>
+            <p>用於處理文字差異和修補程式。</p>
+        </div>
+        <div class="package">
+            <div class="package-header">django-import-export 3.3.7, sqlparse 0.4.4 (BSD License)</div>
+            <p>資料導入匯出功能及SQL解析。</p>
+        </div>
+        <div class="package">
+            <div class="package-header">
+                djlint 1.34.1, EditorConfig 0.12.3, et-xmlfile 1.1.0, html-tag-names 0.1.2, html-void-elements 0.1.0, json5 0.9.14, MarkupPy 1.14, py 1.py26. .2, pathspec 0.12.1, PyYAML 6.0.1, regex 2023.12.25, six 1.16.0, soupsieve 2.5, tablib 3.5.0, tomli 2.0.1, tqqdm 4.66. 2.0.1, xlwt 1.3.0 (MIT, Apache 2.0, Python Software Foundation License, Public Domain, GPL-3.0-or-later, Mozilla Public License 2.0, Open Data Commons Public Domain Dedication and License (PDDL)):
+            </div>
+            <p>提供各 種輔助工具和函式庫以支援系統的開發和運作。</p>
+        </div>
+        <div class="package">
+            <div class="package-header">mysqlclient 2.2.1 (GPL-2.0 License)</div>
+            <p>用於連接和操作 MySQL 資料庫。</p>
+        </div>
+        <h2>版權和許可</h2>
+        <p>本系統所包含的所有開源軟體包均根據其各自的許可證發布。我們感謝這些專案的貢獻者和維護者，他們的工作使得本系統的開發成為可能。</p>
+        <p>在使用本系統前，請確保您已經閱讀並瞭解了上述軟體包的授權條款。這些條款通常允許免費使用、修改和分發這些軟體包，但可能會有特定的限制和要求。例如，一些許可證要求在分發包含該軟體包的產品時包含原始版權和許可證聲明。</p>
+        <h2>免責聲明</h2>
+        <p>本文檔及其中所包含的資訊是依照"原樣"提供的，不包含任何形式的明示或暗示的保證。在法律允許的最大範圍內，本項目及其貢獻者不對任何直接或間接使用本系統及其組件所造成的後果負責。</p>
+    </div>
+{% endblock %}

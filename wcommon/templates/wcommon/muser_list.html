@@ -1,0 +1,136 @@
+{% extends 'base/base_table.html' %} {% block title %}
+  menu list
+{% endblock %}
+{% block javascript %}
+  <script>
+    // 必須使用 '' 因為group_list | safe 中的訊息打包是用 ""
+    var group_list = JSON.parse('{{ group_list | safe }}')
+    
+    function addUser(event) {
+      // event.preventDefault(); // 防止預設行為
+      let button = $(event.target)
+      let url = button.attr('url')
+    
+      // 向後端發送 AJAX 請求
+      $.ajax({
+        url: url,
+        method: 'GET',
+        success: function (data) {
+          $('#modalContainer').html(data)
+          $('#createModal').modal('show')
+        },
+        error: function (error) {
+          console.error('Error loading modal content: ', error)
+        }
+      })
+    }
+    
+    function upload() {
+      // Define the upload function
+    }
+    
+    function editRow(line, id) {
+      // 轉換姓名欄位
+      var nameCell = $('#name-' + id)
+      var currentName = nameCell.text()
+      nameCell.html('<input type="text" id="edit-name-' + id + '" value="' + currentName + '">')
+    
+      // 轉換單位欄位
+      var unitCell = $('#unit-' + id)
+      var currentUnit = unitCell.text()
+      unitCell.html('<input type="text" id="edit-unit-' + id + '" value="' + currentUnit + '">')
+    
+      // 轉換權限欄位
+      var groupCell = $('#group-' + id)
+      var currentGroupId = groupCell.attr('data-group-id')
+      var select = $('<select id="edit-group-' + id + '" class="form-control"></select>')
+      $.each(group_list, function (index, group) {
+        console.info(group)
+        var option = $('<option></option>').attr('value', group.pk).text(group.fields.name)
+        if (group.pk == currentGroupId) {
+          option.attr('selected', 'selected')
+        }
+        select.append(option)
+      })
+      console.info(select)
+      groupCell.html(select)
+    
+      // 更新編輯鏈接以保存變更
+      $(line)
+        .text('保存')
+        .attr('onclick', 'saveRow( ' + id + ')')
+    }
+    
+    function saveRow(id) {
+      // 提取編輯後的值
+      var newName = $('#edit-name-' + id).val()
+      var newUnit = $('#edit-unit-' + id).val()
+      var newGroup = $('#edit-group-' + id).val()
+      var account = $('#account-' + id).text()
+    
+      // 更新介面上的文字並恢復原來的編輯鏈接
+      $.ajax({
+        url: '/account/edit/',
+        method: 'GET',
+        data: {
+          account: account,
+          username_zh: newName,
+          unit: newUnit,
+          group_id: newGroup
+        },
+        success: function (data) {
+          window.alert('成功')
+          reLoadMainPage()
+        }
+      })
+    }
+  </script>
+{% endblock %}
+{% block style %}
+{% endblock %} {% block form %}
+  <!-- Corrected form tag and added trailing slash to action attribute -->
+  <form id="search" action="/account/list/" method="GET">
+    {% csrf_token %}
+    <p>
+      <label for="search_username">帳號:</label>
+      <input type="text" id="search_username" name="search_username" value="{{ request.GET.username }}" />
+      <label for="search_username_zh">姓名:</label>
+      <input type="text" id="search_username_zh" name="search_username_zh" value="{{ request.GET.username_zh }}" />
+      <label for="search_unit">所屬單位:</label>
+      <input type="text" id="search_unit" name="search_unit" value="{{ request.GET.unit }}" />
+    </p>
+    <p>
+      <label for="search_group">群組:</label>
+      <input type="text" id="search_group" name="search_group" value="{{ request.GET.group }}" />
+    </p>
+    <input type="submit" value="查詢" />
+    <button type="button" id="upload" onclick="upload()">上傳EXCEL</button>
+    <button type="button" url="/account/add/" onclick="addUser(event)">新增</button>
+  </form>
+{% endblock %} {% block table %}
+  <caption>帳號</caption>
+  <thead>
+    <tr>
+      <th scope="col">帳號</th>
+      <th scope="col">姓名</th>
+      <th scope="col">所屬單位</th>
+      <th scope="col">權限</th>
+      <th scope="col">編輯</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Corrected the template variables with double curly braces -->
+    {% for info in pagelist %}
+      <tr>
+        <td id="account-{{ info.id }}">{{ info.username }}</td>
+        <td id="name-{{ info.id }}">{{ info.username_zh|default:'' }}</td>
+        <td id="unit-{{ info.id }}">{{ info.unit|default:'' }}</td>
+        <td id="group-{{ info.id }}" data-group-id="{{ info.group.id }}">{{ info.group|default:'' }}</td>
+        <td id="edit-{{ info.id }}">
+          <a href="#" onclick="editRow(this, {{ info.id }})">編輯</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+  <div id="modalContainer"></div>
+{% endblock %}

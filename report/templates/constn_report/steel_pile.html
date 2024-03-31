@@ -1,0 +1,125 @@
+{% extends 'base/base_table.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}
+  <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Adjusting the style of the caption in the table with id 'base_table'
+      $("#base_table caption").each(function () {
+        $(this).css({
+          "position": "static",
+          "left": "auto",
+          "width": "auto",
+          "height": "auto",
+          "overflow": "visible",
+          "clip": "auto",
+          "caption-side": "top"
+        });
+      });
+  
+      // Setting up the click event for the button with id 'exceloutput'
+      $('#exceloutput').click(function() {
+        var fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
+        $('#base_table').tableExport({
+          type: 'excel',
+          mso: {
+            fileFormat: 'xlsx',
+          },
+          fileName: fileName // Using the captured file name
+        });
+      });
+    });
+  </script>
+  
+{% endblock %}
+
+{% block form %}
+  {% load strmap %}
+  <!-- Corrected form tag and added trailing slash to action attribute -->
+  <form id="search" action="/constn/pile/" method="GET">
+    {% csrf_token %}
+    <p>
+      <label for="code">工地編號</label>
+      <input type="text" id="code" name="code" value ="{{ request.GET.code }}" />
+      <label for="owner">業主</label>
+      <input type="text" id="owner" name="owner" value="{{ request.GET.owner }}" />
+      <label for="name">名稱</label>
+      <input type="text"
+             id="name"
+             name="name"
+             value="{{ request.GET.name }}" />
+    </p>
+    <input type="submit" value="查詢" />
+    <input type="button" id="exceloutput" value="匯出EXCEL" />
+  </form>
+{% endblock %}
+{% block table %}
+  <caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}</caption>
+  <!--{{steel_pile_table }}-->
+
+  {% for key, tran_map in steel_pile_table.items %}
+    
+      <tbody>
+        <tr>
+          <th class="s2" dir="ltr">規格:</th>
+          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">出料</th>
+          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">入料</th>
+          <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">支差異</th>
+          <th class="s2" dir="ltr" rowspan="2" style="border-left: 1px solid black">M差異</th>
+        </tr>
+        <tr style="height: 20px">
+          <th class="s5"
+              dir="ltr"
+              rowspan="{{ tran_map.max_length }}"
+              style="vertical-align: middle">{{ key }}</th>
+          {% for _ in column_count %}
+            <th class="s4" dir="ltr" style=" border-left: 1px solid black;">日期</th>
+            <th class="s4" dir="ltr">支</th>
+            <th class="s4" dir="ltr">合計M</th>
+            <th class="s4" dir="ltr">單號</th>
+            <th class="s3" dir="ltr">備註</th>
+          {% endfor %}
+        </tr>
+        {% for row in tran_map.table %}
+          <tr style="height: 20px">
+            {% for item in row %}
+              {% if item %}
+                <td style=" border-left: 1px solid black;">{{ item.build_date | date:"Y/m/d" }}</td>
+                <td>{{ item.total_quantity |floatformat:"2" }}</td>
+                <td>{{ item.total_unit |floatformat:"2" }}</td>
+                <td>{{ item.code }}</td>
+                <td>{{ item.remake }}</td>
+              {% else %}
+                <td style=" border-left: 1px solid black;"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              {% endif %}
+            {% endfor %}
+            {% if forloop.first %}
+              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_count |floatformat:"2" }}</th>
+              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_unit |floatformat:"2" }}</th>
+            {% endif %}
+          </tr>
+        {% endfor %}
+ 
+        <tr style="height: 20px" class="ttttt">
+          {% for row in tran_map.level_summary %}
+            <td style=" border-left: 1px solid black;" class="ttttt">總計:</td>
+            <td>{{ row.count |floatformat:"2" }}</td>
+            <td>{{ row.unit |floatformat:"2" }}</td>
+            <td></td>
+            <td></td>
+          {% endfor %}
+          {% if not tran_map.table %}
+            <th rowspan="{{ tran_map.summary.max_length }}">0</th>
+              <th rowspan="{{ tran_map.summary.max_length }}">0</th>
+          {% endif %}
+        </tr>
+   
+      </tbody>
+   
+  {% endfor %}
+{% endblock %}

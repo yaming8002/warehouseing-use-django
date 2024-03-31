@@ -1,0 +1,1 @@
+from .update_report import report_save_receiver

@@ -1,0 +1,86 @@
+{% extends "base/base_table.html" %}{{""}} {% block title %} group list {{""}}
+{% endblock %} {% block javascript %}
+<script>
+  function addgroup(event) {
+    // 向後端發送 AJAX 請求
+    $.ajax({
+      url: "/group/add/",
+      method: "GET",
+      success: function (data) {
+        $("#modalContainer").html(data);
+        $("#createModal").modal("show");
+      },
+      error: function (error) {
+        console.error("Error loading modal content: ", error);
+      },
+    });
+  }
+
+  function editRow( id) {
+    // 轉換姓名欄位
+
+    $.ajax({
+      url: "/group/edit/",
+      method: "GET",
+      data : { "id": id },  
+      success: function (data) {
+        $("#modalContainer").html(data);
+        $("#createModal").modal("show");
+      },
+      error: function (error) {
+        console.error("Error loading modal content: ", error);
+      },
+    });
+  }
+
+</script>
+{% endblock %} {% block form %}
+<!-- Corrected form tag and added trailing slash to action attribute -->
+<form id="search" action="/group/list/" method="GET">
+  {% csrf_token %}
+  <p>
+    <label for="search_name">權限名稱:</label>
+    <input
+      type="text"
+      id="search_name"
+      name="search_name"
+      value="{{ request.GET.search_name }}"
+    />
+  </p>
+  <input type="submit" value="查詢" />
+  <button type="button" url="/group/add/" onclick="addgroup(event)">
+    新增
+  </button>
+</form>
+{% endblock %} {% block table %}
+<caption>
+  權限
+</caption>
+<thead>
+  <tr>
+    <th scope="col">權限名稱</th>
+    <th scope="col">啟用</th>
+    <th scope="col">編輯</th>
+  </tr>
+</thead>
+<tbody>
+  <!-- Corrected the template variables with double curly braces -->
+  {% for info in pagelist %}
+  <tr>
+    <td id="account-{{ info.id }}">{{ info.name }}</td>
+    <td
+      id="account-{{ info.id }}"
+      style="{% if not info.is_active %}color:red;{% endif %}"
+    >
+      {{ info.is_active|yesno:"啟用,關閉" }}
+    </td>
+    <td id="edit-{{ info.id }}">
+      <a href="#" onclick="editRow({{ info.id }})">編輯</a>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+
+<div id="modalContainer"></div>
+
+{% endblock %}

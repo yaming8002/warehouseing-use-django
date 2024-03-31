@@ -1,6 +1,8 @@
 from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractUser, Group
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+from .user_group import UserGroup
 
 
 class Muser(AbstractUser):
@@ -9,14 +11,16 @@ class Muser(AbstractUser):
     # 所屬單位（中文支持，可為null）
     unit = models.CharField(max_length=30, null=True, verbose_name="所屬單位")
 
-    # group = models.ForeignKey(
-    #     Group, on_delete=models.SET_NULL, null=True, verbose_name="權限組"
-    # )
-    group = models.IntegerField( null=True, verbose_name="權限組"  )
+    group = models.ForeignKey(
+        UserGroup, on_delete=models.SET_NULL, null=True, verbose_name="權限組"
+    )
+
     # Django原先的項目過於複雜，目前重構直接 連接到auth_group 。group的id 在關連到menu
     # menu 功能每一個權限都會建構一筆，表示menu的總數會是 功能數 * (權限數 +1 ) ;+1是有一個預設模板
     email = models.EmailField(null=True, blank=True)
-
+    is_staff = models.BooleanField(default="True")
+    is_active = models.BooleanField(default="True")
+    is_superuser = models.BooleanField(default="False")
     # 覆盖不需要的字段
 
     # is_superuser = None

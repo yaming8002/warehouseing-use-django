@@ -1,0 +1,162 @@
+{% extends 'base/base_table.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}
+  <script>
+  function constn_edit(event) {
+    // 向後端發送 AJAX 請求
+    url = '/constn/edit/'
+
+    $.ajax({
+      url: url,
+      method: 'GET',
+      data:{'id':event},
+      success: function (data) {
+        console.log(data)
+        $('#modalContainer').html(data)
+        $('#createModal').modal('show')
+      },
+      error: function (error) {
+        console.error('Error loading modal content: ', error)
+      }
+    })
+  }
+  
+  function upload(event) {
+    // 向後端發送 AJAX 請求
+    $.ajax({
+      url: '/constn/uploadexcel/',
+      method: 'GET',
+      success: function (data) {
+        console.log(data)
+        $('#modalContainer').html(data)
+        $('#createModal').modal('show')
+      },
+      error: function (error) {
+        console.error('Error loading modal content: ', error)
+      }
+    })
+  }
+
+  </script>
+{% endblock %}
+{% block form %}
+  {% load strmap %}
+  <!-- Corrected form tag and added trailing slash to action attribute -->
+  <form id="search" action="/constn/list/" method="GET">
+    {% csrf_token %}
+    <p>
+      <label for="owner">業主</label>
+      <input type="text" id="owner" name="owner" value="{{ request.GET.owner }}" />
+      <label for="code">工地編號</label>
+      <input type="text" id="code" name="code" value ="{{ request.GET.code }}" />
+      <label for="address">地址</label>
+      <input type="text"
+             id="address"
+             name="address"
+             value="{{ request.GET.address }}" />
+    </p>
+    <p>
+      {% get_constn_state as constn_state %}  <!-- 调用模板标签并将结果赋值给变量 -->
+      <!-- {{constn_state}}-->
+      <label for="state">狀態</label>
+      <select id="state" name="state">
+        <option value>全部</option>
+        {% for state in constn_state %}
+          <!-- 迭代 constn_state 变量 -->
+          <option value="{{ state.0 }}"
+                  {% if request.GET.state == state.0|stringformat:"s" %}selected{% endif %}>{{ state.1 }}</option>
+        {% endfor %}
+      </select>
+      {% get_site_genre as site_genre %}
+      <label for="genre">類別</label>
+      <select id="genre" name="genre">
+        <option value>全部</option>
+        {% for genre in site_genre %}
+          <!-- 迭代 constn_state 变量 -->
+          <option value="{{ genre.0 }}"
+                  {% if request.GET.genre == genre.0|stringformat:"s" %}selected{% endif %}>{{ genre.1 }}</option>
+        {% endfor %}
+      </select>
+    </p>
+    <input type="submit" value="查詢" />
+    <button type="button" onclick="constn_edit(null)">新增</button>
+    <button type="button" onclick="upload(event)">上傳EXCEL</button>
+  </form>
+  <div id="modalContainer"></div>
+{% endblock %}
+{% block table %}
+  <caption>工地資訊</caption>
+  <thead>
+    <tr>
+      <th scope="col">工地編號</th>
+      <th scope="col">業主</th>
+      <th scope="col">工程名稱</th>
+      <th scope="col">發案日期</th>
+      <th scope="col">鋼樁結算</th>
+      <th scope="col">鋼軌結算</th>
+      <th scope="col">狀態</th>
+      <th scope="col">結案日期</th>
+      <th scope="col">編輯</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Corrected the template variables with double curly braces -->
+    {% for item in pagelist %}
+      <tr>
+        <td>
+          <!--{{item.id}}-->{{ item.code }}
+        </td>
+        <td>
+          <!--{{item.id}}-->{{ item.owner }}
+        </td>
+        <td>
+          <!--{{item.id}}-->
+          {{ item.name }}
+        </td>
+        <td>
+          {% if item.crate_date %}
+            {{ item.crate_date | date:'Y-m-d' }}
+          {% else %}
+            ---
+          {% endif %}
+        </td>
+        <td>
+
+        {% if "1" != item.genre|stringformat:"s" %}
+          ---
+        {% elif item.poling_done %}
+          是
+        {% else %}
+          否
+        {% endif %}
+        </td>
+        <td>
+          {% if "1" != item.genre|stringformat:"s" %}
+            ---
+          {% elif item.rail_done %}
+            是
+          {% else %}
+            否
+          {% endif %}
+        </td>
+        <td>
+          {% get_constn_state as constn_state %}
+          {% for state in constn_state %}
+            <!-- 迭代 constn_state 变量 -->
+            {% if state.0|stringformat:"s" == item.state|stringformat:"s" %}{{ state.1 }}{% endif %}
+          {% endfor %}
+        </td>
+        <td>
+          {% if item.done_date %}
+            {{ item.done_date | date:'Y-m-d' }}
+          {% else %}
+            ---
+          {% endif %}
+        </td>
+        <td>
+          <a href="#" onclick="constn_edit('{{ item.pk }}')">編輯</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock %}
