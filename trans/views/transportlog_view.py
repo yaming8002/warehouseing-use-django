@@ -1,21 +1,14 @@
 import json
 import logging
-
 # # Create your models here.
 import logging.config
 import sys
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.views import View
-from django.views.generic.edit import CreateView
-from django.views.generic.list import ListView
-from openpyxl import load_workbook
 
 from report.models.steel_model import DoneSteelReport
 from stock.models.material import MatCat, Materials
@@ -211,7 +204,6 @@ class ImportTransportView(ImportData2Generic):
                 self.error_list.append(errordct)
 
                 logger.info(errordct)
-                sys.exit(0)
 
     def insert_rent_DB(self, data):
         for item in data:

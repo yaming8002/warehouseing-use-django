@@ -69,43 +69,42 @@ class ImportConstnView(ImportData2Generic):
         "備註",
     ]
 
-    def insertDB(self, actual_columns):
-        for item in actual_columns:
-            
-            if item[0] is None:
-                break
-            crate_date = datetime.now()
-            done_date = datetime.now()
-            if item[3]:
-                crate_date = datetime.strptime(item[3], "%Y-%m-%d")
-            if item[8]:
-                done_date = datetime.strptime(item[8], "%Y-%m-%d")
-            
-            code = excel_value_to_str(item[0])
-            genre = tup_map_get_index(site_genre, item[4])  # noqa: F821
-            state = tup_map_get_index(constn_state, item[5])
-            done_date = None if state >0 else done_date
+    def insertDB(self, item):
+  
+        if item[0] is None:
+            return 
+        crate_date = datetime.now()
+        done_date = datetime.now()
+        if item[3]:
+            crate_date = datetime.strptime(item[3], "%Y-%m-%d")
+        if item[8]:
+            done_date = datetime.strptime(item[8], "%Y-%m-%d")
+        
+        code = excel_value_to_str(item[0])
+        genre = tup_map_get_index(site_genre, item[4])  # noqa: F821
+        state = tup_map_get_index(constn_state, item[5])
+        done_date = None if state >0 else done_date
 
-            try:
-                if SiteInfo.objects.filter(code=code).exists():
-                    print(f"{code} is exists ")    
-                else:
-                    SiteInfo.objects.create(
-                        code=code,
-                        owner=str(item[1]),
-                        name=item[2],
-                        crate_date=crate_date,
-                        genre=genre,
-                        state=state,
-                        member=item[6],
-                        counter=item[7],
-                        done_date=done_date,
-                        remark=item[9],
-                    )
-            except Exception as e:
-                # 处理可能的异常情况
-                print("An error occurred:", e)
-                self.response_data["error_list"].append((code, str(e)))
+        try:
+            if SiteInfo.objects.filter(code=code).exists():
+                print(f"{code} is exists ")    
+            else:
+                SiteInfo.objects.create(
+                    code=code,
+                    owner=str(item[1]),
+                    name=item[2],
+                    crate_date=crate_date,
+                    genre=genre,
+                    state=state,
+                    member=item[6],
+                    counter=item[7],
+                    done_date=done_date,
+                    remark=item[9],
+                )
+        except Exception as e:
+            # 处理可能的异常情况
+            print("An error occurred:", e)
+            self.response_data["error_list"].append((code, str(e)))
 
 
 class ConstnSeveView(SaveControlView):

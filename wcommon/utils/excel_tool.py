@@ -1,5 +1,9 @@
 import json
+import logging
+# # Create your models here.
+import logging.config
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -7,6 +11,9 @@ from django.views import View
 from openpyxl import load_workbook
 from openpyxl.cell.cell import Cell
 from openpyxl.worksheet.worksheet import Worksheet
+
+logging.config.dictConfig(settings.LOGGING)
+logger = logging.getLogger(__name__)
 
 
 class ImportDataGeneric(View):
@@ -114,10 +121,13 @@ class ImportData2Generic(View):
         error_list = []
         for item in jsonData:
             try:
-                self.insertDB(item)
+                if item:
+                    self.insertDB(item)
             except Exception as e:
                 # 捕获处理数据时的错误，并添加到错误列表中
-                error_list.append(str(e))
+                errordct = {"item": item, "e": str(e)}
+                error_list.append(errordct)
+                logger.info(errordct)
 
         response_data = {
             "success": False if error_list else True,

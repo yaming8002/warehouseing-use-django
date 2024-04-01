@@ -66,51 +66,49 @@ class ImportMaterialView(ImportData2Generic):
         "備註",
     ]
 
-    def insertDB(self, actual_columns):
+    def insertDB(self, item):
         matcatset = MatCat.objects
         matspceset = MatSpec.objects
-        for item in actual_columns:
-            print(item)
-            if item[0] is None:
-                break
+        if item[0] is None:
+            return 
 
-            code = (
-                str(item[0])
-                if isinstance(item[0], (int, str))
-                else "{:.0f}".format(item[0])
+        code = (
+            str(item[0])
+            if isinstance(item[0], (int, str))
+            else "{:.0f}".format(item[0])
+        )
+    
+        if item[1] is None:
+            code1 = None
+        else :
+            code1= (
+                    str(item[1])
+                    if isinstance(item[1], (int, str))
+                    else "{:.0f}".format(item[1])
             )
-      
-            if item[1] is None:
-                code1 = None
-            else :
-                code1= (
-                        str(item[1])
-                        if isinstance(item[1], (int, str))
-                        else "{:.0f}".format(item[1])
+            
+        if item[2] is None:
+            code2 = None
+        else :
+            code2= (
+                    str(item[2])
+                    if isinstance(item[2], (int, str))
+                    else "{:.0f}".format(item[2])
                 )
-                
-            if item[2] is None:
-                code2 = None
-            else :
-                code2= (
-                        str(item[2])
-                        if isinstance(item[2], (int, str))
-                        else "{:.0f}".format(item[2])
-                    )
- 
-            # mat = Materials(mat_code=code,name=str(item[1]))
-            print(f"code{code},mat_code2:{code1},mat_code3:{code2},name={item[3]}")
-            Materials.objects.create(
-                mat_code=code,
-                mat_code2=code1,
-                mat_code3=code2,
-                name=str(item[3]),
-                category=matcatset.filter(name=item[4]).first(),
-                specification=None if item[5] == "無" else matspceset.filter(name=item[5]).first(),
-                is_consumable=item[6] == "是",
-                is_divisible=item[7] == "是",
-                unit_of_division=item[8],
-            )
+
+        # mat = Materials(mat_code=code,name=str(item[1]))
+        print(f"code{code},mat_code2:{code1},mat_code3:{code2},name={item[3]}")
+        Materials.objects.create(
+            mat_code=code,
+            mat_code2=code1,
+            mat_code3=code2,
+            name=str(item[3]),
+            category=matcatset.filter(name=item[4]).first(),
+            specification=None if item[5] == "無" else matspceset.filter(name=item[5]).first(),
+            is_consumable=item[6] == "是",
+            is_divisible=item[7] == "是",
+            unit_of_division=item[8],
+        )
 
 
 

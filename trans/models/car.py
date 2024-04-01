@@ -15,7 +15,7 @@ class CarInfo(models.Model):
     value = models.DecimalField(
         max_digits=10, default=0, decimal_places=2, verbose_name="基本台金額", null=True
     )
-    remark = models.TextField(verbose_name="噸數(備註)", default="", null=True)
+    remark = models.CharField(max_length=150,verbose_name="噸數(備註)", default="", null=True)
 
     @classmethod
     def create(cls, car_number, firm=None, remark=None, value=None):
@@ -36,7 +36,7 @@ class CarInfo(models.Model):
 
     class Meta:
         unique_together = ["car_number", "firm"]
-        ordering = ["firm", "car_number"]  # 按照 id 升序排序
+        ordering = ["-firm", "car_number"]  # 按照 id 升序排序
 
     def __str__(self):
         return f"{self.car_number} 公司:{self.firm} "

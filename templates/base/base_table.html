@@ -17,6 +17,12 @@
           $(this).addClass("table table-primary table-striped");
         });
 
+        $("#base_table td").each(function () {
+          var value = parseFloat($(this).text()); // 尝试将内容转换为浮点数
+          if (!isNaN(value) && value < 0) { // 检查是否为负数
+              $(this).addClass("negative-value"); // 添加类以改变文本颜色
+          }
+      });
       });
     </script>
     {% block javascript %}<script></script>{% endblock %}
@@ -40,7 +46,6 @@
     }
   
     .tableStyle table{
-      font-size: 13px;
       table-layout: auto;
       min-width: 100%;  /* 可以根据需要调整 */
       min-height: 100% ;
@@ -48,6 +53,7 @@
     }  
   
     .tableStyle table th {
+      font-size:18px;
       font-weight:bolder ;
       white-space: nowrap; /* 防止内容换行 */
       border: 1px solid black;
@@ -62,6 +68,11 @@
       vertical-align: middle;
     }  
 
+
+    .negative-value {
+      color: red !important;
+  }
+  
     .separator {
       height: 20px !important;
       background-color: #fff !important;
@@ -70,6 +81,22 @@
       --bs-table-color-type: : none !important;
       --bs-table-bg-type: none !important;
   }
+
+  .col-color-1 {
+    background-color: lightblue;
+  }
+  .col-color-2 {
+    background-color: lightgreen;
+  }
+
+  /* 奇數行深色 */
+  tr:nth-child(odd) .col-color-1 {
+    background-color: blue;
+  }
+  tr:nth-child(odd) .col-color-2 {
+    background-color: green;
+  }
+
     </style>
     {% block styles %}<style></style>{% endblock %}
     <style></style>

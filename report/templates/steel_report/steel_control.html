@@ -6,19 +6,7 @@
   <script>
     $(document).ready(function () {
       // Adjusting the style of the caption in the table with id 'base_table'
-      $("#base_table caption").each(function () {
-        $(this).css({
-          "position": "static",
-          "left": "auto",
-          "width": "auto",
-          "height": "auto",
-          "overflow": "visible",
-          "clip": "auto",
-          "caption-side": "top"
-        });
-      });
       hideEditRowIfEarlier();
-
     });
 
     function hideEditRowIfEarlier() {
@@ -51,20 +39,7 @@
   </script>
   
 {% endblock %}
-{% block styles %}
-  <style>
 
-  .tableStyle table{
-    font-size: 13px;
-    table-layout: auto;
-    min-width: auto !important;  /* 可以根据需要调整 */
-    min-height: auto !important;
-    width: auto;      /* 允许表格根据内容自动调整宽度 */
-  }  
-
- 
-  </style>
-{% endblock %}
 {% block form %}
   <form id="search" action="/steel_control/" method="GET">
     {% csrf_token %}

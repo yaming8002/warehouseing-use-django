@@ -9,11 +9,9 @@ from report.models.monthreport_model import MonthData, MonthReport
 from stock.models.material import Materials
 from stock.models.site import SiteInfo
 from stock.models.stock import MainStock
-from trans.models import TransLog, TransLogDetail
-from wcommon.templatetags import done_type_map
+from trans.models import TransLog
 from wcommon.utils.uitls import excel_value_to_str, get_year_month
-from decimal import Decimal ,ROUND_HALF_UP
-from django.forms.models import model_to_dict
+from decimal import ROUND_HALF_UP
 import logging
 # # Create your models here.
 import logging.config
@@ -93,9 +91,7 @@ class DoneSteelReport(MonthReport):
         "408": "H408*400",
         "414": "H414*405",
         "4141": "H414中柱",
-        "11": "覆工板 1M *2M",
-        "84": "覆工板 1M *3M",
-        "88": "水泥覆工板",
+        "11": "覆工板",
         "13": "千斤頂",
         "14": "土壓計",
     }

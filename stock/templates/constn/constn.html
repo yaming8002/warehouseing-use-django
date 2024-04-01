@@ -116,9 +116,6 @@
         <td>
           {% if item.crate_date %}
             {{ item.crate_date | date:'Y-m-d' }}
-          {% else %}
-            ---
-          {% endif %}
         </td>
         <td>
 
@@ -149,9 +146,6 @@
         <td>
           {% if item.done_date %}
             {{ item.done_date | date:'Y-m-d' }}
-          {% else %}
-            ---
-          {% endif %}
         </td>
         <td>
           <a href="#" onclick="constn_edit('{{ item.pk }}')">編輯</a>

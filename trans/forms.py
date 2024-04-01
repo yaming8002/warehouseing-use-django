@@ -17,14 +17,16 @@ class CarinfoFrom(forms.ModelForm):
     firm = forms.CharField(
         label="公司",
         initial='',
+        required=False,  # 设置为非必填
         widget=forms.TextInput(attrs={"class": "form-control required"}),
     )
 
 
     is_count = forms.BooleanField(
         label="報價",
-        initial=True,
-        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        initial=False,
+        required=False,  # 设置为非必填
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input" , "role":"switch"}),
     )
 
     remark = forms.CharField(
