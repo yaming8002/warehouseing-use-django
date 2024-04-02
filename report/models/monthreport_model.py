@@ -56,18 +56,19 @@ class MonthReport(MonthData):
         reports = cls.objects.raw(query_str, [site.id, year, year, month])
 
         if reports:
-            report = reports[0]
+            for x in reports:
+                report =x
+                break
+            if f'{report.year}{report.month:02d}' < f'{year}{month:02d}' :
+                report.pk = None  
+                report.year = year
+                report.month = month
         else:
             report = cls.objects.create(
                 siteinfo=site,
                 year=year,
                 month=month,
             )
-
-        if f'{report.year}{report.month}' < f'{year}{month}' :
-            report.pk = None  
-            report.year = year
-            report.month = month
 
         return report
 

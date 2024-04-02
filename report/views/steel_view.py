@@ -27,8 +27,6 @@ static_column_code = [
         "414",
         "4141",
         "11",
-        "84",
-        "88",
         "13",
         "14",
 ]
@@ -79,8 +77,10 @@ class SteelDoneView(MonthListView):
     
     def get_whse_martials(self,context ):
         year,month = get_year_month()
+        print('total_report')
         context['total_report'] = SteelReport.get_current_by_site(SiteInfo.get_site_by_code('0000'),year,month)
         before_year,before_month = self.get_before_year_month()
+        print('befote_total_report')
         context['befote_total_report']= SteelReport.get_current_by_site(SiteInfo.get_site_by_code('0000'),before_year,before_month)
         context['diff'] = self.get_diff_value(context['total_report'],context['befote_total_report'])
         context['before_yearMonth'] = f'{before_year}-{before_month:02d}'
@@ -90,7 +90,6 @@ class SteelDoneView(MonthListView):
         context['h401'] = SteelPillar.get_value('401',year,month)
 
         
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         self.get_whse_martials(context)

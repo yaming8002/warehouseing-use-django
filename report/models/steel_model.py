@@ -33,16 +33,14 @@ class SteelReport(MonthReport):
         "408": "H408*400",
         "414": "H414*405",
         "4141": "H414中柱",
-        "11": "覆工板 1M *2M",
-        "84": "覆工板 1M *3M",
-        "88": "水泥覆工板",
+        "11": "覆工板",
         "13": "千斤頂",
         "14": "土壓計",
     }
 
     for k, v in static_column_code.items():
         locals()[f"m_{k}"] = models.DecimalField(
-            max_digits=10, decimal_places=2, default=0.0, verbose_name=v
+            max_digits=10, decimal_places=2, default=0, verbose_name=v
         )
 
     @classmethod
