@@ -7,21 +7,7 @@
   <script>
     $(document).ready(function () {
       // Adjusting the style of the caption in the table with id 'base_table'
-      $("#base_table caption").each(function () {
-        $(this).css({
-          "position": "static",
-          "left": "auto",
-          "width": "auto",
-          "height": "auto",
-          "overflow": "visible",
-          "clip": "auto",
-          "caption-side": "top"
-        });
-      });
-
       summaryColorUpdate() ;
-
-
     });
 
     function summaryColorUpdate(){
@@ -119,20 +105,20 @@
       <td>
         {% if item.done_type == 1 %} 是 {% endif %}
       </td>
-      <td>出</td>
-      <td>{{ item.out_5|default:"" }}</td>
-      <td>{{ item.out_6|default:"" }}</td>
-      <td>{{ item.out_7|default:"" }}</td>
-      <td>{{ item.out_8|default:"" }}</td>
-      <td>{{ item.out_9|default:"" }}</td>
-      <td>{{ item.out_10|default:"" }}</td>
-      <td>{{ item.out_11|default:"" }}</td>
-      <td>{{ item.out_12|default:"" }}</td>
-      <td>{{ item.out_13|default:"" }}</td>
-      <td>{{ item.out_14|default:"" }}</td>
-      <td>{{ item.out_15|default:"" }}</td>
-      <td>{{ item.out_16|default:"" }}</td>
-      <td>{{ item.out_total|default:"" }}</td>
+      <td>出料</td>
+      <td>{{ item.out_5|floatformat:"0" }}</td>
+      <td>{{ item.out_6|floatformat:"0" }}</td>
+      <td>{{ item.out_7|floatformat:"0" }}</td>
+      <td>{{ item.out_8|floatformat:"0" }}</td>
+      <td>{{ item.out_9|floatformat:"0" }}</td>
+      <td>{{ item.out_10|floatformat:"0" }}</td>
+      <td>{{ item.out_11|floatformat:"0" }}</td>
+      <td>{{ item.out_12|floatformat:"0" }}</td>
+      <td>{{ item.out_13|floatformat:"0" }}</td>
+      <td>{{ item.out_14|floatformat:"0" }}</td>
+      <td>{{ item.out_15|floatformat:"0" }}</td>
+      <td>{{ item.out_16|floatformat:"0" }}</td>
+      <td>{{ item.out_total|floatformat:"0" }}</td>
       <td rowspan='3'>
         <a href="#" onclick="editRow({{ item.siteinfo.id }})">退回</a>
       </td>
@@ -141,19 +127,19 @@
       <td rowspan='2'>結案說明</td>
       <td rowspan='2' colspan='3' style="white-space: pre-line;">{{ item.remark }}</td>
       <td>入料</td>
-      <td>{{ item.in_5|default:"" }}</td>
-      <td>{{ item.in_6|default:"" }}</td>
-      <td>{{ item.in_7|default:"" }}</td>
-      <td>{{ item.in_8|default:"" }}</td>
-      <td>{{ item.in_9|default:"" }}</td>
-      <td>{{ item.in_10|default:"" }}</td>
-      <td>{{ item.in_11|default:"" }}</td>
-      <td>{{ item.in_12|default:"" }}</td>
-      <td>{{ item.in_13|default:"" }}</td>
-      <td>{{ item.in_14|default:"" }}</td>
-      <td>{{ item.in_15|default:"" }}</td>
-      <td>{{ item.in_16|default:"" }}</td>
-      <td>{{ item.in_total|default:"" }}</td>
+      <td>{{ item.in_5|floatformat:"0" }}</td>
+      <td>{{ item.in_6|floatformat:"0" }}</td>
+      <td>{{ item.in_7|floatformat:"0" }}</td>
+      <td>{{ item.in_8|floatformat:"0" }}</td>
+      <td>{{ item.in_9|floatformat:"0" }}</td>
+      <td>{{ item.in_10|floatformat:"0" }}</td>
+      <td>{{ item.in_11|floatformat:"0" }}</td>
+      <td>{{ item.in_12|floatformat:"0" }}</td>
+      <td>{{ item.in_13|floatformat:"0" }}</td>
+      <td>{{ item.in_14|floatformat:"0" }}</td>
+      <td>{{ item.in_15|floatformat:"0" }}</td>
+      <td>{{ item.in_16|floatformat:"0" }}</td>
+      <td>{{ item.in_total|floatformat:"0"}}</td>
     </tr>
     <tr class="table-success">
       {% load custom_filters %}

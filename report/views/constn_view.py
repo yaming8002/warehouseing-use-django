@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from report.util.steel_brace import build_steel_brace_table
-from report.util.steel_pile import  build_steel_pile_table
+from report.util.steel_pile import  build_steel_ng_table, build_steel_pile_table
 from stock.models.site import SiteInfo
 
 # Create your views here.
@@ -55,8 +55,10 @@ def steel_pile_view(request):
             show = True
         
 
+        steel_ng_map = {"300": "H300", "350": "H350", "400": "H400","3050": "鋼軌"}
         if show and constn.exists():
             context["steel_pile_table"] = build_steel_pile_table(constn.get())
+            context["steel_ng_table"] = build_steel_ng_table(constn.get())
             context["constn"] = constn.get()
             context["column_count"] = range(2)
 

@@ -1,5 +1,6 @@
 # Create your views here.
 from datetime import datetime
+from decimal import Decimal
 from typing import Dict, List
 
 from django.db.models import Q
@@ -111,6 +112,7 @@ def rail_update__total(report:RailReport,is_withdraw: bool):
     for i in range(5, 17):
         update_value = getattr(report, f'out_{i}') - getattr(report, f'in_{i}')
         update_value *= 1 if is_withdraw else -1
+        update_value = Decimal(f'{update_value:.2f}')
         setattr(total, f'in_{i}', getattr(total, f'in_{i}') + update_value)
     total_total =getattr(report, "out_total") - getattr(report, "in_total") 
     total_total = 1 if is_withdraw else -1

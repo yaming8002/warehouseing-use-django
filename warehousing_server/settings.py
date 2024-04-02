@@ -195,7 +195,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "detailed": {
-            "format": "{asctime} {classname} {levelname}[In class: {classname}] [In function: {funcName}] {message}",
+            "format": "{asctime} {levelname} [In function: {funcName}] {message}",
             "style": "{",
         },
     },

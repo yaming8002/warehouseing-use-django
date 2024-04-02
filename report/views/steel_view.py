@@ -74,8 +74,8 @@ class SteelDoneView(MonthListView):
 
     def get_queryset(self):
         year,month = get_year_month()
-        query = (Q(year=year)&Q(month=month)&Q(siteinfo__id__gt=4) & Q(is_done=True) )
-        return SteelReport.get_current_by_query(query)
+        query = (Q(year=year)&Q(month=month)&Q(siteinfo__id__gt=4) )
+        return DoneSteelReport.objects.filter(query).all()
     
     def get_whse_martials(self,context ):
         year,month = get_year_month()
@@ -123,9 +123,9 @@ def get_steel_edit_done(request):
         isdone = request.POST.get('isdone')
         report = SteelReport.objects.select_related('siteinfo').get(id=report_id)
         report.is_done =  isdone is not None and isdone == 'on' 
-
+        report.save()
         if report.is_done :
-            # steel_update__total(report,False)
+            steel_update__total(report,False)
             DoneSteelReport.add_done_item('cut',request)
             DoneSteelReport.add_done_item('change',request)
 

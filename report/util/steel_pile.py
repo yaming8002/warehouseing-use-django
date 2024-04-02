@@ -22,7 +22,6 @@ values_dict = {
 }
 
 
-
 def build_steel_pile_table(constn) -> Dict[str, Dict[str, any]]:
     translog = TransLog.objects.filter(constn_site=constn)
     mats = Materials.objects.filter(specification__lt=23)
@@ -88,9 +87,62 @@ def build_steel_pile_table(constn) -> Dict[str, Dict[str, any]]:
         steel_map[name]["max_length"] = max_length + 2
         steel_map[name]["table"] = transpose_list_of_lists(tr_list)
         steel_map[name]["level_summary"] = level_summary_of_lists(tr_list)
-        # print(steel_map[name]["table"] )
-        # print(f"name:{name},max:{max_length}")
     return steel_map
+
+
+steel_ng_map = {26: "H300", 27: "H350", 28: "H400",25: "鋼軌"}
+def build_steel_ng_table(constn) -> Dict[str, Dict[str, any]]:
+    translog = TransLog.objects.filter(constn_site=constn)
+    mats = Materials.objects.filter(mat_code=999)
+    transdefaullog = TransLogDetail.objects.filter(
+        translog__in=translog, material__in=mats
+    )
+
+    steel_map = {}
+    for key, name in steel_ng_map.items():
+        # name = f"m_{mat_code}"
+        steel_map[name] = {}
+        tr_list: List[List[Any]] = [[] for _ in range(2)]
+        max_length = 0
+        summary = {
+            "count_in": Decimal(0),
+            "unit_in": Decimal(0),
+            "count_out": Decimal(0),
+            "unit_out": Decimal(0),
+        }
+
+
+        queryset = transdefaullog.filter(
+            material__specification=key
+        )
+
+        total_quantity_and_unit = (
+            queryset.values(**values_dict)
+            .annotate(
+                total_quantity=Sum("quantity"),
+                total_unit=Sum("all_unit"),
+            )
+        )
+
+        for item in total_quantity_and_unit:
+            # print(item)
+            if item["transaction_type"] == "IN":
+                tr_list[1].append(item)
+                summary["count_in"] += Decimal(item["total_quantity"])
+                summary["unit_in"] += Decimal(item["total_unit"])
+            else:
+                tr_list[0].append(item)
+                summary["count_out"] += Decimal(item["total_quantity"])
+                summary["unit_out"] += Decimal(item["total_unit"])
+        max_length = max(max_length, len(tr_list[0]), len(tr_list[1]))
+
+        summary["max_length"] = max_length + 1
+        steel_map[name]["summary"] = summary
+        steel_map[name]["max_length"] = max_length + 2
+        steel_map[name]["table"] = transpose_list_of_lists(tr_list)
+        steel_map[name]["level_summary"] = level_summary_of_lists(tr_list)
+    return steel_map
+
 
 
 def transpose_list_of_lists(input_list):

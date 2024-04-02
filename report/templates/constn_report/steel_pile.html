@@ -105,6 +105,71 @@
           <th rowspan="{{ tran_map.summary.max_length }}">0</th>
         {% endif %}
       </tr>
+      {% endfor %}
+      <tr ><td class="separator"></td></tr>
+      <tr class='table-warning'><td colspan="13">NG 廢鐵</td></tr>
+      <tr>
+        <th rowspan="2">規格:</th>
+        <th colspan="5" class="table-danger" >出料</th>
+        <th colspan="5" class="table-success" >入料</th>
+        <th rowspan="2" >支差異</th>
+        <th rowspan="2" >M差異</th>
+      </tr>
+      <tr style="height: 20px">
+          <th class="table-danger" >日期</th>
+          <th class="table-danger">支</th>
+          <th class="table-danger">合計M</th>
+          <th class="table-danger">單號</th>
+          <th class="table-danger">備註</th>
+          <th class="table-success">日期</th>
+          <th class="table-success">支</th>
+          <th class="table-success">合計M</th>
+          <th class="table-success">單號</th>
+          <th class="table-success">備註</th>
+      </tr>
+      {% for key, tran_map in steel_ng_table.items %}
+        <tr style=" border-top: 2px solid #000;" >
+          <th class="s5"
+              dir="ltr"
+              rowspan="{{ tran_map.max_length }}"
+              style="vertical-align: middle">{{ key }}</th>
+        </tr>
+        {% for row in tran_map.table %}
+          <tr style="height: 20px">
+            {% for item in row %}
+              {% if item %}
+                <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.build_date | date:"Y/m/d" }}</td>
+                <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.total_quantity |floatformat:"2" }}</td>
+                <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.total_unit |floatformat:"2" }}</td>
+                <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.code }}</td>
+                <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.remake }}</td>
+              {% else %}
+                <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
+                <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
+                <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
+                <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
+                <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
+              {% endif %}
+            {% endfor %}
+            {% if forloop.first %}
+              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_count |floatformat:"2" }}</th>
+              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_unit |floatformat:"2" }}</th>
+            {% endif %}
+          </tr>
+        {% endfor %}
+        <tr style="height: 20px">
+          {% for row in tran_map.level_summary %}
+            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} > 總計:</th>
+            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>{{ row.count |floatformat:"2" }}</th>
+            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>{{ row.unit |floatformat:"2" }}</th>
+            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></th>
+            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></th>
+          {% endfor %}
+          {% if not tran_map.table %}
+            <th rowspan="{{ tran_map.summary.max_length }}">0</th>
+            <th rowspan="{{ tran_map.summary.max_length }}">0</th>
+          {% endif %}
+        </tr>
     </tbody>
   {% endfor %}
 {% endblock %}

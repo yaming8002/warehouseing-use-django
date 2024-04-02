@@ -85,7 +85,7 @@
   <div id="modalContainer"></div>
 {% endblock %}
 {% block table %}
-  <caption>工地資訊</caption>
+  <caption>工地清單</caption>
   <thead>
     <tr>
       <th scope="col">工地編號</th>
@@ -114,18 +114,16 @@
           {{ item.name }}
         </td>
         <td>
-          {% if item.crate_date %}
-            {{ item.crate_date | date:'Y-m-d' }}
+          {% if item.crate_date %}{{ item.crate_date | date:'Y-m-d' }}{% endif %}
         </td>
         <td>
-
-        {% if "1" != item.genre|stringformat:"s" %}
-          ---
-        {% elif item.poling_done %}
-          是
-        {% else %}
-          否
-        {% endif %}
+          {% if "1" != item.genre|stringformat:"s" %}
+            ---
+          {% elif item.poling_done %}
+            是
+          {% else %}
+            否
+          {% endif %}
         </td>
         <td>
           {% if "1" != item.genre|stringformat:"s" %}
@@ -144,8 +142,7 @@
           {% endfor %}
         </td>
         <td>
-          {% if item.done_date %}
-            {{ item.done_date | date:'Y-m-d' }}
+          {% if item.done_date %}{{ item.done_date | date:'Y-m-d' }}{% endif %}
         </td>
         <td>
           <a href="#" onclick="constn_edit('{{ item.pk }}')">編輯</a>

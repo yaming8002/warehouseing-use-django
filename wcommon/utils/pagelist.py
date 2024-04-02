@@ -53,7 +53,6 @@ class MonthListView(ListView):
         context = super().get_context_data(**kwargs)
         context["title"] = self.title_name
         year_month = self.request.GET.get("yearMonth" )
-        print(year_month)
         y,m=get_year_month(year_month) 
         context['yearMonth'] = f'{y}-{m:02d}'
 

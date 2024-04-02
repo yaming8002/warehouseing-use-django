@@ -45,28 +45,18 @@ class MonthReport(MonthData):
         if year is None:
             now = datetime.now()
             year, month = now.year, now.month
-        query = Q(siteinfo=site) & Q(year__lte=year) & Q(month__lte=month)
-        query_set = (
-            cls.objects
-            .select_related('siteinfo')  # 预先加载siteinfo相关联的对象
-            .annotate(
-                rank=Window(
-                    expression=Rank(),
-                    partition_by=[F('siteinfo__id')],
-                    order_by=[F('year').desc(), F('month').desc()]
-                )
-            )
-            .filter(rank=1)
-            .filter(query)
-            .order_by('-year', '-month')
-            .values('id', 'siteinfo__id')
-        )
-        # print(query_set.query)
-        ids = [item['id'] for item in query_set]
 
+        query_str = """
+                    SELECT * FROM report_railreport
+                    WHERE siteinfo_id = %s
+                    AND (`year` < %s OR (`year` = %s AND `month` <= %s))
+                    ORDER BY `year` DESC, `month` DESC
+                    """
+        
+        reports = cls.objects.raw(query_str, [site.id, year, year, month])
 
-        if ids:
-            report = cls.objects.select_related('siteinfo').get(id=ids[0])
+        if reports:
+            report = reports[0]
         else:
             report = cls.objects.create(
                 siteinfo=site,
@@ -86,7 +76,6 @@ class MonthReport(MonthData):
     def get_current_by_query(cls,query, is_done=False ):
         query_set = (
             cls.objects
-            .select_related('siteinfo')  # 预先加载siteinfo相关联的对象
             .annotate(
                 rank=Window(
                     expression=Rank(),
