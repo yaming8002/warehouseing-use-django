@@ -136,11 +136,43 @@
       </td>
     </tr>
   {% endfor %}
+  <tr>
+    <th colspan="5">工地出入總計</th>
+    <th class='table-danger' >{{ summary.out_5 |floatformat:"0" }}</th>
+    <th class='table-danger' >{{ summary.out_6 |floatformat:"0" }}</th>
+    <th class='table-danger' >{{ summary.out_7 |floatformat:"0" }}</th>
+    <th class='table-danger' >{{ summary.out_8 |floatformat:"0" }}</th>
+    <th class='table-danger' >{{ summary.out_9 |floatformat:"0" }}</th>
+    <th class='table-danger' >{{ summary.out_10 |floatformat:"0" }}</th>
+    <th class='table-danger' >{{ summary.out_11 |floatformat:"0" }}</th>
+    <th class='table-danger' >{{ summary.out_12 |floatformat:"0" }}</th>
+    <th class='table-danger' >{{ summary.out_13 |floatformat:"0" }}</th>
+    <th class='table-danger' >{{ summary.out_14 |floatformat:"0" }}</th>
+    <th class='table-danger' >{{ summary.out_15 |floatformat:"0" }}</th>
+    <th class='table-danger' >{{ summary.out_16 |floatformat:"0" }}</th>
+    <th class='table-danger' >{{ summary.out_total  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_5  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_6  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_7  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_8  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_9  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_10  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_11  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_12  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_13  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_14  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_15  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_16  |floatformat:"0" }}</th>
+    <th class='table-success' >{{ summary.in_total |floatformat:"0" }}</th>
+    <th>{{ summary.rail_ng |floatformat:"0" }}</th>
+    <th>
+    </th>
+  </tr>
   <tr class="separator">
     <td colspan="18" class="separator"></td>
   </tr>
   <tr>
-    <th colspan="5" rowspan=2>倉庫數量</th>
+    <th colspan="5" rowspan=2> 林口倉庫數量</th>
     <th>5M</th>
     <th>6M</th>
     <th>7M</th>
@@ -169,9 +201,6 @@
     <td>{{ lk_report.in_15 |floatformat:"0" }}</td>
     <td>{{ lk_report.in_16 |floatformat:"0" }}</td>
     <td>{{ lk_report.in_total|floatformat:"0" }}</td>
-  </tr>
-  <tr class="separator">
-    <td colspan="18" class="separator"></td>
   </tr>
   <tr>
     <th colspan="5" rowspan=2>國廣總數量</th>

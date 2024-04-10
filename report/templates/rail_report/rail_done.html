@@ -103,7 +103,7 @@
       <td>{{ item.siteinfo.owner }}</td>
       <td>{{ item.siteinfo.name }}</td>
       <td>
-        {% if item.done_type == 1 %} 是 {% endif %}
+        {% if item.done_type == 1 %} 是 {% else %} 否 {% endif %}
       </td>
       <td>出料</td>
       <td>{{ item.out_5|floatformat:"0" }}</td>

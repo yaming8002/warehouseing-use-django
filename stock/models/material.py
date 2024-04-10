@@ -1,6 +1,8 @@
 from decimal import Decimal
+import math
 from django.db import models
 from django.db.models import Q
+
 
 
 ng_spec_name =['鋼軌','中H300','中H350','中H400']
@@ -59,7 +61,7 @@ class Materials(models.Model):
             spec = MatSpec.objects.get(id=23)
             quest &= Q(specification=spec)
         elif unit :
-            spec = MatSpec.objects.get(id=round(unit))
+            spec = MatSpec.objects.get(id=math.ceil(unit))
             quest &= Q(specification=spec)
 
         # print(cls.objects.filter(quest).query)

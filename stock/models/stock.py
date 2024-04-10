@@ -2,7 +2,6 @@ from decimal import Decimal
 from django.db import models
 from stock.models.material import Materials
 from stock.models.site import SiteInfo
-from trans.models.trans import TransLogDetail
 
 
 class StockBase(models.Model):
@@ -24,20 +23,8 @@ class StockBase(models.Model):
 
     @classmethod
     def getItem(cls, site: SiteInfo, mat: Materials):
-        return cls.objects.get_or_create(siteinfo=site, material=mat)[0]
-
-    @classmethod
-    def move_material(cls, detial: TransLogDetail, is_main=False, is_in=True):
-        translog = detial.translog
-        mat = detial.material
-        if is_main:
-            stock = cls.objects.filter(siteinfo=2).get(material=mat)
-        else:
-            stock = cls.getItem(translog.constn_site, mat)
-
-        quantity = detial.quantity if detial.quantity else Decimal(0)
-        unit = detial.unit if detial.unit else Decimal(0)
-        stock.change_quantity_util(is_in, quantity, unit)
+        stock, _ = cls.objects.get_or_create(siteinfo=site, material=mat)
+        return stock
 
     def change_quantity_util(self, is_add=True, quantity=Decimal(0), unit=Decimal(0)):
         if is_add:
@@ -51,7 +38,7 @@ class StockBase(models.Model):
         self.save()
 
     class Meta:
-        unique_together = ("siteinfo", "material")
+        unique_together = ["siteinfo", "material"]
         abstract = True
         ordering = ["siteinfo", "material"]  # 按照 id 升序排序
 
@@ -59,12 +46,22 @@ class StockBase(models.Model):
 class MainStock(StockBase):
     date_tag = models.DateField(null=True, verbose_name="時間標籤")
 
+    @classmethod
+    def move_material(cls, site, mat, quantity, unit, is_in=True):
+        stock = cls.getItem(SiteInfo.get_warehouse(), mat)
+        stock.change_quantity_util(is_in, quantity, unit)
+
     class Meta:
         verbose_name = "主庫存"
         verbose_name_plural = "主庫存"
 
 
 class ConStock(StockBase):
+    @classmethod
+    def move_material(cls, site, mat, quantity, unit, is_in=True):
+        stock = cls.getItem(site, mat)
+        stock.change_quantity_util(is_in, quantity, unit)
+
     class Meta:
         verbose_name = "建設庫存"
         verbose_name_plural = "建設庫存"

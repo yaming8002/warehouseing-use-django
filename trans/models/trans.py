@@ -1,4 +1,3 @@
-
 from decimal import Decimal, ROUND_HALF_UP
 
 from django.db import models
@@ -6,6 +5,7 @@ from datetime import datetime
 from django.db.models import Q
 from stock.models.material import Materials
 from stock.models.site import SiteInfo
+from stock.models.stock import ConStock, MainStock
 from trans.models.car import CarInfo
 from wcommon.utils.uitls import excel_num_to_date, excel_value_to_str, get_month_range
 
@@ -38,7 +38,6 @@ class TransLog(models.Model):
 
     @classmethod
     def create(cls, code: str, item: list):
-
         consite = excel_value_to_str(item[2], 4)
         turn_site = excel_value_to_str(item[3], 4)
 
@@ -90,6 +89,7 @@ class TransLog(models.Model):
             "build_date",
         ]
 
+
 class TransLogDetail(models.Model):
     translog = models.ForeignKey(
         TransLog,
@@ -100,7 +100,7 @@ class TransLogDetail(models.Model):
     material = models.ForeignKey(
         Materials, on_delete=models.CASCADE, verbose_name="物料"
     )
-    
+
     is_rent = models.BooleanField(default=False, verbose_name="租賃")
     level = models.IntegerField(default=0, null=True, verbose_name="施工層別")
     rollback = models.BooleanField(default=False, verbose_name="作廢")
@@ -137,6 +137,12 @@ class TransLogDetail(models.Model):
             unit=unit,
             all_unit=all_unit,
             remark=remark,
+        )
+
+        is_stock_add = tran.transaction_type == "IN"
+        MainStock.move_material(tran.constn_site, mat, quantity, all_unit, is_stock_add)
+        ConStock.move_material(
+            tran.constn_site, mat, quantity, all_unit, not is_stock_add
         )
 
     @classmethod

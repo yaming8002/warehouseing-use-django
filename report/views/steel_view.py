@@ -20,12 +20,9 @@ static_column_code = [
         "301",
         "350",
         "351",
-        "390",
         "400",
         "401",
         "408",
-        "414",
-        "4141",
         "11",
         "13",
         "14",
@@ -50,12 +47,14 @@ class SteelControlView(MonthListView):
         context['before_yearMonth'] = f'{before_year}-{before_month:02d}'
 
 
-    def get_diff_value(self, current, before):
+    def get_diff_value(self, current:SteelReport, before:SteelReport):
         diff = []
         if current and before:
-            current = model_to_dict(current)
-            before = model_to_dict(before)
-            diff = [(Decimal(current[f'm_{key}']) - Decimal(before[f'm_{key}'])) for key in static_column_code]
+            currentdata = model_to_dict(current)
+            beforedata = model_to_dict(before)
+            print()
+            print()
+            diff = [(currentdata[f'm_{key}'] - beforedata[f'm_{key}']) for key in static_column_code]
         return diff
 
 
@@ -71,16 +70,15 @@ class SteelDoneView(MonthListView):
     template_name = "steel_report/steel_done.html"
 
     def get_queryset(self):
-        year,month = get_year_month()
-        query = (Q(year=year)&Q(month=month)&Q(siteinfo__id__gt=4) )
+        year,month = self.get_year_month()
+        query = (Q(year=year)&Q(month=month) )
+        print(DoneSteelReport.objects.filter(query).query)
         return DoneSteelReport.objects.filter(query).all()
     
     def get_whse_martials(self,context ):
-        year,month = get_year_month()
-        print('total_report')
+        year,month = self.get_year_month()
         context['total_report'] = SteelReport.get_current_by_site(SiteInfo.get_site_by_code('0000'),year,month)
-        before_year,before_month = self.get_before_year_month()
-        print('befote_total_report')
+        before_year,before_month = self.get_before_year_month(year,month)
         context['befote_total_report']= SteelReport.get_current_by_site(SiteInfo.get_site_by_code('0000'),before_year,before_month)
         context['diff'] = self.get_diff_value(context['total_report'],context['befote_total_report'])
         context['before_yearMonth'] = f'{before_year}-{before_month:02d}'
@@ -88,6 +86,7 @@ class SteelDoneView(MonthListView):
         context['h301'] = SteelPillar.get_value('301',year,month)
         context['h351'] = SteelPillar.get_value('351',year,month)
         context['h401'] = SteelPillar.get_value('401',year,month)
+
 
         
     def get_context_data(self, **kwargs):

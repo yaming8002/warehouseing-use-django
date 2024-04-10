@@ -12,6 +12,7 @@ from report.views import (
     steel_brace_view,
     steel_pile_view
 )
+from report.views.board_view import BoardControlView
 
 
 
@@ -28,6 +29,10 @@ urlpatterns = [
     path("steel_control/edit/", get_steel_edit_done, name="rail_edit"),
     path("steel_done/", SteelDoneView.as_view(), name="rail_done"),
     path("steel_done/withdraw/", steel_done_withdraw, name="rail_withdraw"),
+
+    path("board_report/", BoardControlView.as_view(), name="board_report"),
+    path("board_report/edit/", get_steel_edit_done, name="rail_edit"),
+
 
     path("constn/pile/", steel_pile_view, name="steel_pile_view"),
     path("constn/brace/", steel_brace_view, name="steel_brace_view"),

@@ -1,18 +1,25 @@
+import logging
+
+# # Create your models here.
+import logging.config
 from datetime import datetime
 from decimal import Decimal
+from typing import Optional
 
+from django.conf import settings
 from django.db import models, transaction
-from django.db.models import F
-from django.db.models import Q
+from django.db.models import F, Q, Window
+from django.db.models.functions import Rank
+from django.forms.models import model_to_dict
+
 from stock.models.material import Materials
 from stock.models.site import SiteInfo
 from trans.models import TransLog, TransLogDetail
 from wcommon.templatetags import done_type_map
-from django.forms.models import model_to_dict
-from typing import Optional
-from django.db.models import Window, F
-from django.db.models.functions import Rank
-# # Create your models here.
+
+logging.config.dictConfig(settings.LOGGING)
+
+logger = logging.getLogger(__name__)
 
 
 class MonthData(models.Model):
@@ -23,7 +30,6 @@ class MonthData(models.Model):
     class Meta:
         unique_together = ("year", "month")
         abstract = True
-        ordering = ["id" ]  # 按照 id 升序排序
 
 
 class MonthReport(MonthData):
@@ -42,23 +48,16 @@ class MonthReport(MonthData):
 
     @classmethod
     def get_current_by_site(cls, site: SiteInfo ,year: Optional[int] = None, month: Optional[int] = None):
-        if year is None:
+        if not year :
             now = datetime.now()
             year, month = now.year, now.month
 
-        query_str = """
-                    SELECT * FROM report_railreport
-                    WHERE siteinfo_id = %s
-                    AND (`year` < %s OR (`year` = %s AND `month` <= %s))
-                    ORDER BY `year` DESC, `month` DESC
-                    """
-        
-        reports = cls.objects.raw(query_str, [site.id, year, year, month])
 
-        if reports:
-            for x in reports:
-                report =x
-                break
+        query = (Q(siteinfo=site) & (Q(year__lt=year) | Q(year=year, month__lte=month)))
+        # print( cls.objects.filter(query).order_by('-year', '-month').query)
+        report = cls.objects.filter(query).order_by('-year', '-month').first()
+
+        if report:
             if f'{report.year}{report.month:02d}' < f'{year}{month:02d}' :
                 report.pk = None  
                 report.year = year
@@ -93,6 +92,20 @@ class MonthReport(MonthData):
         ids = [item['id'] for item in query_set]
         return cls.objects.select_related('siteinfo').filter(id__in=ids).filter(is_done=is_done).all()
     
+    @classmethod
+    def update_column_value(cls,id:int, is_add: bool,column:str,value:Decimal):
+        cls.objects.filter(id=id).update(**{
+            column: F(column) + value if is_add else F(column) - value
+        })
+
+
+    def update_edit_date(self):
+        now = datetime.now()
+        self.edit_date = now
+        self.year = now.year
+        self.month = now.month
+  
+
     def get_column_decimal_val(self, column:str):
         float_value = getattr(self, column)
         if isinstance(float_value, float):
@@ -102,4 +115,3 @@ class MonthReport(MonthData):
     class Meta:
         unique_together = ("siteinfo", "year", "month", "done_type", "is_done")
         abstract = True
-        ordering = ["id" ]  # 按照 id 升序排序

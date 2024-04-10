@@ -4,6 +4,7 @@ from decimal import Decimal
 from typing import Dict, List
 
 from django.db.models import Q
+from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -25,12 +26,23 @@ class RailControlView(MonthListView):
         # context['kh_stock'] = RailReport.get_current_by_site(SiteInfo.get_site_by_code('0003'),year,month)
         context['lk_report'] = RailReport.get_current_by_site(SiteInfo.get_site_by_code('0001'),year,month)
         context['total_report'] = RailReport.get_current_by_site(SiteInfo.get_site_by_code('0000'),year,month)
+        lst = self.object_list
+        summary = {}
+        for i in range(5, 17):
+            in_field_sum = sum(getattr(item, f"in_{i}", 0) for item in lst)
+            out_field_sum = sum(getattr(item, f"out_{i}", 0) for item in lst)
+            summary[f"in_{i}"] = in_field_sum
+            summary[f"out_{i}"] = out_field_sum
+        summary["in_total"] = sum(getattr(item, "in_total", 0) for item in lst)
+        summary["out_total"] = sum(getattr(item, "out_total", 0) for item in lst)
+        summary["rail_ng"] = sum(getattr(item, "rail_ng", 0) for item in lst)
+        context["summary"] = summary
 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         self.get_whse_martials(context)
-      
+        
         return context
 
 

@@ -52,8 +52,7 @@ class MonthListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = self.title_name
-        year_month = self.request.GET.get("yearMonth" )
-        y,m=get_year_month(year_month) 
+        y,m=self.get_year_month() 
         context['yearMonth'] = f'{y}-{m:02d}'
 
         return context
@@ -69,9 +68,11 @@ class MonthListView(ListView):
         return year,month
 
 
-    def get_year_month(self):
+    def get_year_month(self): 
         year_month = self.request.GET.get("yearMonth")
-        return get_year_month(year_month)
+        year_month =year_month if year_month else (datetime.now()).strftime('%Y-%m') 
+        split_year_month = [int(x) for x in year_month.split('-')]
+        return split_year_month[0],split_year_month[1]
 
     def get_month_range(self):
         # 获取当前日期

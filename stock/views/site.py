@@ -31,6 +31,7 @@ class SiteViewList(PageListView):
         result = SiteInfo.objects
         owner = self.request.GET.get("owner")
         code = self.request.GET.get("code")
+        name = self.request.GET.get("name")
         state = self.request.GET.get("state")
         genre = self.request.GET.get("genre")
 
@@ -38,6 +39,8 @@ class SiteViewList(PageListView):
             result = result.filter(code=code)
         if owner:
             result = result.filter(owner__istartswith=owner)
+        if name:
+            result = result.filter(name__istartswith=name)
         if state:
             state_int = int(state)
             result = result.filter(state=state_int)

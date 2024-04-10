@@ -1,0 +1,131 @@
+{% extends 'base/base_table.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}
+  <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+  <script type="text/javascript"
+          src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Adjusting the style of the caption in the table with id 'base_table'
+      hideEditRowIfEarlier();
+    });
+
+    function hideEditRowIfEarlier() {
+      var yearMonthInput = $('#yearMonthInput').val(); // 從輸入欄位獲得年月值
+      var currentDate = new Date();
+      var currentYearMonth = currentDate.toISOString().slice(0, 7); // 獲取當前年月
+  
+      if (yearMonthInput < currentYearMonth) {
+        // 如果輸入的年月早於當前年月，尋找並隱藏結案連結
+        $('.editRow_select').hide(); // 隱藏包含結案連結的<td>元素
+      }
+    }
+
+    function editRow(id) {
+      // 結案選單
+      console.log({ 'id': id })
+      $.ajax({
+        url: '/board_report/edit/',
+        method: 'GET',
+        data: { 'id': id },
+        success: function (data) {
+          $('#modalContainer').html(data)
+          $('#createModal').modal('show')
+        },
+        error: function (error) {
+          console.error('Error loading modal content: ', error)
+        }
+      })
+    }
+  </script>
+{% endblock %}
+{% block form %}
+  <form id="search" action="/board_report/" method="GET">
+    {% csrf_token %}
+    <p>
+      <label for="mat_code">物料:</label>
+      <select id="mat_code" name="mat_code">
+        <option value='21' {% if request.GET.mat_code == '21' %}selected{% endif %}>鐵板</option>
+        <option value='11' {% if request.GET.mat_code == '11' %}selected{% endif %}>簍空覆工板</option>
+        <option value='12' {% if request.GET.mat_code == '12' %}selected{% endif %}>洗車板</option>
+      </select>
+    </p>
+    <input type="submit" value="查詢" />
+    <input type="button" id="exceloutput" value="匯出EXCEL" />
+  </form>
+{% endblock %}
+{% block table %}
+  <caption></caption>
+  <tr>
+    <th>項次</th>
+    <th>工地代號</th>
+    <th>業主</th>
+    <th>名稱</th>
+    {% if  request.GET.mat_code == '21' %}
+      <th>鐵板 全</th>
+      <th>鐵板 半</th>
+      <th>總計</th>
+      <th>完成支撐</th>
+      <th>簽單</th>
+    {% else %}
+      <th>數量</th>
+      <th>完工</th>
+    {% endif %}
+    <th>現場人員</th>
+    <th>備註</th>
+    <th>編輯</th>
+  </tr>
+  {% for item in list %}
+
+    <tr >
+      <td>{{ forloop.counter }}</td>
+      <td>{{ item.siteinfo.code }}</td>
+      <td>{{ item.siteinfo.owner }}</td>
+      <td>{{ item.siteinfo.name }}</td>
+      <td>{{ item.quantity | floatformat:"0" }}</td>
+      {% if request.GET.mat_code == '21' %}
+        <td>{{ item.quantity2 | floatformat:"0" }}</td>
+        <td>{{ item.quantity|add:item.quantity2 | floatformat:"0" }}</td>
+        <td>
+          {% if item.done_type == 1 %}O{% endif %}
+        </td>
+      {% endif %}
+      <td>
+        {% if item.is_done %}O{% endif %}
+      </td>
+      <td>
+        {% if item.siteinfo.member %}{{ item.siteinfo.member }}{% endif %}
+      </td>
+      <td>{{ item.remark }}</td>
+      <td>
+        <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>
+      </td>
+    </tr>
+  {% endfor %}
+  <tr>
+    <th colspan="4">{{ kh_report.siteinfo.name }}</th>
+    <th>{{ kh_report.quantity | floatformat:"0" }}</th>
+    {% if request.GET.mat_code == '21' %}
+      <th>{{ kh_report.quantity2 | floatformat:"0" }}</th>
+      <th>{{ kh_report.quantity|add:kh_report.quantity2 | floatformat:"0" }}</th>
+      <th></th>
+    {% endif %}
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+  <tr>
+    <th colspan="4">{{ lk_report.siteinfo.name }}</th>
+    <th>{{ lk_report.quantity | floatformat:"0" }}</th>
+    {% if request.GET.mat_code == '21' %}
+      <th>{{ lk_report.quantity2 | floatformat:"0" }}</th>
+      <th>{{ lk_report.quantity|add:lk_report.quantity2 | floatformat:"0" }}</th>
+      <th></th>
+    {% endif %}
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+{% endblock %}

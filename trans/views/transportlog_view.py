@@ -4,7 +4,7 @@ import logging
 import logging.config
 import sys
 from datetime import datetime, timedelta
-
+import traceback
 from django.conf import settings
 from django.db.models import Q
 from django.http import JsonResponse
@@ -33,10 +33,7 @@ class TrandportView(PageListView):
         detail = TransLogDetail.objects.select_related()
         log = TransLog.objects.select_related(
             "constn_site", "turn_site", "carinfo"
-        ).filter(turn_site__isnull=False)
-        log = TransLog.objects.select_related(
-            "constn_site", "turn_site", "carinfo"
-        ).filter(turn_site__isnull=False)
+        )
         material = Materials.objects
 
         begin, end = self.get_month_range()
@@ -80,8 +77,8 @@ class TrandportView(PageListView):
         # 使用过滤后的 log 过滤 detail
         detail = detail.filter(
             is_rent=False, material__in=material.all(), translog__in=log.all()
-        )
-
+        ).order_by('id')
+        print(detail.query)
         return detail.all()
 
     def get_context_data(self, **kwargs):
@@ -143,7 +140,7 @@ class ImportTransportView(ImportData2Generic):
         jsonData = json.loads(request.body.decode("utf-8"))
         is_rent = jsonData["is_rent"]
         items = jsonData["jsonData"]
-        print(jsonData)
+        self.error_list = []
         # 检查jsonData是否为列表
         if not isinstance(items, list):
             return JsonResponse(
@@ -154,20 +151,20 @@ class ImportTransportView(ImportData2Generic):
                 }
             )
         # 处理数据
-        error_list = []
         if is_rent:
             self.insert_rent_DB(items)
         else:
             self.insertDB(items)
 
         response_data = {
-            "success": False if error_list else True,
-            "msg": "",
-            "error_list": error_list,
+            "success": False if self.error_list else True,
+            "msg": "上傳成功",
+            "error_list": self.error_list,
         }
         return JsonResponse(response_data)
 
     def insertDB(self, data):
+
         trans_end_date = SysInfo.get_value_by_name("trans_end_day")
         trans_end_date = datetime.strptime(trans_end_date, "%Y/%m/%d")
         self.end_date = trans_end_date
@@ -180,7 +177,6 @@ class ImportTransportView(ImportData2Generic):
                 edit_date = excel_num_to_date(item[27])
                 if mat_code is None or trans_end_date > edit_date:
                     continue
-                print(self.end_date, self.end_date < edit_date, edit_date)
                 self.end_date = (
                     self.end_date if self.end_date > edit_date else edit_date
                 )
@@ -191,10 +187,7 @@ class ImportTransportView(ImportData2Generic):
 
                 tran = TransLog.create(code=trancode, item=item)
 
-                if item[5] is not None and remark is not None and "採購" in remark:
-                    DoneSteelReport.add_stock(tran, item)
-                    TransLogDetail.create(tran, item, is_rent=False)
-                elif item[5] is not None:
+                if item[5] and item[5] != "" :
                     TransLogDetail.create(tran, item, is_rent=False)
 
             except Exception as e:
@@ -203,7 +196,7 @@ class ImportTransportView(ImportData2Generic):
                 errordct = {"item": item, "e": str(e)}
                 self.error_list.append(errordct)
 
-                logger.info(errordct)
+                logger.info({"item": item, "e": f"{str(e)}\n{type(e).__name__}\n{traceback.format_exc()}"})
 
     def insert_rent_DB(self, data):
         for item in data:
@@ -223,7 +216,7 @@ class ImportTransportView(ImportData2Generic):
                 # print(f"{trancode},is error {e} item{item}")
                 errordct = {"item": item, "e": str(e)}
                 self.error_list.append(errordct)
-                logger.info(errordct)
+                logger.info({"item": item, "e": f"{str(e)}\n{type(e).__name__}\n"+traceback.format_exc()})
 
     def get(self, request, *args, **kwargs):
         context = {

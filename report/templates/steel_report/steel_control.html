@@ -71,18 +71,12 @@
       支撐(m)</th>
     <th>H350 <br>
       中柱(m)</th>
-    <th>H390 <br>
-        支撐(m)</th>
     <th>H400 <br>
       支撐(m)</th>
     <th>H400 <br>
       中柱(m)</th>
     <th>H408 <br>
       支撐(m)</th>
-    <th>H414 <br>
-      支撐(m)</th>
-    <th>H414 <br>
-      中柱(m)</th>
     <th>覆工板</th>      
     <th>千斤頂(個)</th>
     <th>土壓計(個)</th>
@@ -99,91 +93,76 @@
     <td>{{ item.m_301 }}</td>
     <td>{{ item.m_350 }}</td>
     <td>{{ item.m_351 }}</td>
-    <td>{{ item.m_390 }}</td>
     <td>{{ item.m_400 }}</td>
     <td>{{ item.m_401 }}</td>
     <td>{{ item.m_408 }}</td>
-    <td>{{ item.m_414 }}</td>
-    <td>{{ item.m_4141 }}</td>
-    <td>{{ item.m_11 }}</td>
-    <td>{{ item.m_13 }}</td>
-    <td>{{ item.m_14 }}</td>
+    <td>{{ item.m_11 |floatformat:"0"}}</td>
+    <td>{{ item.m_13 |floatformat:"0"}}</td>
+    <td>{{ item.m_14 |floatformat:"0"}}</td>
     <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a></td>
   </tr>
   {% endfor %}
-  <tr>
-    <td colspan=4>高雄倉庫</td>
-    <td>{{ kh_report.m_300 }}</td>
-    <td>{{ kh_report.m_301 }}</td>
-    <td>{{ kh_report.m_350 }}</td>
-    <td>{{ kh_report.m_351 }}</td>
-    <td>{{ kh_report.m_390 }}</td>
-    <td>{{ kh_report.m_400 }}</td>
-    <td>{{ kh_report.m_401 }}</td>
-    <td>{{ kh_report.m_408 }}</td>
-    <td>{{ kh_report.m_414 }}</td>
-    <td>{{ kh_report.m_4141 }}</td>
-    <td>{{ kh_report.m_11 }}</td>
-    <td>{{ kh_report.m_13 }}</td>
-    <td>{{ kh_report.m_14 }}</td>
-    <td></td>
+  <tr class="table-warning">
+    <th colspan=4>高雄倉庫</th>
+    <th>{{ kh_report.m_300 }}</th>
+    <th>{{ kh_report.m_301 }}</th>
+    <th>{{ kh_report.m_350 }}</th>
+    <th>{{ kh_report.m_351 }}</th>
+    <th>{{ kh_report.m_400 }}</th>
+    <th>{{ kh_report.m_401 }}</th>
+    <th>{{ kh_report.m_408 }}</th>
+    <th>{{ kh_report.m_11 |floatformat:"0"}}</th>
+    <th>{{ kh_report.m_13 |floatformat:"0"}}</th>
+    <th>{{ kh_report.m_14 |floatformat:"0"}}</th>
+    <th></th>
   </tr>
-  <tr>
-    <td colspan=4>林口倉庫</td>
-    <td>{{ lk_report.m_300 }}</td>
-    <td>{{ lk_report.m_301 }}</td>
-    <td>{{ lk_report.m_350 }}</td>
-    <td>{{ lk_report.m_351 }}</td>
-    <td>{{ lk_report.m_390 }}</td>
-    <td>{{ lk_report.m_400 }}</td>
-    <td>{{ lk_report.m_401 }}</td>
-    <td>{{ lk_report.m_408 }}</td>
-    <td>{{ lk_report.m_414 }}</td>
-    <td>{{ lk_report.m_4141 }}</td>
-    <td>{{ lk_report.m_11 }}</td>
-    <td>{{ lk_report.m_13 }}</td>
-    <td>{{ lk_report.m_14 }}</td>
-    <td></td>
+  <tr class="table-warning">
+    <th colspan=4>林口倉庫</th>
+    <th>{{ lk_report.m_300 }}</th>
+    <th>{{ lk_report.m_301 }}</th>
+    <th>{{ lk_report.m_350 }}</th>
+    <th>{{ lk_report.m_351 }}</th>
+    <th>{{ lk_report.m_400 }}</th>
+    <th>{{ lk_report.m_401 }}</th>
+    <th>{{ lk_report.m_408 }}</th>
+    <th>{{ lk_report.m_11 |floatformat:"0" }}</th>
+    <th>{{ lk_report.m_13 |floatformat:"0"}}</th>
+    <th>{{ lk_report.m_14 |floatformat:"0"}}</th>
+    <th></th>
   </tr>
-  <tr>
-    <td colspan=4>總計({{yearMonth}})</td>
-    <td>{{ total_report.m_300 }}</td>
-    <td>{{ total_report.m_301 }}</td>
-    <td>{{ total_report.m_350 }}</td>
-    <td>{{ total_report.m_351 }}</td>
-    <td>{{ total_report.m_390 }}</td>
-    <td>{{ total_report.m_400 }}</td>
-    <td>{{ total_report.m_401 }}</td>
-    <td>{{ total_report.m_408 }}</td>
-    <td>{{ total_report.m_414 }}</td>
-    <td>{{ total_report.m_4141 }}</td>
-    <td>{{ total_report.m_11 }}</td>
-    <td>{{ total_report.m_13 }}</td>
-    <td>{{ total_report.m_14 }}</td>
-    <td></td>
+  <tr class="table-warning">
+    <th colspan=4>總計({{yearMonth}})</th>
+    <th>{{ total_report.m_300 }}</th>
+    <th>{{ total_report.m_301 }}</th>
+    <th>{{ total_report.m_350 }}</th>
+    <th>{{ total_report.m_351 }}</th>
+    <th>{{ total_report.m_400 }}</th>
+    <th>{{ total_report.m_401 }}</th>
+    <th>{{ total_report.m_408 }}</th>
+    <th>{{ total_report.m_11 |floatformat:"0"}}</th>
+    <th>{{ total_report.m_13 |floatformat:"0"}}</th>
+    <th>{{ total_report.m_14 |floatformat:"0"}}</th>
+    <th></th>
   </tr>
-  <tr>
-    <td colspan=4>上期之總計({{before_yearMonth}})</td>
-    <td>{{ befote_total_report.m_300 }}</td>
-    <td>{{ befote_total_report.m_301 }}</td>
-    <td>{{ befote_total_report.m_350 }}</td>
-    <td>{{ befote_total_report.m_351 }}</td>
-    <td>{{ befote_total_report.m_390 }}</td>
-    <td>{{ befote_total_report.m_400 }}</td>
-    <td>{{ befote_total_report.m_401 }}</td>
-    <td>{{ befote_total_report.m_408 }}</td>
-    <td>{{ befote_total_report.m_414 }}</td>
-    <td>{{ befote_total_report.m_4141 }}</td>
-    <td>{{ befote_total_report.m_11 }}</td>
-    <td>{{ befote_total_report.m_13 }}</td>
-    <td>{{ befote_total_report.m_14 }}</td>
-    <td></td>
+  <tr class="table-warning">
+    <th colspan=4>上期之總計({{before_yearMonth}})</th>
+    <th>{{ befote_total_report.m_300 }}</th>
+    <th>{{ befote_total_report.m_301 }}</th>
+    <th>{{ befote_total_report.m_350 }}</th>
+    <th>{{ befote_total_report.m_351 }}</th>
+    <th>{{ befote_total_report.m_400 }}</th>
+    <th>{{ befote_total_report.m_401 }}</th>
+    <th>{{ befote_total_report.m_408 }}</th>
+    <th>{{ befote_total_report.m_11 |floatformat:"0"}}</th>
+    <th>{{ befote_total_report.m_13 |floatformat:"0"}}</th>
+    <th>{{ befote_total_report.m_14 |floatformat:"0"}}</th>
+    <th></th>
   </tr>
-  <tr>
-    <td colspan=4>本月與上期之差異(({{yearMonth}})-({{before_yearMonth}})=差異數)</td>
+  <tr class="table-warning">
+    <th colspan=4>本月與上期之差異(({{yearMonth}})-({{before_yearMonth}})=差異數)</th>
     {% for d in diff %}
-      <td>{{d}}</td>
+      <th>{{d}}</th>
     {% endfor %}
-    <td></td>
+    <th></th>
   </tr>
 {% endblock %}

@@ -74,4 +74,3 @@ class RailReport(MonthReport):
 
         report.save()
         whse.save()
-
