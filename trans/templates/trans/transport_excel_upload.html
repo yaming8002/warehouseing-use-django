@@ -13,11 +13,10 @@
           var fileInput = document.getElementById('excelFile');
           var file = fileInput.files[0];
           if (file) {
-              // 如果文件存在，则处理文件
-              handleFileProcessing(file);
               // 显示加载指示器
               $("#base_table tbody").empty();
               $('#loadingSpinner').show();
+              handleFileProcessing(file);
           } else {
               // 如果没有选择文件，则提示用户
               alert("请先选择一个文件。");
@@ -72,7 +71,7 @@
               }
   
               if (checkColumns(columns3, rent_rows[2]) & checkColumns(columns4, rent_rows[3])) {
-                  processAndUploadData(rent_rows.slice(4), true); // 移除列名行
+                 processAndUploadData(rent_rows.slice(4), true); // 移除列名行
               } else {
                   alert("租賃文件格式不正确");
               }
@@ -102,9 +101,9 @@
             alert("完成");
             $('#loadingSpinner').hide();
           }else{
-            endtotal = true ;
+            endtotal = true
           }
-        }
+        
       } catch (error) {
           console.error("上传数据过程中出现错误：", error);
           // 在这里处理任何上传过程中的错误

@@ -57,20 +57,20 @@
       <tbody>
         <tr>
           <th class="s2" dir="ltr">規格:</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第一層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第一層入料</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第二層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第二層入料</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第三層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第三層入料</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第四層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第四層入料</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第五層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第五層入料</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第六層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第六層入料</th>
-          <th class="s3" dir="ltr" colspan="5" style="border-left: 1px solid black">第七層出料</th>
-          <th class="s2" dir="ltr" colspan="5" style="border-left: 1px solid black">第七層入料</th>
+          <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第一層出料</th>
+          <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第一層入料</th>
+          <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第二層出料</th>
+          <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第二層入料</th>
+          <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第三層出料</th>
+          <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第三層入料</th>
+          <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第四層出料</th>
+          <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第四層入料</th>
+          <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第五層出料</th>
+          <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第五層入料</th>
+          <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第六層出料</th>
+          <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第六層入料</th>
+          <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第七層出料</th>
+          <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第七層入料</th>
           <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
             出支
             <br>
@@ -100,47 +100,47 @@
               rowspan="{{ tran_map.max_length }}"
               style="vertical-align: middle">{{ key }}</th>
           {% for _ in column_count %}
-            <th class="s4" dir="ltr" style=" border-left: 1px solid black;">日期</th>
-            <th class="s4" dir="ltr">支</th>
-            <th class="s4" dir="ltr">合計M</th>
-            <th class="s4" dir="ltr">單號</th>
-            <th class="s3" dir="ltr">備註</th>
+            <th class="s4 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" dir="ltr" style=" border-left: 1px solid black;">日期</th>
+            <th class="s4 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" dir="ltr">支</th>
+            <th class="s4 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" dir="ltr">合計M</th>
+            <th class="s4 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" dir="ltr">單號</th>
+            <th class="s3 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" dir="ltr">備註</th>
           {% endfor %}
         </tr>
         {% for row in tran_map.table %}
           <tr style="height: 20px">
             {% for item in row %}
               {% if item %}
-                <td style=" border-left: 1px solid black;">{{ item.build_date | date:"Y/m/d" }}</td>
-                <td>{{ item.total_quantity |floatformat:"2" }}</td>
-                <td>{{ item.total_unit |floatformat:"2" }}</td>
-                <td>{{ item.code }}</td>
-                <td>{{ item.remake }}</td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" >{{ item.build_date | date:"Y/m/d" }}</td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.total_quantity |floatformat:"2" }}</td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.total_unit |floatformat:"2" }}</td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.code }}</td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.remake }}</td>
               {% else %}
-                <td style=" border-left: 1px solid black;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" ></td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
               {% endif %}
             {% endfor %}
             {% if forloop.first %}
-              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.count_out|floatformat:"2" }}</th>
-              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.unit_out|floatformat:"2" }}</th>
-              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.count_in|floatformat:"2" }}</th>
-              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.unit_in|floatformat:"2" }}</th>
-              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_count |floatformat:"2" }}</th>
-              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_unit |floatformat:"2" }}</th>
+              <th  rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.count_out|floatformat:"2" }}</th>
+              <th  rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.unit_out|floatformat:"2" }}</th>
+              <th  rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.count_in|floatformat:"2" }}</th>
+              <th  rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.unit_in|floatformat:"2" }}</th>
+              <th  rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_count |floatformat:"2" }}</th>
+              <th  rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_unit |floatformat:"2" }}</th>
             {% endif %}
           </tr>
         {% endfor %}
         <tr style="height: 20px" class="ttttt">
           {% for row in tran_map.level_summary %}
-            <td style=" border-left: 1px solid black;" class="ttttt">總計:</td>
-            <td>{{ row.count |floatformat:"2" }}</td>
-            <td>{{ row.unit |floatformat:"2" }}</td>
-            <td></td>
-            <td></td>
+            <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" style=" border-left: 1px solid black;" class="ttttt">總計:</td>
+            <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" >{{ row.count |floatformat:"2" }}</td>
+            <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" >{{ row.unit |floatformat:"2" }}</td>
+            <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" ></td>
+            <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" ></td>
           {% endfor %}
         </tr>
       </tbody>

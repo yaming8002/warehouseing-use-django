@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.db import models, transaction
 from django.db.models import F
+from django.forms import model_to_dict
 
 from stock.models.material import Materials
 from stock.models.site import SiteInfo
@@ -38,39 +39,17 @@ class RailReport(MonthReport):
     ):
         if mat.mat_code != "3050":
             return
-            # 获取当前年份和月份
-
         site = translog.constn_site
         year, month = translog.build_date.year, translog.build_date.month
         report = cls.get_current_by_site(site, year, month)
         whse = cls.get_current_by_site(SiteInfo.objects.get(code="0001"), year, month)
+        column = f"in_{mat.specification.id}"  if is_in else f"out_{mat.specification.id}"
+        if translog.constn_site.code=='1565':
+            print(model_to_dict(report))
+            print(f"in_{mat.specification.id}")
+            print(all_quantity)
 
-        if is_in:
-            setattr(
-                report,
-                f"in_{mat.specification.id}",
-                report.get_column_decimal_val(f"in_{mat.specification.id}")
-                + all_quantity,
-            )
-            setattr(
-                whse,
-                f"in_{mat.specification.id}",
-                whse.get_column_decimal_val(f"in_{mat.specification.id}")
-                + all_quantity,
-            )
-        else:
-            setattr(
-                report,
-                f"out_{mat.specification.id}",
-                report.get_column_decimal_val(f"out_{mat.specification.id}")
-                + all_quantity,
-            )
-            setattr(
-                whse,
-                f"in_{mat.specification.id}",
-                whse.get_column_decimal_val(f"in_{mat.specification.id}")
-                - all_quantity,
-            )
-
+        cls.update_column_value(report.id,True,column,all_quantity)
+        cls.update_column_value(whse.id,is_in,f"in_{mat.specification.id}",all_quantity)
         report.save()
         whse.save()

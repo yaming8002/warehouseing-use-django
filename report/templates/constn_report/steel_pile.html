@@ -94,11 +94,11 @@
       {% endfor %}
       <tr style="height: 20px">
         {% for row in tran_map.level_summary %}
-          <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} > 總計:</th>
-          <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>{{ row.count |floatformat:"2" }}</th>
-          <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>{{ row.unit |floatformat:"2" }}</th>
-          <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></th>
-          <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></th>
+          <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}' > 總計:</th>
+          <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'>{{ row.count |floatformat:"2" }}</th>
+          <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'>{{ row.unit |floatformat:"2" }}</th>
+          <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'></th>
+          <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'></th>
         {% endfor %}
         {% if not tran_map.table %}
           <th rowspan="{{ tran_map.summary.max_length }}">0</th>
