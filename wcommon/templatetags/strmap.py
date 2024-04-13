@@ -44,8 +44,12 @@ level = [
 
 
 @register.simple_tag
-def get_level():
+def get_level_all():
     return level
+
+@register.simple_tag
+def get_level():
+    return level[1:]
 
 
 done_type_map = [

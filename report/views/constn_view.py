@@ -3,6 +3,7 @@ from django.shortcuts import render
 from report.util.steel_brace import build_steel_brace_table
 from report.util.steel_pile import  build_steel_ng_table, build_steel_pile_table
 from stock.models.site import SiteInfo
+from wcommon.templatetags.strmap import get_level
 
 # Create your views here.
 
@@ -26,10 +27,15 @@ def steel_brace_view(request):
             constn = constn.filter(name=name)
             show = True
 
+        level = request.GET.get("level")
+        level = int(level) if level else 7
+    
         if show and constn.exists():
-            context["steel_pile_table"] = build_steel_brace_table(constn.get())
+            context["steel_pile_table"] = build_steel_brace_table(constn.get(),level)
             context["constn"] = constn.get()
-            context["column_count"] = range(14)
+            context["select_level"]= [x for x in get_level() if (x[0]>0)]
+            context["table_level"]= level
+            context["column_count"] = range(level*2)
 
     return render(request, "constn_report/steel_brace.html", context)
 
@@ -54,6 +60,7 @@ def steel_pile_view(request):
             constn = constn.filter(name=name)
             show = True
         
+  
 
         if show and constn.exists():
             # context["steel_pile_table"] = build_steel_pile_table(constn.get())

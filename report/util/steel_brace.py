@@ -19,7 +19,7 @@ values_dict = {
     "level_annotation": F("level"),
 }
 
-def build_steel_brace_table(constn) -> Dict[str, Dict[str, any]]:
+def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
     translog = TransLog.objects.filter(constn_site=constn)
     mats = Materials.objects.filter(specification__lt=23)
     transdefaullog = TransLogDetail.objects.filter(
@@ -31,7 +31,7 @@ def build_steel_brace_table(constn) -> Dict[str, Dict[str, any]]:
     for mat_code, name in support_list.items():
         # name = f"m_{mat_code}"
         steel_map[name] = {}
-        tr_list: List[List[Any]] = [[] for _ in range(14)]
+        tr_list: List[List[Any]] = [[] for _ in range(level*2)]
         max_length = 0
         summary = {
             "count_in": Decimal(0),
@@ -39,9 +39,10 @@ def build_steel_brace_table(constn) -> Dict[str, Dict[str, any]]:
             "count_out": Decimal(0),
             "unit_out": Decimal(0),
         }
-
+        print(level)
         
-        for seat in range(7):
+        for seat in range(level):
+            print(f"seat{seat}")
             total_quantity_and_unit = (
                 transdefaullog.filter(material__mat_code=mat_code, level=(seat + 1))
                 .values(
@@ -58,6 +59,7 @@ def build_steel_brace_table(constn) -> Dict[str, Dict[str, any]]:
                     total_unit=Sum("all_unit"),
                 )
             )
+
             site_in = (seat * 2) + 1
             site_out = seat * 2
             for item in total_quantity_and_unit:
@@ -87,7 +89,7 @@ def build_steel_brace_table(constn) -> Dict[str, Dict[str, any]]:
 def transpose_list_of_lists(input_list):
     # 确定最大长度
     max_length = max(len(row) for row in input_list)
-
+    print(input_list)
     # 创建转置后的列表
     transposed_list = []
     for i in range(max_length):
