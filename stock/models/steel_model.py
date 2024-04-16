@@ -5,11 +5,10 @@ from django.db import models, transaction
 from django.db.models import F, Q
 from django.utils.timezone import datetime
 
-from report.models.monthreport_model import MonthData, MonthReport
-from stock.models.material import Materials
-from stock.models.site import SiteInfo
-from stock.models.stock import MainStock
-from trans.models import TransLog
+
+from stock.models.material_model import Materials
+from stock.models.monthreport_model import MonthData, MonthReport
+from stock.models.site_model import SiteInfo
 from wcommon.utils.uitls import excel_value_to_str, get_year_month
 from decimal import ROUND_HALF_UP
 import logging
@@ -48,7 +47,8 @@ class SteelReport(MonthReport):
     @classmethod
     def add_report(
         cls,
-        translog: TransLog,
+        site: SiteInfo,
+        build_date:datetime,
         is_in: bool,
         mat: Materials,
         all_quantity: Decimal,
@@ -57,8 +57,7 @@ class SteelReport(MonthReport):
         if mat.mat_code not in cls.static_column_code.keys():
             return
 
-        site = translog.constn_site
-        year, month = translog.build_date.year, translog.build_date.month
+        year, month = build_date.year, build_date.month
         report = cls.get_current_by_site(site, year, month)
         whse = cls.get_current_by_site(SiteInfo.objects.get(code="0001"), year, month)
         value = all_unit if mat.is_divisible else all_quantity
@@ -100,7 +99,7 @@ class DoneSteelReport(MonthReport):
         ordering = ["done_type", "id"]  # 按照 id 升序排序
 
     @classmethod
-    def add_stock(cls, tran: TransLog, item):
+    def add_stock(cls, site: SiteInfo, item):
         mat_code = excel_value_to_str(item[7])
         unit_req = item[9]
         quantity = Decimal(abs(item[15]))
@@ -116,7 +115,6 @@ class DoneSteelReport(MonthReport):
             return
 
         y, m = get_year_month()
-        site = tran.constn_site
         done_report_obj = cls.objects.select_related("siteinfo").filter(
             siteinfo=site,
             done_type=2,
@@ -134,7 +132,8 @@ class DoneSteelReport(MonthReport):
                 remark=excel_value_to_str(item[20]),
             )
 
-        setattr(done_report, f"m_{mat.mat_code}", unit * quantity if unit else quantity)
+        value= unit * quantity if unit else quantity
+        cls.update_column_value(done_report.id,True,f"m_{mat.mat_code}",value)
 
         done_report.save()
 
@@ -169,7 +168,9 @@ class DoneSteelReport(MonthReport):
         for k, _ in done_report.static_column_code.items():
             # print(f"{case_name}.m_{k}")
             # print(request.POST.get(f"{case_name}.m_{k}"))
-            setattr(done_report, f"m_{k}", request.POST.get(f"{case_name}.m_{k}"))
+            value = Decimal( request.POST.get(f"{case_name}.m_{k}"))
+            # cls.update_column_value(done_report.id,True,f"m_{k}",value)
+            setattr(done_report, f"m_{k}", value)
 
         done_report.save()
 
@@ -213,19 +214,18 @@ class SteelPillar(MonthData):
     @classmethod
     def add_report(
         cls,
-        translog: TransLog,
+        build_date: datetime,
         mat: Materials,
     ):
-        y, m = translog.build_date.year ,translog.build_date.month
+        y, m = build_date.year ,build_date.month
         cls.update_value(mat,y,m)
 
     @classmethod
-    def update_value(cls, mat: Materials, year, month):
+    def update_value(cls, mat: Materials,quantity: Decimal, year, month):
         if mat.mat_code not in ("301", "351", "401"):
             return
         sp, _ = cls.objects.get_or_create(mat_code=mat.mat_code, year=year, month=month)
-        stock = MainStock.getItem(SiteInfo.get_warehouse(), mat)
-        setattr(sp, f"l_{mat.specification.id}", stock.quantity)
+        setattr(sp, f"l_{mat.specification.id}", quantity)
         sp.save()
 
     class Meta:

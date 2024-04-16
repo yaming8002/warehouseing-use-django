@@ -1,6 +1,6 @@
 from django import forms
 from django.utils import timezone
-from stock.models.site import SiteInfo
+from stock.models.site_model import SiteInfo
 
 
 from wcommon.templatetags import constn_state
@@ -18,8 +18,8 @@ class SiteInfoForm(forms.ModelForm):
             "member",
             "counter",
             "company",
-            "poling_done",
-            "rail_done",
+            "is_steel_done",
+            "is_rail_done",
             "state",
             "done_date",
             "remark",
@@ -33,8 +33,8 @@ class SiteInfoForm(forms.ModelForm):
             "member": "現場人員",
             "counter": "會計人員",
             "company": "公司行號",
-            "poling_done":"鋼樁結案",
-            "rail_done":"鋼軌結案",   
+            "is_steel_done":"鋼樁結案",
+            "is_rail_done":"鋼軌結案",   
             "state": "狀態",
             "done_date": "結案日期",
             "remark": "備註",
@@ -46,15 +46,15 @@ class SiteInfoForm(forms.ModelForm):
         if not self.instance:
             self.initial["crate_date"] = timezone.now().date()
             self.fields["done_date"].widget = forms.HiddenInput()
-            self.fields["poling_done"].widget = forms.HiddenInput()
-            self.fields["rail_done"].widget = forms.HiddenInput()
+            self.fields["is_steel_done"].widget = forms.HiddenInput()
+            self.fields["is_rail_done"].widget = forms.HiddenInput()
             self.fields["code"].widget.attrs["readonly"] = True
         else:
             self.fields["code"].widget.attrs["readonly"] = False
-            if not self.instance.poling_done:
-                self.fields["poling_done"].widget = forms.HiddenInput()
-            if not self.instance.rail_done:
-                self.fields["rail_done"].widget = forms.HiddenInput()
+            if not self.instance.is_steel_done:
+                self.fields["is_steel_done"].widget = forms.HiddenInput()
+            if not self.instance.is_rail_done:
+                self.fields["is_rail_done"].widget = forms.HiddenInput()
 
     code = forms.CharField(
         label="工地代號",
@@ -104,11 +104,11 @@ class SiteInfoForm(forms.ModelForm):
         widget=forms.TextInput(attrs={"class": "form-control required"}),
     )
 
-    poling_done = forms.BooleanField(
+    is_steel_done = forms.BooleanField(
         label="鋼樁結案", required=False,widget=forms.CheckboxInput()
     )
 
-    rail_done = forms.BooleanField(
+    is_rail_done = forms.BooleanField(
         label="鋼軌結案", required=False, widget=forms.CheckboxInput()
     )
 

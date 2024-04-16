@@ -10,9 +10,9 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from report.models.steel_model import DoneSteelReport
-from stock.models.material import MatCat, Materials
-from stock.models.site import SiteInfo
+from stock.models.steel_model import DoneSteelReport
+from stock.models.material_model import MatCat, Materials
+from stock.models.site_model import SiteInfo
 from trans.models import TransLog, TransLogDetail
 from wcommon.models.menu import SysInfo
 from wcommon.utils.excel_tool import ImportData2Generic, ImportDataGeneric
@@ -137,6 +137,7 @@ class ImportTransportView(ImportData2Generic):
     ]
 
     def post(self, request, *args, **kwargs):
+        
         jsonData = json.loads(request.body.decode("utf-8"))
         is_rent = jsonData["is_rent"]
         items = jsonData["jsonData"]
@@ -175,8 +176,7 @@ class ImportTransportView(ImportData2Generic):
             try:
                 mat_code = excel_value_to_str(item[8])
                 edit_date = excel_num_to_date(item[27])
-                if mat_code is None or trans_end_date > edit_date:
-                    continue
+
                 self.end_date = (
                     self.end_date if self.end_date > edit_date else edit_date
                 )
@@ -187,7 +187,7 @@ class ImportTransportView(ImportData2Generic):
 
                 tran = TransLog.create(code=trancode, item=item)
 
-                if item[5] and item[5] != "" :
+                if mat_code and mat_code != "" :
                     TransLogDetail.create(tran, item, is_rent=False)
 
             except Exception as e:
@@ -205,10 +205,8 @@ class ImportTransportView(ImportData2Generic):
             if trancode is None:
                 break
             try:
-                if mat_code is None:
-                    continue
                 tran = TransLog.create(code=trancode, item=item)
-                if item[5] is not None:
+                if mat_code is not None:
                     TransLogDetail.create(tran, item, is_rent=True)
 
             except Exception as e:
@@ -219,11 +217,22 @@ class ImportTransportView(ImportData2Generic):
                 logger.info({"item": item, "e": f"{str(e)}\n{type(e).__name__}\n"+traceback.format_exc()})
 
     def get(self, request, *args, **kwargs):
+        trans_end_day = SysInfo.objects.get(name="trans_end_day")
+        if trans_end_day:  # 确保获取到了日期
+            latest_date =  datetime.strptime(trans_end_day.value,"%Y/%m/%d")
+        else :
+            latest_date =datetime.now() - timedelta(days=10)
+
+        excel_epoch = datetime(1899, 12, 30)
+        delta = latest_date - excel_epoch
+        excel_date = float(delta.days) + (float(delta.seconds) / 86400)
+    
         context = {
             "title": self.title,
             "action": self.action,
             "columns3": self.columns3,
             "columns4": self.columns4,
+            "end_date":excel_date
         }
 
         return render(request, self.html_path, context)
@@ -296,3 +305,26 @@ class TransTurn(PageListView):
         context["matinfo_cats"] = MatCat.objects.all()
 
         return context
+
+
+def update_end_date(request):
+    log_date_dict = TransLog.objects.values("build_date").order_by("-build_date").first()
+    
+    if log_date_dict:  # 确保获取到了日期
+        # 获取日期值
+        latest_date = log_date_dict['build_date']
+    else :
+        latest_date =datetime.now()
+        # 计算5天前的日期
+    five_days_before = latest_date - timedelta(days=5)
+
+    end_day = SysInfo.objects.get(name="trans_end_day")
+    end_day.value = f"{five_days_before.year}/{five_days_before.month}/{five_days_before.day}"
+    end_day.save()
+
+    response_data = {
+        "success": False ,
+        "msg": "上傳成功",
+    }
+
+    return JsonResponse(response_data)

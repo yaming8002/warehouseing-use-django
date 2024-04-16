@@ -7,8 +7,8 @@ from django.db.models.functions import Coalesce
 from django.db.models import Case, F, Sum, Value, When
 from django.shortcuts import render
 
-from stock.models.material import Materials
-from stock.models.site import SiteInfo
+from stock.models.material_model import Materials
+from stock.models.site_model import SiteInfo
 from trans.models import TransLog, TransLogDetail
 
 support_list = {"351-0": "中\nH350", "351-1": "中\nH350構台樑", "401-0": "中\nH400","401-1": "中\nH400構台樑"}

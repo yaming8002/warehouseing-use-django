@@ -7,8 +7,8 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from report.models.board_model import BoardReport
-from stock.models.site import SiteInfo
+from stock.models.board_model import BoardReport
+from stock.models.site_model import SiteInfo
 from wcommon.utils import MonthListView
 from wcommon.utils.uitls import get_year_month
 
@@ -26,6 +26,7 @@ class BoardControlView(MonthListView):
         mat_code =self.request.GET.get("mat_code")
         mat_code = mat_code if mat_code else '21'
         obj_board= BoardReport.objects.select_related("siteinfo").filter( Q(mat_code = mat_code))
+        print(obj_board.filter(siteinfo__code="0001").query)
         context['lk_report'] = obj_board.get(siteinfo__code="0001")
         context['kh_report'] = obj_board.get(siteinfo__code="0003")
         # context['lk_report'] = BoardReport.objects.get(siteinfo__code="0001")

@@ -134,7 +134,13 @@
           }
         })
       }
-
+      function showSpinner() {
+        $('#loadingSpinner').modal('show') ;
+      }
+      
+      function hideSpinner() {
+        $('#loadingSpinner').modal('hide') ;
+      }
       function aboutSys() {
         // 使用 jQuery AJAX 获取 about_sys.html 的内容
         window.open("/about_sys/", "AboutSysWindow", "width=800,height=600");
@@ -226,10 +232,31 @@
         right: 0;
       }
 
+      .loading-overlay {
+        display: none; /* 默认隐藏，通过JavaScript进行控制 */
+        position: fixed; /* 固定位置，全屏覆盖 */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
+        z-index: 9999; /* 高层次以确保在其他内容上方 */
+      }
+      
+      .spinner-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
+      
+      .spinner-border {
+        width: 80px;
+        height: 80px;
+      }
     </style>
   </head>
   <body>
-
     <header class="col-md-12 m-0">
       <div class="row  p-0 h-100">
         <h1 class="col-md-10 text-start">{{ topic }}</h1>
@@ -242,8 +269,7 @@
           </a>
           <ul class="dropdown-menu text-small">
             <li>
-              <a class="dropdown-item" href="#"
-              onclick="editPassWord();">修改密碼</a>
+              <a class="dropdown-item" href="#" onclick="editPassWord();">修改密碼</a>
             </li>
             <li>
               <a class="dropdown-item" href="#"  onclick="aboutSys();">關於系統</a>
@@ -264,39 +290,74 @@
             {% csrf_token %}
           </form>
         </div>
-    </header>
-    <div class="p-0 h-100 d-flex flex-row">
-
-      <div class="m-0 flex-shrink-0 p-2"
-           style="background-color: gray;
-                  color: black;
-                  weight:180px">
-        <ul class="list-unstyled ps-0">
-          {% for category in allmenu %}
-            <li class="mb-1">
-              <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#category-{{ category.name }}"
-                      aria-expanded="false">
-                <h3>{{ category.name }}</h3>
-              </button>
-              <br />
-              <div class="collapse m-10" id="category-{{ category.name }}">
-                <ul class="btn-toggle-nav fw-normal small">
-                  {% for menu in category.list %}
-                    <li>
-                      <a href="{{ menu.url }}" class="link-dark rounded h5 menu">{{ menu.name }}</a>
-                    </li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </li>
-          {% endfor %}
-        </ul>
+      </header>
+      <div class="p-0 h-100 d-flex flex-row">
+        <div class="m-0 flex-shrink-0 p-2"
+             style="background-color: gray;
+                    color: black;
+                    weight:180px">
+          <ul class="list-unstyled ps-0">
+            {% for category in allmenu %}
+              <li class="mb-1">
+                <button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#category-{{ category.name }}"
+                        aria-expanded="false">
+                  <h3>{{ category.name }}</h3>
+                </button>
+                <br />
+                <div class="collapse m-10" id="category-{{ category.name }}">
+                  <ul class="btn-toggle-nav fw-normal small">
+                    {% for menu in category.list %}
+                      <li>
+                        <a href="{{ menu.url }}" class="link-dark rounded h5 menu">{{ menu.name }}</a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <!-- 主要工作區 -->
+        <div id="main" class="flex-grow-1 m-0 p-0"></div>
       </div>
-      <!-- 主要工作區 -->
-      <div id="main" class="flex-grow-1 m-0 p-0"></div>
+      <div id="modalContainer"></div>
+      <!-- Loading Modal -->
+      <div class="modal fade"
+           id="loadingSpinner"
+           tabindex="-1"
+           role="dialog"
+           aria-labelledby="loadingModalLabel"
+           aria-hidden="true"
+           data-bs-keyboard="false"
+           data-bs-backdrop="static">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div style="width:45px;
+                          height: 45px;
+                          display: flex;
+                          justify-content: center;
+                          align-items: center"
+                   role="status">
+                <div class="spinner-border text-primary"
+                     role="status"
+                     style="position: relative;
+                            width: 45px;
+                            height: 45px"></div>
+              </div>
+              <span class="sr-only"
+                    id="update_text"
+                    style="position: absolute;
+                           top: 50%;
+                           left: 50%;
+                           transform: translate(-50%, -50%);
+                           font-size: 80%">上傳中...</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div id="modalContainer"></div>
   </body>
 </html>

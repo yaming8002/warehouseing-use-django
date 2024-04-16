@@ -3,9 +3,12 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.db import models
 from datetime import datetime
 from django.db.models import Q
-from stock.models.material import Materials
-from stock.models.site import SiteInfo
-from stock.models.stock import ConStock, MainStock
+from stock.models.board_model import BoardReport
+from stock.models.material_model import Materials
+from stock.models.rail_model import RailReport
+from stock.models.site_model import SiteInfo
+from stock.models.steel_model import SteelReport
+from stock.models.stock_model import ConStock, MainStock
 from trans.models.car import CarInfo
 from wcommon.utils.uitls import excel_num_to_date, excel_value_to_str, get_month_range
 
@@ -112,7 +115,9 @@ class TransLogDetail(models.Model):
     all_unit = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, null=True, verbose_name="總單位量"
     )
-    remark = models.TextField(default="", null=True, verbose_name="備註")
+    remark = models.CharField(
+        max_length=250, default="", null=True, verbose_name="備註"
+    )
 
     @classmethod
     def create(cls, tran: TransLog, item: list, is_rent: False):
@@ -140,10 +145,17 @@ class TransLogDetail(models.Model):
         )
 
         is_stock_add = tran.transaction_type == "IN"
-        MainStock.move_material(tran.constn_site, mat, quantity, all_unit, is_stock_add)
+        MainStock.move_material(mat, quantity, all_unit, is_stock_add)
         ConStock.move_material(
             tran.constn_site, mat, quantity, all_unit, not is_stock_add
         )
+        RailReport.add_report(
+            tran.constn_site, tran.build_date, is_stock_add, mat, quantity
+        )
+        SteelReport.add_report(
+            tran.constn_site, tran.build_date, is_stock_add, mat, quantity, all_unit
+        )
+        BoardReport.add_report(tran.constn_site, remark, is_stock_add, mat, quantity)
 
     @classmethod
     def rollback(cls, tran):

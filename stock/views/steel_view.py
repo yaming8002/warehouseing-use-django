@@ -8,9 +8,9 @@ from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 from decimal import Decimal
-from report.models import  SteelReport
-from report.models.steel_model import DoneSteelReport, SteelPillar
-from stock.models.site import SiteInfo
+from stock.models import  SteelReport
+from stock.models.steel_model import DoneSteelReport, SteelPillar
+from stock.models.site_model import SiteInfo
 from wcommon.utils import MonthListView 
 
 from wcommon.utils.uitls import get_year_month

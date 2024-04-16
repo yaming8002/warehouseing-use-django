@@ -1,7 +1,7 @@
 from django.db import models
 
 from django import forms
-from stock.models.material import MatCat, Materials, MatSpec
+from stock.models.material_model import MatCat, Materials, MatSpec
 
 
 class MaterialsForm(forms.ModelForm):

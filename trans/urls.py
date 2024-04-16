@@ -1,12 +1,13 @@
 from django.urls import path
 from trans.views import CarInfoControlView, CarListView, ImportCarInfoView, ImportTransportView, TrandportView, TransRentView
-from trans.views.transportlog_view import TransTurn
+from trans.views.transportlog_view import TransTurn, update_end_date
 
 urlpatterns = [
     path("carinfo/list/", CarListView.as_view(), name="carinfo"),
     path("carinfo/save/", CarInfoControlView.as_view(), name="carinfo"),
     path("carinfo/uploadexcel/", ImportCarInfoView.as_view(), name="carinfo"),
     path("transport_log/uploadexcel/", ImportTransportView.as_view(), name="carinfo"),
+    path("update_end_date/",update_end_date,name="update_end_date"),
 
     # path("transport_request/<str:log_type>/", transport_log_from, name="carinfo"),
     path("transport_log/list/", TrandportView.as_view(), name="transport_log"),

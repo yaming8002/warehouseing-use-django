@@ -2,8 +2,8 @@ from decimal import Decimal ,ROUND_HALF_UP
 from django.db import models
 from datetime import datetime
 from django.db.models import Q
-from stock.models.material import Materials
-from stock.models.site import SiteInfo
+from stock.models.material_model import Materials
+from stock.models.site_model import SiteInfo
 from wcommon.utils.uitls import excel_value_to_str, get_month_range
 
 

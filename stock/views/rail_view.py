@@ -8,8 +8,8 @@ from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from report.models import RailReport
-from stock.models.site import SiteInfo
+from stock.models import RailReport
+from stock.models.site_model import SiteInfo
 from wcommon.utils import MonthListView
 from wcommon.utils.uitls import get_year_month
 

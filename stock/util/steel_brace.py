@@ -6,8 +6,8 @@ from typing import Dict, List, Any
 from django.db.models import F, Sum
 from django.shortcuts import render
 
-from stock.models.material import Materials
-from stock.models.site import SiteInfo
+from stock.models.material_model import Materials
+from stock.models.site_model import SiteInfo
 from trans.models import TransLogDetail, TransLog
 
 support_list = {"300": "H300", "350": "H350", "400": "H400", "408": "H408"}

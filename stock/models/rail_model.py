@@ -5,13 +5,12 @@ from django.db import models, transaction
 from django.db.models import F
 from django.forms import model_to_dict
 
-from stock.models.material import Materials
-from stock.models.site import SiteInfo
+from stock.models.material_model import Materials
+from stock.models.monthreport_model import MonthReport
+from stock.models.site_model import SiteInfo
 
 # # Create your models here.
 
-from report.models.monthreport_model import MonthReport
-from trans.models.trans import TransLog
 import sys
 
 
@@ -35,21 +34,20 @@ class RailReport(MonthReport):
 
     @classmethod
     def add_report(
-        cls, translog: TransLog, is_in: bool, mat: Materials, all_quantity: Decimal
+        cls, site: SiteInfo, build_date, is_in: bool, mat: Materials, all_quantity: Decimal
     ):
         if mat.mat_code != "3050":
             return
-        site = translog.constn_site
-        year, month = translog.build_date.year, translog.build_date.month
+        year, month = build_date.year, build_date.month
         report = cls.get_current_by_site(site, year, month)
         whse = cls.get_current_by_site(SiteInfo.objects.get(code="0001"), year, month)
-        column = f"in_{mat.specification.id}"  if is_in else f"out_{mat.specification.id}"
-        if translog.constn_site.code=='1565':
-            print(model_to_dict(report))
-            print(f"in_{mat.specification.id}")
-            print(all_quantity)
-
+        if is_in:
+            column = f"in_{mat.specification.id}"
+            total_col = "in_total"
+        else:    
+            column = f"out_{mat.specification.id}"
+            total_col = "out_total"
+        
         cls.update_column_value(report.id,True,column,all_quantity)
+        cls.update_column_value(report.id,True,total_col,all_quantity)
         cls.update_column_value(whse.id,is_in,f"in_{mat.specification.id}",all_quantity)
-        report.save()
-        whse.save()

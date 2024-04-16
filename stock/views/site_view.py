@@ -7,13 +7,13 @@ from django.http import JsonResponse
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from stock.froms.site import SiteInfoForm
-from stock.models.stock import MainStock
+from stock.models.stock_model import MainStock
 from datetime import datetime, timezone
 from wcommon.utils.excel_tool import ImportData2Generic, ImportDataGeneric
 from wcommon.utils.pagelist import PageListView
 from stock.froms.material import MaterialsForm
-from stock.models.material import MatCat, Materials, MatSpec
-from stock.models.site import SiteInfo
+from stock.models.material_model import MatCat, Materials, MatSpec
+from stock.models.site_model import SiteInfo
 from wcommon.utils.save_control import SaveControlView
 from wcommon.templatetags import constn_state, site_genre
 from wcommon.utils.uitls import excel_value_to_str, tup_map_get_index

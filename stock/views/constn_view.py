@@ -1,8 +1,8 @@
 from django.shortcuts import render
 
-from report.util.steel_brace import build_steel_brace_table
-from report.util.steel_pile import  build_steel_ng_table, build_steel_pile_table
-from stock.models.site import SiteInfo
+from stock.util.steel_brace import build_steel_brace_table
+from stock.util.steel_pile import  build_steel_ng_table, build_steel_pile_table
+from stock.models.site_model import SiteInfo
 from wcommon.templatetags.strmap import get_level
 
 # Create your views here.

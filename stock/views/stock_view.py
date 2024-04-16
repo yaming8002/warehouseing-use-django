@@ -12,9 +12,9 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
 from stock.froms.material import MaterialsForm
-from stock.models.material import MatCat, Materials, MatSpec
-from stock.models.site import SiteInfo
-from stock.models.stock import ConStock, MainStock
+from stock.models.material_model import MatCat, Materials, MatSpec
+from stock.models.site_model import SiteInfo
+from stock.models.stock_model import ConStock, MainStock
 from wcommon.templatetags import constn_state
 from wcommon.utils import ImportDataGeneric
 from wcommon.utils import PageListView

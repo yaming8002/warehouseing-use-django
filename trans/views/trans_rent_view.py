@@ -13,9 +13,9 @@ from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from openpyxl import load_workbook
 
-from report.models.steel_model import DoneSteelReport
-from stock.models.material import MatCat, Materials, MatSpec
-from stock.models.site import SiteInfo
+from stock.models.steel_model import DoneSteelReport
+from stock.models.material_model import MatCat, Materials, MatSpec
+from stock.models.site_model import SiteInfo
 from trans.forms import CarinfoFrom
 from trans.models import CarInfo, TransLog, TransLogDetail
 from wcommon.utils.excel_tool import ImportDataGeneric

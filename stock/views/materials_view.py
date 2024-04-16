@@ -11,7 +11,7 @@ from django.views import View
 from wcommon.utils.excel_tool import ImportData2Generic, ImportDataGeneric
 from wcommon.utils.pagelist import PageListView
 from stock.froms.material import MaterialsForm
-from stock.models.material import MatCat, Materials, MatSpec
+from stock.models.material_model import MatCat, Materials, MatSpec
 from wcommon.utils.save_control import SaveControlView
 
 logger = logging.getLogger(__name__)
