@@ -19,8 +19,10 @@ from stock.views import (
     SiteViewList,
     StockView,
 )
-from stock.views.board_view import BoardControlView
+from stock.views.board_view import BoardControlView, get_board_edit_done
+from stock.views.constn_view import component_view
 from stock.views.site_view import ConstnSeveView
+from stock.views.steel_view import get_edit_remark
 from stock.views.stock_view import ConstnStockViewList
 
 urlpatterns = [
@@ -48,10 +50,12 @@ urlpatterns = [
     path("steel_control/", SteelControlView.as_view(), name="rail_control"),
     path("steel_control/edit/", get_steel_edit_done, name="rail_edit"),
     path("steel_done/", SteelDoneView.as_view(), name="rail_done"),
+    path("steel_done/edit/", get_edit_remark, name="rail_withdraw"),
     path("steel_done/withdraw/", steel_done_withdraw, name="rail_withdraw"),
     path("board_report/", BoardControlView.as_view(), name="board_report"),
-    path("board_report/edit/", get_steel_edit_done, name="rail_edit"),
+    path("board_report/edit/", get_board_edit_done, name="rail_edit"),
     path("constn/pile/", steel_pile_view, name="steel_pile_view"),
     path("constn/brace/", steel_brace_view, name="steel_brace_view"),
+    path("constn/component/", component_view, name="component_view"),
 ]
 

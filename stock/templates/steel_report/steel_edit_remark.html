@@ -1,0 +1,52 @@
+{% extends 'base/model_edit.html' %}
+{% block javascript %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+{% endblock %}
+{% block styles %}
+  <style>
+  .modal-content {
+   width: auto ;
+  }
+
+  .helptext{
+  color:red ;
+  display:inline-block ;
+  }
+  .steel_table{
+    width:1300px ;
+  }
+
+  .steel_table input{
+    width:100% ;
+  }
+
+  th, td {
+    border: 1px solid black; /* 設置單元格邊框 */
+    padding: 8px; /* 設置內邊距 */
+    text-align: center; /* 文字居中 */
+  }
+
+  th {
+    background-color: #f2f2f2; /* 設置表頭背景顏色 */
+  }
+  </style>
+{% endblock %}
+{% block form %}
+  <!-- 修改了 form 的 id 以便直接选中 -->
+  <form style="with:100%" method="post" action="/steel_done/edit/">
+    {% csrf_token %}
+    <div>工地 : {{ report.siteinfo.name }}</div>
+    <div>業主 : {{ report.siteinfo.owner }}</div>
+    <input type="hidden" name="id" id="id" value="{{ report.id }}">
+    <input type="hidden"
+           name="siteinfo_id"
+           id="siteinfo_id"
+           value="{{ report.siteinfo.id }}">
+    <div>
+      <div>
+        <label for="remark">說明</label>
+        <br>
+        <textarea style="with:100%" id="remark" name="remark" row="5">{% if report.remark %}{{report.remark}}{% endif %}</textarea>
+      </div>
+    </form>
+  {% endblock %}

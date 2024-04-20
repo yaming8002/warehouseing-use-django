@@ -20,17 +20,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 os_environ = os.environ
 
-# ALLOWED_HOSTS_VALUE = [
-#     origin.strip() for origin in os_environ["MY_ALLOWED_HOSTS"].split(",") if origin
-# ]
-# print(f"ALLOWED_HOSTS_VALUE{ALLOWED_HOSTS_VALUE}")
+ALLOWED_HOSTS_VALUE = [
+    origin.strip() for origin in os_environ["MY_ALLOWED_HOSTS"].split(",") if origin
+]
+print(f"ALLOWED_HOSTS_VALUE{ALLOWED_HOSTS_VALUE}")
 
-# CSRF_TRUSTED_ORIGINS_VALUE = [
-#     origin.strip()
-#     for origin in os_environ["MY_CSRF_TRUSTED_ORIGINS"].split(",")
-#     if origin
-# ]
-# print(f"CSRF_TRUSTED_ORIGINS_VALUE{CSRF_TRUSTED_ORIGINS_VALUE}")
+CSRF_TRUSTED_ORIGINS_VALUE = [
+    origin.strip()
+    for origin in os_environ["MY_CSRF_TRUSTED_ORIGINS"].split(",")
+    if origin
+]
+print(f"CSRF_TRUSTED_ORIGINS_VALUE{CSRF_TRUSTED_ORIGINS_VALUE}")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -42,8 +42,8 @@ SECRET_KEY = "Dv*4JqwxMSClY$x2lVzy!yAeBkX5ZVF0*qbGnCYZI@T#T4CIxA@p&GgeiRhrLhC4"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ALLOWED_HOSTS_VALUE
-# CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_VALUE  # 使用環境變數的值
+ALLOWED_HOSTS = ALLOWED_HOSTS_VALUE
+CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_VALUE  # 使用環境變數的值
 # Application definition
 
 INSTALLED_APPS = [
@@ -108,10 +108,10 @@ WSGI_APPLICATION = "warehousing_server.wsgi.application"
 # }
 
 
-# db_user = os_environ["MYSQL_USERNAME"]
-# db_pass = os_environ["MYSQL_PASSWORD"]
-# db_host = os_environ["MYSQL_HOST"]
-# db_port = os_environ["MYSQL_PORT"]
+db_user = os_environ["MYSQL_USERNAME"]
+db_pass = os_environ["MYSQL_PASSWORD"]
+db_host = os_environ["MYSQL_HOST"]
+db_port = os_environ["MYSQL_PORT"]
 # 检查配置文件是否存在
 config_file_path = f"{BASE_DIR}/config_json.json"
 if os.path.exists(config_file_path):

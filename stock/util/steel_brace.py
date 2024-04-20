@@ -6,8 +6,8 @@ from typing import Dict, List, Any
 from django.db.models import F, Sum
 from django.shortcuts import render
 
+
 from stock.models.material_model import Materials
-from stock.models.site_model import SiteInfo
 from trans.models import TransLogDetail, TransLog
 
 support_list = {"300": "H300", "350": "H350", "400": "H400", "408": "H408"}
@@ -26,7 +26,7 @@ def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
         translog__in=translog, material__in=mats
     )
 
-    steel_map = {}
+    steel_map = dict()
     
     for mat_code, name in support_list.items():
         # name = f"m_{mat_code}"
@@ -39,10 +39,8 @@ def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
             "count_out": Decimal(0),
             "unit_out": Decimal(0),
         }
-        print(level)
         
         for seat in range(level):
-            print(f"seat{seat}")
             total_quantity_and_unit = (
                 transdefaullog.filter(material__mat_code=mat_code, level=(seat + 1))
                 .values(
@@ -63,7 +61,7 @@ def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
             site_in = (seat * 2) + 1
             site_out = seat * 2
             for item in total_quantity_and_unit:
-                # print(item)
+                print(item)
                 if item["transaction_type"] == "IN":
                     tr_list[site_in].append(item)
                     summary["count_in"] += Decimal(item["total_quantity"])
@@ -89,7 +87,6 @@ def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
 def transpose_list_of_lists(input_list):
     # 确定最大长度
     max_length = max(len(row) for row in input_list)
-    print(input_list)
     # 创建转置后的列表
     transposed_list = []
     for i in range(max_length):

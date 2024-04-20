@@ -1,19 +1,17 @@
 
 # Create your views here.
 from datetime import datetime
-from typing import Dict, List
 
 from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
-from decimal import Decimal
-from stock.models import  SteelReport
-from stock.models.steel_model import DoneSteelReport, SteelPillar
-from stock.models.site_model import SiteInfo
-from wcommon.utils import MonthListView 
 
-from wcommon.utils.uitls import get_year_month
+from stock.models import SteelReport
+from stock.models.site_model import SiteInfo
+from stock.models.steel_model import DoneSteelReport
+from stock.models.steel_pillar import SteelPillar
+from wcommon.utils import MonthListView
 
 static_column_code = [
         "300",
@@ -22,6 +20,8 @@ static_column_code = [
         "351",
         "400",
         "401",
+        "414",
+        "4141",
         "408",
         "11",
         "13",
@@ -32,7 +32,8 @@ class SteelControlView(MonthListView):
     template_name = "steel_report/steel_control.html"
 
     def get_queryset(self):
-        query =  (Q(siteinfo__id__gt=4) )
+        year,month = self.get_year_month()
+        query =  (Q(siteinfo__id__gt=4) & (Q(year__lt=year) | Q(year=year, month__lte=month)) )
         return SteelReport.get_current_by_query(query)
             
     def get_whse_martials(self,context ):
@@ -52,8 +53,6 @@ class SteelControlView(MonthListView):
         if current and before:
             currentdata = model_to_dict(current)
             beforedata = model_to_dict(before)
-            print()
-            print()
             diff = [(currentdata[f'm_{key}'] - beforedata[f'm_{key}']) for key in static_column_code]
         return diff
 
@@ -71,8 +70,7 @@ class SteelDoneView(MonthListView):
 
     def get_queryset(self):
         year,month = self.get_year_month()
-        query = (Q(year=year)&Q(month=month) )
-        print(DoneSteelReport.objects.filter(query).query)
+        query =  (Q(siteinfo__id__gt=4) & (Q(year=year) & Q( month=month)) )
         return DoneSteelReport.objects.filter(query).all()
     
     def get_whse_martials(self,context ):
@@ -130,23 +128,38 @@ def get_steel_edit_done(request):
         context = {'msg':"成功"}
         return JsonResponse(context)
     
-
-
 def steel_done_withdraw(request):
     if request.method == 'GET':
         report_id = request.GET.get('id') 
-        report = SteelReport.objects.select_related('siteinfo').get(id=report_id)
-        report.siteinfo.rail_done = False
-        report.siteinfo.save()
-        steel_update__total(report,True)
+        print(report_id)
+        report = DoneSteelReport.objects.select_related('siteinfo').get(id=report_id)
+        site= report.siteinfo
+        site.rail_done = False
+        site.save()
+        report.get
         context={'msg':"成功退回"}
+        return JsonResponse(context)
+
+def get_edit_remark(request):
+    if request.method == 'GET':
+        report_id = request.GET.get('id') 
+        report = DoneSteelReport.objects.get(id=report_id)
+        context = {'report':report}
+
+        return render(request,'steel_report/steel_edit_remark.html',context)
+    else :
+        report_id = request.POST.get('id')
+        remark = request.POST.get('remark')
+        report = DoneSteelReport.objects.get(id=report_id)
+        report.remark = remark
+        report.save()
+
+        context = {'msg':"成功"}
         return JsonResponse(context)
 
 
 def steel_update__total(constn:SteelReport,is_withdraw: bool):
     site = constn.siteinfo
-    if site.id < 5:
-        return
     
     split_year_month = [int(x) for x in  (datetime.now()).strftime('%Y-%m') .split('-')]
     rail_objects = SteelReport.objects.select_related('siteinfo').filter(Q(year=split_year_month[0])&Q(month=split_year_month[1]))

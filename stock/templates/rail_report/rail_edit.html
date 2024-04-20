@@ -85,7 +85,7 @@
     <div style="with:100%">
       <label for="remark">說明</label>
       <br>
-      <textarea style="with:100%" id="remark" name="remark" row="5" >{{report.remark}}</textarea>
+      <textarea style="with:100%" id="remark" name="remark" row="5" >{% if report.remark %}{{report.remark}}{% endif %}</textarea>
     </div>
   </form>
 {% endblock %}

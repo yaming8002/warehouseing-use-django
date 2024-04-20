@@ -1,7 +1,8 @@
 from django.shortcuts import render
 
 from stock.util.steel_brace import build_steel_brace_table
-from stock.util.steel_pile import  build_steel_ng_table, build_steel_pile_table
+from stock.util.steel_pile import build_steel_ng_table
+from stock.util.steel_component import component_map , build_component_table
 from stock.models.site_model import SiteInfo
 from wcommon.templatetags.strmap import get_level
 
@@ -11,6 +12,7 @@ from wcommon.templatetags.strmap import get_level
 def steel_brace_view(request):
     # 将查询结果传递给模板
     context = {}
+    table_level = 7
     if request.method == "GET":
         owner = request.GET.get("owner")
         code = request.GET.get("code")
@@ -27,18 +29,17 @@ def steel_brace_view(request):
             constn = constn.filter(name=name)
             show = True
 
-        level = request.GET.get("level")
-        level = int(level) if level else 7
-    
+        get_level_val = request.GET.get("level")
+        table_level = int(get_level_val) if get_level_val else table_level
+
         if show and constn.exists():
-            context["steel_pile_table"] = build_steel_brace_table(constn.get(),level)
+            context["steel_pile_table"] = build_steel_brace_table(constn.get(), table_level)
             context["constn"] = constn.get()
-            context["select_level"]= [x for x in get_level() if (x[0]>0)]
-            context["table_level"]= level
-            context["column_count"] = range(level*2)
+            context["select_level"] = [x for x in get_level() if (x[0] > 0)]
 
+    context["table_level"] = table_level
+    context["column_count"] = range(table_level * 2)
     return render(request, "constn_report/steel_brace.html", context)
-
 
 
 def steel_pile_view(request):
@@ -59,8 +60,6 @@ def steel_pile_view(request):
         if name:
             constn = constn.filter(name=name)
             show = True
-        
-  
 
         if show and constn.exists():
             # context["steel_pile_table"] = build_steel_pile_table(constn.get())
@@ -70,13 +69,19 @@ def steel_pile_view(request):
 
     return render(request, "constn_report/steel_pile.html", context)
 
+
 def component_view(request):
     # 将查询结果传递给模板
     context = {}
+    table_level = 7
+    selected_items = []
     if request.method == "GET":
         owner = request.GET.get("owner")
         code = request.GET.get("code")
         name = request.GET.get("name")
+        selected_items = request.GET.getlist("selected_items")
+
+        print("selected_items", selected_items)
         constn = SiteInfo.objects.filter(genre=1)
         show = False
         if owner:
@@ -88,17 +93,26 @@ def component_view(request):
         if name:
             constn = constn.filter(name=name)
             show = True
-        
 
-        # steel_ng_map = {"10": "補強板", "6300": "H300止水板","6350": "H350止水板","6400": "H400止水板",
-        #                  "79": "擋土板","9": "防墬網/安全網","11":"覆工板","12":"洗車板","21": "鋪路鐵板 全", "2105":"鋪路鐵板 半" ,
-        #                   "13": "千斤頂","14": "土壓計",
-        #                   "11":"樓梯","12":"小鐵板0.8*1.5","21": "小鐵板1*2", "2105":"斜撐",
-        #                    "13": "安全步道 1M","14": "伸縮梯","11":"伸縮臂","12":"牛頭","21": "小鐵板1*2", "2105":"斜撐" }
+        get_level_val = request.GET.get("level")
+        table_level = int(get_level_val) if get_level_val else table_level
+
+        selected_items_map = {key: component_map[key] for key in selected_items}
+        print(selected_items_map)
         if show and constn.exists():
-            context["steel_pile_table"] = build_steel_pile_table(constn.get())
-            context["steel_ng_table"] = build_steel_ng_table(constn.get())
+            context["steel_pile_table"] = build_component_table(
+                constn.get(), table_level, selected_items_map
+            )
+            print(context["steel_pile_table"])
             context["constn"] = constn.get()
-            context["column_count"] = range(2)
 
-    return render(request, "constn_report/steel_pile.html", context)
+            context["select_level"] = [x for x in get_level() if (x[0] > 0)]
+
+    context["mat_list"] = [
+        {"key": key, "value": value} for key, value in component_map.items()
+    ]
+    context['selected_items'] = selected_items
+    context["table_level"] = table_level
+    context["column_count"] = range(table_level * 2)
+    return render(request, "constn_report/component.html", context)
+

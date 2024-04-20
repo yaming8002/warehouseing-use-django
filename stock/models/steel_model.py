@@ -7,7 +7,7 @@ from django.utils.timezone import datetime
 
 
 from stock.models.material_model import Materials
-from stock.models.monthreport_model import MonthData, MonthReport
+from stock.models.monthreport_model import MonthReport
 from stock.models.site_model import SiteInfo
 from wcommon.utils.uitls import excel_value_to_str, get_year_month
 from decimal import ROUND_HALF_UP
@@ -48,7 +48,7 @@ class SteelReport(MonthReport):
     def add_report(
         cls,
         site: SiteInfo,
-        build_date:datetime,
+        build_date: datetime,
         is_in: bool,
         mat: Materials,
         all_quantity: Decimal,
@@ -60,15 +60,21 @@ class SteelReport(MonthReport):
         year, month = build_date.year, build_date.month
         report = cls.get_current_by_site(site, year, month)
         whse = cls.get_current_by_site(SiteInfo.objects.get(code="0001"), year, month)
+
         value = all_unit if mat.is_divisible else all_quantity
         value = Decimal(value)
-
-        SteelReport.update_column_value(
-            report.id, not is_in, f"m_{mat.mat_code}", value
-        )
-        SteelReport.update_column_value(whse.id, not is_in, f"m_{mat.mat_code}", value)
-        SteelPillar.update_value(mat,year, month)
-
+        cls.update_column_value(whse.id, not is_in, f"m_{mat.mat_code}", value)
+        original_value = getattr(report, f"m_{mat.mat_code}")
+        if is_in and site.genre > 1 and float(original_value) - float(value) < 0:
+            total_site = SiteInfo.objects.get(code="0000")
+            total = cls.get_current_by_site(total_site, year, month)
+            cls.update_column_value(total.id, not is_in, f"m_{mat.mat_code}", value)
+            DoneSteelReport.add_new_mat(
+                total_site, build_date, is_in, mat, all_quantity, all_unit
+            )
+            cls.objects.filter(id=report.id).delete()
+        else:
+            cls.update_column_value(report.id, not is_in, f"m_{mat.mat_code}", value)
 
 
 class DoneSteelReport(MonthReport):
@@ -99,43 +105,48 @@ class DoneSteelReport(MonthReport):
         ordering = ["done_type", "id"]  # 按照 id 升序排序
 
     @classmethod
-    def add_stock(cls, site: SiteInfo, item):
-        mat_code = excel_value_to_str(item[7])
-        unit_req = item[9]
-        quantity = Decimal(abs(item[15]))
-        unit = (
-            Decimal(unit_req).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-            if unit_req
-            else None
-        )
-        mat_code = excel_value_to_str(item[7])
-        remark = excel_value_to_str(item[20])
-        mat = Materials.get_item_by_code(mat_code, remark, unit)
-        if mat.mat_code not in cls.static_column_code.keys():
-            return
+    def add_new_mat(
+        cls,
+        site: SiteInfo,
+        build_date: datetime,
+        is_in: bool,
+        mat: Materials,
+        all_quantity: Decimal,
+        all_unit: Decimal,
+    ):
+        y, m = build_date.year, build_date.month
 
-        y, m = get_year_month()
-        done_report_obj = cls.objects.select_related("siteinfo").filter(
-            siteinfo=site,
-            done_type=2,
+        obj = cls.objects.filter(
+            siteinfo=site, year=y, month=m, done_type=2, is_done=True
         )
-
-        if done_report_obj.exists():
-            done_report = done_report_obj.first()
-        else:
-            done_report = cls.objects.create(
-                siteinfo=site,
-                done_type=2,
-                year=y,
-                month=m,
-                is_done=True,
-                remark=excel_value_to_str(item[20]),
+        if not obj.exists():
+            obj = cls.objects.create(
+                siteinfo=site, year=y, month=m, done_type=2, is_done=True
             )
+        else:
+            obj = obj.first()
+        value = all_unit if mat.is_divisible else all_quantity
+        value = Decimal(value)
+        cls.update_column_value(obj.id, True, f"m_{mat.mat_code}", value)
 
-        value= unit * quantity if unit else quantity
-        cls.update_column_value(done_report.id,True,f"m_{mat.mat_code}",value)
-
-        done_report.save()
+    @classmethod
+    def roll_back(
+        cls,
+        site: SiteInfo,
+        build_date: datetime,
+        is_in: bool,
+        mat: Materials,
+        all_quantity: Decimal,
+        all_unit: Decimal,
+    ):
+        cls.objects.filter(siteinfo=site).update(**{"is_done":False})
+        report = SteelReport.get_current_by_site(site)
+        report.is_done = True
+        total = SteelReport.get_current_by_site(SiteInfo.objects.get(code="0000"))
+        for code in cls.static_column_code.keys():
+            setattr(total, f'm_{code}', getattr(total, f'm_{code}') - report.get(f'm_{code}', 0))
+        report.save()
+        total.save()
 
     @classmethod
     def add_done_item(cls, case_name, request):
@@ -168,7 +179,7 @@ class DoneSteelReport(MonthReport):
         for k, _ in done_report.static_column_code.items():
             # print(f"{case_name}.m_{k}")
             # print(request.POST.get(f"{case_name}.m_{k}"))
-            value = Decimal( request.POST.get(f"{case_name}.m_{k}"))
+            value = Decimal(request.POST.get(f"{case_name}.m_{k}"))
             # cls.update_column_value(done_report.id,True,f"m_{k}",value)
             setattr(done_report, f"m_{k}", value)
 
@@ -196,37 +207,3 @@ class SteelItem(MonthReport):
     class Meta:
         unique_together = ["steel", "material", "all_quantity"]
         ordering = ["id"]  # 按照 id 升序排序
-
-
-class SteelPillar(MonthData):
-    edit_date = models.DateTimeField(default=datetime.now)
-    mat_code = models.CharField(max_length=10, default="", verbose_name="物料代號")
-    for i in range(1, 18):
-        locals()[f"l_{i}"] = models.IntegerField(default=0, verbose_name=f"In_{i}")
-    total = models.IntegerField(default=0, verbose_name="總計")
-
-    @classmethod
-    def get_value(cls, mat_code, year, month):
-        sp, _ = cls.objects.get_or_create(mat_code=mat_code, year=year, month=month)
-        return sp
-
-
-    @classmethod
-    def add_report(
-        cls,
-        build_date: datetime,
-        mat: Materials,
-    ):
-        y, m = build_date.year ,build_date.month
-        cls.update_value(mat,y,m)
-
-    @classmethod
-    def update_value(cls, mat: Materials,quantity: Decimal, year, month):
-        if mat.mat_code not in ("301", "351", "401"):
-            return
-        sp, _ = cls.objects.get_or_create(mat_code=mat.mat_code, year=year, month=month)
-        setattr(sp, f"l_{mat.specification.id}", quantity)
-        sp.save()
-
-    class Meta:
-        unique_together = ["year", "month", "mat_code"]

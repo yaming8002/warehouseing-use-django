@@ -51,7 +51,7 @@
     <label for="level">層數</label>
     <select id="level" name="level">
       {% get_level as levels %}
-      {% for level in levels %}<option value="{{ level.0 }}"  {% if level.0 == request.GET.level %} selected {% endif %} >{{ level.1 }}</option>{% endfor %}
+      {% for level in levels %}<option value="{{ level.0 }}"  {% if table_level == level.0 %} selected {% endif %} >{{ level.1 }}</option>{% endfor %}
     </select>
   </p>
   <input type="submit" value="查詢" />
@@ -130,8 +130,8 @@
   <tr style="height: 20px">
     {% for item in row %}
     {% if item %}
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.build_date | date:"Y/m/d" }}</td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{item.total_quantity |floatformat:"2" }}</td>
+    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"><!--{{ item }}-->{{ item.build_date | date:"Y/m/d" }}</td>
+    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.total_quantity |floatformat:"2" }}</td>
     <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.total_unit|floatformat:"2" }}</td>
     <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.code }}
     </td>

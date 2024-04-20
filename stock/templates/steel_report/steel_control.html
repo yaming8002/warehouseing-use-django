@@ -7,6 +7,7 @@
     $(document).ready(function () {
       // Adjusting the style of the caption in the table with id 'base_table'
       hideEditRowIfEarlier();
+      zero_item_hide();
     });
 
     function hideEditRowIfEarlier() {
@@ -18,6 +19,13 @@
         // 如果輸入的年月早於當前年月，尋找並隱藏結案連結
         $('.editRow_select').hide(); // 隱藏包含結案連結的<td>元素
       }
+    }
+
+    function zero_item_hide() {
+      $(".item").each(function(x){
+       $(x).find('.value')
+      }) ;
+
     }
 
     function editRow(id) {
@@ -77,6 +85,10 @@
       中柱(m)</th>
     <th>H408 <br>
       支撐(m)</th>
+    <th>H414 <br>
+      支撐(m)</th>
+    <th>H414 <br>
+      中柱(m)</th>
     <th>覆工板</th>      
     <th>千斤頂(個)</th>
     <th>土壓計(個)</th>
@@ -84,21 +96,23 @@
   </tr>
 
   {% for item in list %}
-  <tr>
+  <tr class="item seat_{{forloop.counter}}" >
     <td>{{ forloop.counter }}</td>
     <td>{{ item.siteinfo.code }}</td>
     <td>{{ item.siteinfo.owner }}</td>
     <td>{{ item.siteinfo.name }}</td>
-    <td>{{ item.m_300 }}</td>
-    <td>{{ item.m_301 }}</td>
-    <td>{{ item.m_350 }}</td>
-    <td>{{ item.m_351 }}</td>
-    <td>{{ item.m_400 }}</td>
-    <td>{{ item.m_401 }}</td>
-    <td>{{ item.m_408 }}</td>
-    <td>{{ item.m_11 |floatformat:"0"}}</td>
-    <td>{{ item.m_13 |floatformat:"0"}}</td>
-    <td>{{ item.m_14 |floatformat:"0"}}</td>
+    <td class="value">{{ item.m_300 }}</td>
+    <td class="value">{{ item.m_301 }}</td>
+    <td class="value">{{ item.m_350 }}</td>
+    <td class="value">{{ item.m_351 }}</td>
+    <td class="value">{{ item.m_400 }}</td>
+    <td class="value">{{ item.m_401 }}</td>
+    <td class="value">{{ item.m_408 }}</td>
+    <td class="value">{{ item.m_414 }}</td>
+    <td class="value">{{ item.m_4141 }}</td>    
+    <td class="value">{{ item.m_11 |floatformat:"0"}}</td>
+    <td class="value">{{ item.m_13 |floatformat:"0"}}</td>
+    <td class="value">{{ item.m_14 |floatformat:"0"}}</td>
     <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a></td>
   </tr>
   {% endfor %}
@@ -111,6 +125,8 @@
     <th>{{ kh_report.m_400 }}</th>
     <th>{{ kh_report.m_401 }}</th>
     <th>{{ kh_report.m_408 }}</th>
+    <th>{{ kh_report.m_414 }}</th>
+    <th>{{ kh_report.m_4141 }}</th>
     <th>{{ kh_report.m_11 |floatformat:"0"}}</th>
     <th>{{ kh_report.m_13 |floatformat:"0"}}</th>
     <th>{{ kh_report.m_14 |floatformat:"0"}}</th>
@@ -125,6 +141,8 @@
     <th>{{ lk_report.m_400 }}</th>
     <th>{{ lk_report.m_401 }}</th>
     <th>{{ lk_report.m_408 }}</th>
+    <th>{{ lk_report.m_414 }}</th>
+    <th>{{ lk_report.m_4141 }}</th>
     <th>{{ lk_report.m_11 |floatformat:"0" }}</th>
     <th>{{ lk_report.m_13 |floatformat:"0"}}</th>
     <th>{{ lk_report.m_14 |floatformat:"0"}}</th>
@@ -139,6 +157,8 @@
     <th>{{ total_report.m_400 }}</th>
     <th>{{ total_report.m_401 }}</th>
     <th>{{ total_report.m_408 }}</th>
+    <th>{{ total_report.m_414 }}</th>
+    <th>{{ total_report.m_4141 }}</th>
     <th>{{ total_report.m_11 |floatformat:"0"}}</th>
     <th>{{ total_report.m_13 |floatformat:"0"}}</th>
     <th>{{ total_report.m_14 |floatformat:"0"}}</th>
@@ -153,6 +173,8 @@
     <th>{{ befote_total_report.m_400 }}</th>
     <th>{{ befote_total_report.m_401 }}</th>
     <th>{{ befote_total_report.m_408 }}</th>
+    <th>{{ befote_total_report.m_414 }}</th>
+    <th>{{ befote_total_report.m_4141 }}</th>    
     <th>{{ befote_total_report.m_11 |floatformat:"0"}}</th>
     <th>{{ befote_total_report.m_13 |floatformat:"0"}}</th>
     <th>{{ befote_total_report.m_14 |floatformat:"0"}}</th>

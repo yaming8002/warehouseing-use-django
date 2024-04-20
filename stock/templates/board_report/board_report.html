@@ -45,9 +45,9 @@
     <p>
       <label for="mat_code">物料:</label>
       <select id="mat_code" name="mat_code">
-        <option value='21' {% if request.GET.mat_code == '21' %}selected{% endif %}>鐵板</option>
-        <option value='11' {% if request.GET.mat_code == '11' %}selected{% endif %}>簍空覆工板</option>
-        <option value='12' {% if request.GET.mat_code == '12' %}selected{% endif %}>洗車板</option>
+        <option value='21' {% if mat_code == '21' %}selected{% endif %}>鐵板</option>
+        <option value='11' {% if mat_code == '11' %}selected{% endif %}>簍空覆工板</option>
+        <option value='12' {% if mat_code == '12' %}selected{% endif %}>洗車板</option>
       </select>
     </p>
     <input type="submit" value="查詢" />
@@ -55,13 +55,15 @@
   </form>
 {% endblock %}
 {% block table %}
-  <caption></caption>
+  <caption>{% if .mat_code == '21' %}鐵板
+     {% elif mat_code == '11' %}簍空覆工板
+     {% elif mat_code == '11' %}洗車板{% endif %}</caption>
   <tr>
     <th>項次</th>
     <th>工地代號</th>
     <th>業主</th>
     <th>名稱</th>
-    {% if  request.GET.mat_code == '21' %}
+    {% if  mat_code == '21' %}
       <th>鐵板 全</th>
       <th>鐵板 半</th>
       <th>總計</th>
@@ -71,6 +73,7 @@
     {% else %}
       <th>數量</th>
       <th>完工</th>
+      <th>遺失</th>
     {% endif %}
     <th>現場人員</th>
     <th>備註</th>
@@ -84,7 +87,7 @@
       <td>{{ item.siteinfo.owner }}</td>
       <td>{{ item.siteinfo.name }}</td>
       <td>{{ item.quantity | floatformat:"0" }}</td>
-      {% if request.GET.mat_code == '21' %}
+      {% if mat_code == '21' %}
         <td>{{ item.quantity2 | floatformat:"0" }}</td>
         <td>{{ item.quantity|add:item.quantity2 | floatformat:"0" }}</td>
         <td>
@@ -100,12 +103,13 @@
       <td>
         {% if item.siteinfo.member %}{{ item.siteinfo.member }}{% endif %}
       </td>
-      <td>{{ item.remark }}</td>
+      <td>{% if item.remark %}{{ item.remark}}{% endif %}</td>
       <td>
         <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>
       </td>
     </tr>
   {% endfor %}
+  {% if kh_report  %}
   <tr>
     <th colspan="4">{{ kh_report.siteinfo.name }}</th>
     <th>{{ kh_report.quantity | floatformat:"0" }}</th>
@@ -118,7 +122,10 @@
     <th></th>
     <th></th>
     <th></th>
+    <th></th>
   </tr>
+  {% endif %}
+  {% if lk_report  %}
   <tr>
     <th colspan="4">{{ lk_report.siteinfo.name }}</th>
     <th>{{ lk_report.quantity | floatformat:"0" }}</th>
@@ -131,5 +138,7 @@
     <th></th>
     <th></th>
     <th></th>
+    <th></th>
   </tr>
+  {% endif %}
 {% endblock %}

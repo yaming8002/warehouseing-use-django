@@ -92,6 +92,7 @@ class MonthReport(MonthData):
             cls.objects.select_related("siteinfo")
             .filter(id__in=ids)
             .filter(is_done=is_done)
+            .order_by("siteinfo__genre","siteinfo__code")
             .all()
         )
 

@@ -82,18 +82,16 @@ class ConStock(StockBase):
         if site.genre > 1 and stock.quantity < 0 and mat.mat_code in SteelReport.static_column_code.keys() :
             now = datetime.now()
             y, m = now.year, now.month
-            total = SteelReport.get_current_by_site(SiteInfo.objects.get(code="0000"), y, m)
-            check_done = DoneSteelReport.objects.gercreate(
+            check_done,_ = DoneSteelReport.objects.get_or_create(
                     siteinfo=site,
                     done_type = 2,
                     year=y,
                     month=m,
                     is_done=True,
             )
-            print("check_done",model_to_dict(check_done))
-            value = stock.total_unit if stock.total_unit else stock.quantity
+            value = quantity*unit if unit else stock.quantity
+            DoneSteelReport.update_column_value(check_done.id, True, f"m_{mat.mat_code}", value)
             total = SteelReport.get_current_by_site(SiteInfo.objects.get(code="0000"), y, m)
-            print("total",model_to_dict(total))
             SteelReport.update_column_value(total.id,True,f"m_{mat.mat_code}",value)
             stock.quantity = 0
             stock.unit = 0
