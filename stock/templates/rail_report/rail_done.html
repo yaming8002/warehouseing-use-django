@@ -68,7 +68,7 @@
              value='{{ yearMonth }}'>
     </p>
     <input type="submit" value="查詢" />
-    <input type="button" id="exceloutput" value="匯出EXCEL" />
+     <!-- <input type="button" id="exceloutput" value="匯出EXCEL" />-->
   </form>
   <div id="modalContainer"></div>
 {% endblock %}
@@ -144,19 +144,19 @@
     <tr class="table-success">
       {% load custom_filters %}
       <td>出入差</td>
-      <td>{{ item.in_5|custom_subtract:item.out_5 }}</td>
-      <td>{{ item.in_6|custom_subtract:item.out_6 }}</td>
-      <td>{{ item.in_7|custom_subtract:item.out_7 }}</td>
-      <td>{{ item.in_8|custom_subtract:item.out_8 }}</td>
-      <td>{{ item.in_9|custom_subtract:item.out_9 }}</td>
-      <td>{{ item.in_10|custom_subtract:item.out_10 }}</td>
-      <td>{{ item.in_11|custom_subtract:item.out_11 }}</td>
-      <td>{{ item.in_12|custom_subtract:item.out_12 }}</td>
-      <td>{{ item.in_13|custom_subtract:item.out_13 }}</td>
-      <td>{{ item.in_14|custom_subtract:item.out_14 }}</td>
-      <td>{{ item.in_15|custom_subtract:item.out_15 }}</td>
-      <td>{{ item.in_16|custom_subtract:item.out_16 }}</td>
-      <td>{{ item.in_total|custom_subtract:item.out_total }}</td>
+      <td>{{ item.in_5|custom_subtract:item.out_5 |floatformat:"0" }}</td>
+      <td>{{ item.in_6|custom_subtract:item.out_6 |floatformat:"0" }}</td>
+      <td>{{ item.in_7|custom_subtract:item.out_7 |floatformat:"0"}}</td>
+      <td>{{ item.in_8|custom_subtract:item.out_8 |floatformat:"0"}}</td>
+      <td>{{ item.in_9|custom_subtract:item.out_9 |floatformat:"0"}}</td>
+      <td>{{ item.in_10|custom_subtract:item.out_10 |floatformat:"0"}}</td>
+      <td>{{ item.in_11|custom_subtract:item.out_11 |floatformat:"0"}}</td>
+      <td>{{ item.in_12|custom_subtract:item.out_12 |floatformat:"0"}}</td>
+      <td>{{ item.in_13|custom_subtract:item.out_13 |floatformat:"0"}}</td>
+      <td>{{ item.in_14|custom_subtract:item.out_14 |floatformat:"0"}}</td>
+      <td>{{ item.in_15|custom_subtract:item.out_15 |floatformat:"0"}}</td>
+      <td>{{ item.in_16|custom_subtract:item.out_16 |floatformat:"0"}}</td>
+      <td>{{ item.in_total|custom_subtract:item.out_total |floatformat:"0"}}</td>
     </tr>
   {% endfor %}
 {% endblock %}
