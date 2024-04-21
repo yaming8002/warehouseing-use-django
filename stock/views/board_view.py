@@ -27,8 +27,8 @@ class BoardControlView(MonthListView):
         mat_code = mat_code if mat_code else '21'
         obj_board= BoardReport.objects.select_related("siteinfo").filter( Q(mat_code = mat_code))
         context['mat_code'] = mat_code
-        context['lk_report'] = obj_board.get(siteinfo__code="0001")
-        context['kh_report'] = obj_board.get(siteinfo__code="0003")
+        context['lk_report'] = obj_board.get(siteinfo__code="0001") if obj_board.filter(siteinfo__code="0001").exists() else None
+        context['kh_report'] = obj_board.get(siteinfo__code="0003") if obj_board.filter(siteinfo__code="0003").exists() else None
         # context['lk_report'] = BoardReport.objects.get(siteinfo__code="0001")
 
 

@@ -183,7 +183,11 @@
   <tr class="table-warning">
     <th colspan=4>本月與上期之差異(({{yearMonth}})-({{before_yearMonth}})=差異數)</th>
     {% for d in diff %}
+      {% if forloop.counter > 9 %}
+      <th>{{d |floatformat:"0"}}</th>
+      {% else %}
       <th>{{d}}</th>
+      {% endif %}
     {% endfor %}
     <th></th>
   </tr>

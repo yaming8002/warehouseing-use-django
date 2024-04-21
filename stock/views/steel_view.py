@@ -53,7 +53,7 @@ class SteelControlView(MonthListView):
         if current and before:
             currentdata = model_to_dict(current)
             beforedata = model_to_dict(before)
-            diff = [(currentdata[f'm_{key}'] - beforedata[f'm_{key}']) for key in static_column_code]
+            diff = [(float(currentdata[f'm_{key}']) - float(beforedata[f'm_{key}'])) for key in static_column_code]
         return diff
 
 

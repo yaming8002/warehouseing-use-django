@@ -144,19 +144,19 @@
     <tr class="table-success">
       {% load custom_filters %}
       <td>出入差</td>
-      <td>{{ item.out_5|custom_subtract:item.in_5 }}</td>
-      <td>{{ item.out_6|custom_subtract:item.in_6 }}</td>
-      <td>{{ item.out_7|custom_subtract:item.in_7 }}</td>
-      <td>{{ item.out_8|custom_subtract:item.in_8 }}</td>
-      <td>{{ item.out_9|custom_subtract:item.in_9 }}</td>
-      <td>{{ item.out_10|custom_subtract:item.in_10 }}</td>
-      <td>{{ item.out_11|custom_subtract:item.in_11 }}</td>
-      <td>{{ item.out_12|custom_subtract:item.in_12 }}</td>
-      <td>{{ item.out_13|custom_subtract:item.in_13 }}</td>
-      <td>{{ item.out_14|custom_subtract:item.in_14 }}</td>
-      <td>{{ item.out_15|custom_subtract:item.in_15 }}</td>
-      <td>{{ item.out_16|custom_subtract:item.in_16 }}</td>
-      <td>{{ item.out_total|custom_subtract:item.in_total }}</td>
+      <td>{{ item.in_5|custom_subtract:item.out_5 }}</td>
+      <td>{{ item.in_6|custom_subtract:item.out_6 }}</td>
+      <td>{{ item.in_7|custom_subtract:item.out_7 }}</td>
+      <td>{{ item.in_8|custom_subtract:item.out_8 }}</td>
+      <td>{{ item.in_9|custom_subtract:item.out_9 }}</td>
+      <td>{{ item.in_10|custom_subtract:item.out_10 }}</td>
+      <td>{{ item.in_11|custom_subtract:item.out_11 }}</td>
+      <td>{{ item.in_12|custom_subtract:item.out_12 }}</td>
+      <td>{{ item.in_13|custom_subtract:item.out_13 }}</td>
+      <td>{{ item.in_14|custom_subtract:item.out_14 }}</td>
+      <td>{{ item.in_15|custom_subtract:item.out_15 }}</td>
+      <td>{{ item.in_16|custom_subtract:item.out_16 }}</td>
+      <td>{{ item.in_total|custom_subtract:item.out_total }}</td>
     </tr>
   {% endfor %}
 {% endblock %}
