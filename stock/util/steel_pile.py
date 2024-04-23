@@ -152,12 +152,7 @@ def transpose_list_of_lists(input_list):
     # 创建转置后的列表
     transposed_list = []
     for i in range(max_length):
-        transposed_row = []
-        for row in input_list:
-            if i < len(row):
-                transposed_row.append(row[i])
-            else:
-                transposed_row.append(None)
+        transposed_row = [row[i] if i < len(row) else None for row in input_list]
         transposed_list.append(transposed_row)
 
     return transposed_list

@@ -17,6 +17,7 @@ component_map = {
     "6350": "H350止水板",
     "6400": "H400止水板",
     "79": "擋土板5.6.8分",
+    "44":"黑皮",
     "9": "防墬網/安全網",
     "11": "覆工板 1M *2M",
     "12": "洗車版 2M *2M",
@@ -158,12 +159,7 @@ def transpose_list_of_lists(input_list):
     # 创建转置后的列表
     transposed_list = []
     for i in range(max_length):
-        transposed_row = []
-        for row in input_list:
-            if i < len(row):
-                transposed_row.append(row[i])
-            else:
-                transposed_row.append(None)
+        transposed_row = [row[i] if i < len(row) else None for row in input_list]
         transposed_list.append(transposed_row)
 
     return transposed_list
@@ -171,12 +167,9 @@ def transpose_list_of_lists(input_list):
 
 def level_summary_of_lists(input_list):
     # 确定最大长度
-    level_list: List[Dict[str, Decimal]] = []
+    level_list = []
     for row in input_list:
-        summary = {"count": Decimal(0), "unit": Decimal(0)}
-        for item in row:
-            summary["count"] += item["total_quantity"]
-            summary["unit"] += item["total_unit"]
+        summary = sum([item["total_quantity"] for item in row ])
         level_list.append(summary)
 
     # print(level_list)

@@ -1,3 +1,4 @@
+from typing import List
 from django import template
 
 register = template.Library()
@@ -12,3 +13,6 @@ def check_done_type(value, encountered_done_type):
         return True
     return False
 
+@register.filter
+def list_index_value(lst:List, index:int):
+    return lst[index-1]

@@ -88,14 +88,12 @@
     let batchData = [];
 
     for (let i = 0; i < rows.length; i++) {
-        console.info("上传中..." + i + "/" + rows.length);
         if (end_date < rows[i][1]) {
             batchData.push(rows[i]);
         }
 
         // Upload when batch is full or at the end of array
         if (batchData.length === batchSize || rows[i].length < 2 || !rows[i][6]) {
-          $('#update_text').text("上传中..." + i + "/" + rows.length);
             try {
                 await $.ajax({
                     url: url,
@@ -107,8 +105,15 @@
                     success:function(data ){
                       data.error_list.forEach(item => {
                         const tr = $('<tr></tr>').append(`<td>${item.e}</td>`);
-                        item.item.slice(1).forEach(col => {
-                            tr.append(`<td>${col || ''}</td>`);
+                        item.item.slice(1).forEach((col, index) => {
+                          if (index + 1 === 1 || index + 1 === 27) {
+                            let jsDate = excelDateToJSDate(col); // Convert to JS Date
+                            let formattedDate = formatDate(jsDate); // Format to "Y-m-d"
+                            tr.append(`<td>${formattedDate}</td>`); // Append formatted date
+                          } else {
+                              tr.append(`<td>${col || ''}</td>`);
+                          }
+                 
                         });
                         $("#base_table tbody").append(tr);
                     });
@@ -138,6 +143,23 @@
             console.error("更新结束日期过程中出现错误：", error);
         }
     }
+}
+
+function excelDateToJSDate(serial) {
+  const excelEpoch = new Date(Date.UTC(1899, 11, 31)); // setting Excel epoch
+  const utc_days = serial - 2; // Adjusting for Excel's leap year bug
+  return new Date(excelEpoch.getTime() + utc_days * 86400000); // 86400000 ms per day
+}
+function formatDate(date) {
+  let d = new Date(date),
+      month = '' + (d.getUTCMonth() + 1), // getUTCMonth returns 0-11
+      day = '' + d.getUTCDate(),
+      year = d.getUTCFullYear();
+
+  if (month.length < 2) month = '0' + month; // padding single-digit months
+  if (day.length < 2) day = '0' + day; // padding single-digit days
+
+  return [year, month, day].join('-'); // joining components with '-'
 }
 
   </script>
@@ -199,11 +221,6 @@
     </tr>
   </thead>
   <tbody>
-    {% for x in error_list %}
-      <tr>
-        <td>{{ x.e }}</td>
-        {% for item in x.item %}<td>{{ item }}</td>{% endfor %}
-      </tr>
-    {% endfor %}
+
   </tbody>
 {% endblock %}
