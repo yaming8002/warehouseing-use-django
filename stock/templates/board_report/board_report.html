@@ -45,7 +45,7 @@
     <p>
       <label for="mat_code">物料:</label>
       <select id="mat_code" name="mat_code">
-        <option value='21' {% if mat_code == '21' %}selected{% endif %}>鐵板</option>
+        <option value='22' {% if mat_code == '22' %}selected{% endif %}>鐵板</option>
         <option value='11' {% if mat_code == '11' %}selected{% endif %}>簍空覆工板</option>
         <option value='12' {% if mat_code == '12' %}selected{% endif %}>洗車板</option>
       </select>
@@ -55,7 +55,7 @@
   </form>
 {% endblock %}
 {% block table %}
-  <caption>{% if .mat_code == '21' %}鐵板
+  <caption>{% if .mat_code == '22' %}鐵板
      {% elif mat_code == '11' %}簍空覆工板
      {% elif mat_code == '11' %}洗車板{% endif %}</caption>
   <tr>
@@ -63,7 +63,7 @@
     <th>工地代號</th>
     <th>業主</th>
     <th>名稱</th>
-    {% if  mat_code == '21' %}
+    {% if  mat_code == '22' %}
       <th>鐵板 全</th>
       <th>鐵板 半</th>
       <th>總計</th>
@@ -87,7 +87,7 @@
       <td>{{ item.siteinfo.owner }}</td>
       <td>{{ item.siteinfo.name }}</td>
       <td>{{ item.quantity | floatformat:"0" }}</td>
-      {% if mat_code == '21' %}
+      {% if mat_code == '22' %}
         <td>{{ item.quantity2 | floatformat:"0" }}</td>
         <td>{{ item.quantity|add:item.quantity2 | floatformat:"0" }}</td>
         <td>
@@ -113,7 +113,7 @@
   <tr>
     <th colspan="4">{{ kh_report.siteinfo.name }}</th>
     <th>{{ kh_report.quantity | floatformat:"0" }}</th>
-    {% if request.GET.mat_code == '21' %}
+    {% if request.GET.mat_code == '22' %}
       <th>{{ kh_report.quantity2 | floatformat:"0" }}</th>
       <th>{{ kh_report.quantity|add:kh_report.quantity2 | floatformat:"0" }}</th>
       <th></th>
@@ -129,7 +129,7 @@
   <tr>
     <th colspan="4">{{ lk_report.siteinfo.name }}</th>
     <th>{{ lk_report.quantity | floatformat:"0" }}</th>
-    {% if request.GET.mat_code == '21' %}
+    {% if request.GET.mat_code == '22' %}
       <th>{{ lk_report.quantity2 | floatformat:"0" }}</th>
       <th>{{ lk_report.quantity|add:lk_report.quantity2 | floatformat:"0" }}</th>
       <th></th>

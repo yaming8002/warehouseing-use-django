@@ -18,8 +18,8 @@ logging.config.dictConfig(settings.LOGGING)
 
 logger = logging.getLogger(__name__)
 static_column_code = {
-    "21": "鋪路鐵板 全",
-    "2105": "鋪路鐵板 半",
+    "22": "鋪路鐵板 全",
+    "2205": "鋪路鐵板 半",
     "11": "簍空覆工板",
     "12": "洗車板",
 }
@@ -30,7 +30,7 @@ class BoardReport(MonthReport):
     is_lost =models.BooleanField(default=False,verbose_name="是否遺失")
 
     mat_code = models.CharField(
-        max_length=5, default="21", verbose_name="物料(預設鐵板 全)"
+        max_length=5, default="22", verbose_name="物料(預設鐵板 全)"
     )
     mat_code2 = models.CharField(
         max_length=5, null=True, verbose_name="物料(預設鐵板半)"
@@ -49,8 +49,8 @@ class BoardReport(MonthReport):
     @classmethod
     def get_board_report(cls, site, mat):
         # 简化mat_code逻辑
-        mat_code = "21" if mat.mat_code in ["21", "2105"] else mat.mat_code
-        mat_code2 = "2105" if mat.mat_code in ["21", "2105"] else None
+        mat_code = "22" if mat.mat_code in ["21", "2205"] else mat.mat_code
+        mat_code2 = "2205" if mat.mat_code in ["21", "2205"] else None
 
         # 使用 get_or_create 方法简化对象获取或创建逻辑
         obj, _ = cls.objects.get_or_create(
@@ -74,7 +74,7 @@ class BoardReport(MonthReport):
 
         report = cls.get_board_report(site, mat)
         whse = cls.get_board_report(SiteInfo.objects.get(code="0001"), mat)
-        code_str = "quantity2" if mat.mat_code == "2105" else "quantity"
+        code_str = "quantity2" if mat.mat_code == "2205" else "quantity"
 
         cls.update_column_value(report.id, not is_in, code_str, all_quantity)
         cls.update_column_value(whse.id, is_in, code_str, all_quantity)

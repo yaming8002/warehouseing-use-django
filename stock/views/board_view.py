@@ -18,13 +18,13 @@ class BoardControlView(MonthListView):
 
     def get_queryset(self):
         mat_code =self.request.GET.get("mat_code")
-        mat_code = mat_code if mat_code else '21'
+        mat_code = mat_code if mat_code else '22'
         query = Q(close=False) & Q(siteinfo_id__gte=4) & Q(mat_code = mat_code)
         return BoardReport.objects.filter(query).all() 
 
     def get_whse_martials(self, context):
         mat_code =self.request.GET.get("mat_code")
-        mat_code = mat_code if mat_code else '21'
+        mat_code = mat_code if mat_code else '22'
         obj_board= BoardReport.objects.select_related("siteinfo").filter( Q(mat_code = mat_code))
         context['mat_code'] = mat_code
         context['lk_report'] = obj_board.get(siteinfo__code="0001") if obj_board.filter(siteinfo__code="0001").exists() else None

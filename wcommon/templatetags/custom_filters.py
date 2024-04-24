@@ -16,3 +16,7 @@ def check_done_type(value, encountered_done_type):
 @register.filter
 def list_index_value(lst:List, index:int):
     return lst[index-1]
+
+@register.filter
+def is_not_none(value):
+    return value is not None and value != "None"

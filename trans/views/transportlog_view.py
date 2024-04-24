@@ -214,7 +214,7 @@ class ImportTransportView(ImportData2Generic):
                 # print(f"{trancode},is error {e} item{item}")
                 errordct = {"item": item, "e": str(e)}
                 self.error_list.append(errordct)
-                logger.info({"item": item, "e": f"{str(e)}\n{type(e).__name__}\n"+traceback.format_exc()})
+                logger.warning({"item": item, "e": f"{str(e)}\n{type(e).__name__}\n"+traceback.format_exc()})
 
     def get(self, request, *args, **kwargs):
         trans_end_day = SysInfo.objects.get(name="trans_end_day")

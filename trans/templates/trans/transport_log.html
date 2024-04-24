@@ -149,7 +149,8 @@
             {{ item.all_unit }}
           {% endif %}
         </td>
-        <td> {% if item.remark %}{{ item.remark }}{% endif %}</td>
+        {% load custom_filters %}
+        <td> {% if item.remark|is_not_none %}{{ item.remark }}{% endif %}</td>
         <td>{% if item.level %}{{ item.level }}{% endif %}</td>
         <td>{{ item.translog.carinfo.firm }}</td>
         <td>{{ item.translog.carinfo.car_number }}</td>
