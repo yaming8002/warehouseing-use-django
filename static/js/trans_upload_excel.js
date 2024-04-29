@@ -103,6 +103,7 @@ async function uploadSiteBatches(url, data, batchSize, csrftoken) {
                 type: 'POST',
                 contentType: 'application/json',
                 headers: { 'X-CSRFToken': csrftoken },
+                async:false,
                 data: JSON.stringify(batches[i])
             });
             console.log(`Batch ${i + 1} uploaded successfully:`, response);
@@ -144,7 +145,7 @@ async function updateCarInfo(file) {
             contentType: 'application/json',
             headers: { 'X-CSRFToken': csrftoken },
             data: JSON.stringify(bcData),
-
+            async:false,
             success: function (response) {
                 console.log('Data uploaded successfully:', response);
             },
