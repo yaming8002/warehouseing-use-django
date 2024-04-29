@@ -130,7 +130,7 @@ class ImportSiteInfoByTotalView(ImportData2Generic):
             return 
         
         code= f"{item['code']}"
-        code= "0"+code if len(code) < 4 else code
+        code= f"{code:0>4}"
         if SiteInfo.objects.filter(code=code).exists():
             SiteInfo.objects.filter(code=code).update(
                 owner=item["owner"],

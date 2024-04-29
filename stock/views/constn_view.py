@@ -121,18 +121,9 @@ def constn_diff_view(request):
         constn_obj = SiteInfo.get_obj_by_value(
             genre=1, owner=owner, code=code, name=name
         )
-        print(constn_obj.query)
         context["constn"] = constn_obj.get()
         if constn_obj.exists():
-            print("ssssssssss")
             context["steel_table"],context["components"] = build_constn_diff_view(context["constn"])
-        # if constn_obj.exists():
-        #     context["constn"] = constn_obj.get()
-        #     context["steel_pile_table"] = build_component_table(
-        #         context["constn"], table_level
-        #     )
-
-        #     context["select_level"] = [x for x in get_level() if (x[0] > 0)]
 
     context["mat_tree"] = mat_tree
     context["selected_items"] = selected_items

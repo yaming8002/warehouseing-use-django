@@ -14,17 +14,7 @@
           event.preventDefault();
           var fileInput = document.getElementById('excelFile');
           var file = fileInput.files[0];
-          if (file) {
-              // 顯示載入指示器
-              $("#base_table tbody").empty();
-              showSpinner();
-              await updateCarInfo(file) ;
-              await updateSiteInfo(file) ;
-              await handleFileProcessing(file);
-          } else {
-              // 如果沒有選擇檔，則提示用戶
-              alert("請先選擇一個檔。");
-          }
+          totalUpload(file)
       });
   });
   

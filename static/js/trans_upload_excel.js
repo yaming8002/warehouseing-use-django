@@ -1,3 +1,49 @@
+var conditionMet = false;
+
+
+async function totalUpload(file) {
+    if (file) {
+        // 顯示載入指示器
+        $("#base_table tbody").empty();
+        showSpinner();
+        $('#update_text').text("EXCEL 分析中....");
+
+        // await updateCarInfo(file);
+        // await updateSiteInfo(file);
+        // simulateAsyncOperation();
+        // performActions();
+        handleFileProcessing(file);
+    } else {
+        // 如果沒有選擇檔，則提示用戶
+        alert("請先選擇一個檔。");
+    }
+}
+
+// 模擬一個設置conditionMet為true的異步操作
+function simulateAsyncOperation() {
+    setTimeout(() => {
+        conditionMet = true;
+    }, 5000); // 模擬一個耗時5秒的異步操作
+}
+
+async function performActions() {
+    console.log("正在等待條件成立...");
+    await waitForConditionToBeTrue(conditionMet);
+    console.log("條件已成立，繼續執行剩餘代碼。");
+
+    // 繼續執行你的代碼
+}
+
+function waitForConditionToBeTrue(conditionVariable) {
+    return new Promise(resolve => {
+        const intervalId = setInterval(() => {
+            if (conditionVariable) {
+                clearInterval(intervalId);
+                resolve();
+            }
+        }, 100); // 每100毫秒檢查一次
+    });
+}
 
 function getCookie(name) {
     let cookieValue = null;
@@ -21,14 +67,11 @@ function checkColumns(columns, input) {
 }
 
 async function handleFileProcessing(file) {
+    const csrftoken = getCookie('csrftoken');
     const reader = new FileReader();
     reader.onload = async function (e) {
-        const data = e.target.result;
-        const workbook = XLSX.read(data, {
-            type: 'binary'
-        });
-
-        const worksheet = workbook.Sheets["總表"];
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
         // 轉換工作表資料為JSON
         const total_rows = XLSX.utils.sheet_to_json(workbook.Sheets["總表"], {
             header: 1
@@ -36,103 +79,10 @@ async function handleFileProcessing(file) {
         const rent_rows = XLSX.utils.sheet_to_json(workbook.Sheets["租賃"], {
             header: 1
         });
-        if (total_rows.length > 0 || rent_rows.length > 1) {
-            // 驗證列名
-            if (checkColumns(columns3, total_rows[2]) & checkColumns(columns4, total_rows[3])) {
-                // 如果驗證通過，則處理並分批上傳資料
-                await processAndUploadData(total_rows.slice(4), false); // 移除列名行
-            } else {
-                alert("總表檔案格式不正確");
-            }
-
-            if (checkColumns(columns3, rent_rows[2]) & checkColumns(columns4, rent_rows[3])) {
-                await processAndUploadData(rent_rows.slice(4), true); // 移除列名行
-            } else {
-                alert("租賃檔案格式不正確");
-            }
-        }
-
-    };
-    await reader.readAsBinaryString(file);
-}
-
-async function updateSiteInfo(file) {
-    const csrftoken = getCookie('csrftoken');
-    const reader = new FileReader();
-    reader.onload = async function (e) {
-        const data = e.target.result;
-        // Use binary string for SheetJS when reading from a binary string
-        const workbook = XLSX.read(data, {
-            type: 'binary'
-        });
-
-        const worksheet = workbook.Sheets["Index"];
-        // Use total_rows for consistency and clear naming
-        const total_rows = XLSX.utils.sheet_to_json(worksheet, {
+        const index_rows = XLSX.utils.sheet_to_json(workbook.Sheets["Index"], {
             header: 1
         });
-
-        var bcData = total_rows.slice(0, 2000).map(row => ({
-            code: row[9],  // B 列
-            owner: row[10],  // B 列
-            name: row[11]   // C 列
-        }));
-
-		const batchSize = 100;  // Adjust this number based on what your server can handle
-        await uploadSiteBatches('/carinfo/uploadexcelByTotal/', bcData, batchSize, csrftoken);
-    };
-    // Use readAsBinaryString for compatibility with type: 'binary'
-    await reader.readAsBinaryString(file);
-}
-
-function splitIntoBatches(data, batchSize) {
-    let batches = [];
-    while (data.length) {
-        batches.push(data.splice(0, batchSize));
-    }
-    return batches;
-}
-
-async function uploadSiteBatches(url, data, batchSize, csrftoken) {
-    const batches = splitIntoBatches(data, batchSize);
-    for (let i = 0; i < batches.length; i++) {
-        console.log(`Uploading batch ${i + 1} of ${batches.length}`);
-        try {
-            const response = await $.ajax({
-                url: url,
-                type: 'POST',
-                contentType: 'application/json',
-                headers: { 'X-CSRFToken': csrftoken },
-                async:false,
-                data: JSON.stringify(batches[i])
-            });
-            console.log(`Batch ${i + 1} uploaded successfully:`, response);
-        } catch (error) {
-            console.error(`Error uploading batch ${i + 1}:`, error.statusText);
-            // Optionally, break the loop or handle retries here
-        }
-    }
-}
-
-
-
-async function updateCarInfo(file) {
-    const csrftoken = getCookie('csrftoken');
-    const reader = new FileReader();
-    reader.onload = async function (e) {
-        const data = e.target.result;
-        // Use binary string for SheetJS when reading from a binary string
-        const workbook = XLSX.read(data, {
-            type: 'binary'
-        });
-
-        const worksheet = workbook.Sheets["Index"];
-        // Use total_rows for consistency and clear naming
-        const total_rows = XLSX.utils.sheet_to_json(worksheet, {
-            header: 1
-        });
-
-        var bcData = total_rows.slice(1, 2000).map(row => ({
+        var carbcData = index_rows.slice(1, 2000).map(row => ({
             car_number: row[20],  // B 列
             car_firm: row[21],   // C 列
             remark: row[22],  // B 列
@@ -144,8 +94,7 @@ async function updateCarInfo(file) {
             type: 'POST',
             contentType: 'application/json',
             headers: { 'X-CSRFToken': csrftoken },
-            data: JSON.stringify(bcData),
-            async:false,
+            data: JSON.stringify(carbcData),
             success: function (response) {
                 console.log('Data uploaded successfully:', response);
             },
@@ -153,13 +102,134 @@ async function updateCarInfo(file) {
                 console.log('Error uploading data:', error);
             }
         });
+
+        var siteinfo = index_rows.slice(2, 2000).map(row => ({
+            code: row[9],  // B 列
+            owner: row[10],  // B 列
+            name: row[11]   // C 列
+        }));
+
+        let i = 0
+        for (; i < siteinfo.length; i += 100) {
+            var bcData = siteinfo.slice(i, i + 200);
+            $.ajax({
+                url: '/constn/uploadexcelByTotal/',
+                type: 'POST',
+                contentType: 'application/json',
+                headers: { 'X-CSRFToken': csrftoken },
+                data: JSON.stringify(bcData)
+            });
+            console.log(`Batch ${i + 1} uploaded successfully:`);
+        }
+
+        var bcData = siteinfo.slice(i);
+        await $.ajax({
+            url: '/constn/uploadexcelByTotal/',
+            type: 'POST',
+            contentType: 'application/json',
+            headers: { 'X-CSRFToken': csrftoken },
+            data: JSON.stringify(bcData),
+            success: function (data) {
+                conditionMet = false;
+            }
+        });
+        if (total_rows.length > 0 || rent_rows.length > 1) {
+            // 驗證列名
+            if (checkColumns(columns3, total_rows[2]) & checkColumns(columns4, total_rows[3])) {
+                // 如果驗證通過，則處理並分批上傳資料
+                await processAndUploadData(total_rows.slice(4), false,csrftoken); // 移除列名行
+            } else {
+                alert("總表檔案格式不正確");
+            }
+
+            if (checkColumns(columns3, rent_rows[2]) & checkColumns(columns4, rent_rows[3])) {
+                await processAndUploadData(rent_rows.slice(4), true,csrftoken); // 移除列名行
+            } else {
+                alert("租賃檔案格式不正確");
+            }
+        }
+
     };
-    // Use readAsBinaryString for compatibility with type: 'binary'
-    reader.readAsBinaryString(file);
+    await reader.readAsArrayBuffer(file);
 }
 
-async function processAndUploadData(rows, is_rent) {
+async function updateSiteInfo(file) {
     const csrftoken = getCookie('csrftoken');
+    const reader = new FileReader();
+    $('#update_text').text("上傳工地資料");
+    reader.onload = async function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        const worksheet = workbook.Sheets["Index"];
+        // Use total_rows for consistency and clear naming
+        const total_rows = XLSX.utils.sheet_to_json(worksheet, {
+            header: 1
+        });
+
+        var carbcData = total_rows.slice(1, 2000).map(row => ({
+            car_number: row[20],  // B 列
+            car_firm: row[21],   // C 列
+            remark: row[22],  // B 列
+            value: row[23]   // C 列
+        }));
+
+        var rows = total_rows.slice(2, 2000).map(row => ({
+            code: row[9],  // B 列
+            owner: row[10],  // B 列
+            name: row[11]   // C 列
+        }));
+
+        var bcData = []
+        let i = 0
+        try {
+            await $.ajax({
+                url: '/carinfo/uploadexcelByTotal/',  // 替換為你的後台地址
+                type: 'POST',
+                contentType: 'application/json',
+                headers: { 'X-CSRFToken': csrftoken },
+                data: JSON.stringify(carbcData),
+                success: function (response) {
+                    console.log('Data uploaded successfully:', response);
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error uploading data:', error);
+                }
+            });
+
+            for (; i < rows.length; i += 100) {
+                var bcData = rows.slice(i, i + 200);
+                $.ajax({
+                    url: '/constn/uploadexcelByTotal/',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    headers: { 'X-CSRFToken': csrftoken },
+                    data: JSON.stringify(bcData)
+                });
+                console.log(`Batch ${i + 1} uploaded successfully:`);
+            }
+            bcData = rows.slice(i);
+            await $.ajax({
+                url: '/constn/uploadexcelByTotal/',
+                type: 'POST',
+                contentType: 'application/json',
+                headers: { 'X-CSRFToken': csrftoken },
+                data: JSON.stringify(bcData),
+                success: function (response) {
+                    console.log('Data uploaded successfully:', response);
+                    conditionMet = false;
+                }
+            });
+        } catch (error) {
+            console.error(`Error uploading batch ${i + 1}:`, error.statusText);
+            // Optionally, break the loop or handle retries here
+        }
+    };
+    await reader.readAsArrayBuffer(file);
+}
+
+
+async function processAndUploadData(rows, is_rent,csrftoken) {
     const batchSize = 50;
     let batchData = [];
 
@@ -227,6 +297,7 @@ function excelDateToJSDate(serial) {
     const utc_days = serial - 2; // Adjusting for Excel's leap year bug
     return new Date(excelEpoch.getTime() + utc_days * 86400000); // 86400000 ms per day
 }
+
 function formatDate(date) {
     let d = new Date(date),
         month = '' + (d.getUTCMonth() + 1), // getUTCMonth returns 0-11

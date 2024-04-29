@@ -85,13 +85,13 @@ class ImportCarInfoByTotalView(ImportData2Generic):
 
         if CarInfo.objects.filter(car_number=item['car_number']).exists():
             CarInfo.objects.filter(car_number=item['car_number']).update(
-                firm=item['car_firm'],
+                firm=item['car_firm'] if "car_firm" in item.keys() else "",
                 remark=remark
             )
         else :
             CarInfo.objects.create(
                 car_number =item['car_number'],
-                firm=item['car_firm'],
+                firm=item['car_firm'] if "car_firm" in item.keys() else "",
                 remark=remark
             )
 
