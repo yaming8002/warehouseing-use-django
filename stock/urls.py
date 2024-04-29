@@ -21,7 +21,7 @@ from stock.views import (
 )
 from stock.views.board_view import BoardControlView, get_board_edit_done
 from stock.views.constn_view import component_view, constn_diff_view
-from stock.views.site_view import ConstnSeveView
+from stock.views.site_view import ConstnSeveView, ImportSiteInfoByTotalView
 from stock.views.steel_view import get_edit_remark
 from stock.views.stock_view import ConstnStockViewList
 
@@ -39,9 +39,13 @@ urlpatterns = [
     path("constn/list/", SiteViewList.as_view(), name="constn"),
     path("constn/edit/", ConstnSeveView.as_view(), name="construction_update"),
     path("constn/uploadexcel/", ImportConstnView.as_view(), name="constn"),
+    path(
+        "constn/uploadexcelByTotal/",
+        ImportSiteInfoByTotalView.as_view(),
+        name="material_uploadexcel",
+    ),
     # path("split/material/", split_mat_constn, name="split_mat"),
-
-      # path("steel_pile/", steel_pile, name="steel_pile"),
+    # path("steel_pile/", steel_pile, name="steel_pile"),
     path("rail_control/", RailControlView.as_view(), name="rail_control"),
     path("rail_control/edit/", get_rail_edit_done, name="rail_edit"),
     path("rail_done/", RailDoneView.as_view(), name="rail_done"),
@@ -58,6 +62,4 @@ urlpatterns = [
     path("constn/brace/", steel_brace_view, name="steel_brace_view"),
     path("constn/component/", component_view, name="component_view"),
     path("constn/constn_diff/", constn_diff_view, name="component_view"),
-    
 ]
-

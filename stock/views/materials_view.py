@@ -184,3 +184,4 @@ def getMatrtialData(request):
         context["spec"] = serializers.serialize("json", MatSpec.objects.all())
         context["success"] = True
         return JsonResponse(context)
+

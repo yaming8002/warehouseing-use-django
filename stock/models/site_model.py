@@ -12,7 +12,7 @@ class SiteInfo(models.Model):
     crate_date = models.DateField(default=timezone.now, verbose_name="發案日期")
     genre = models.IntegerField(default=2, choices=site_genre)
     """
-    site_genre = [(0, "內部倉"), (1, "工地"),(2,"租料倉"),(3,"加工廠"),(4,"維修廠"),(5,"供應商")]
+    site_genre = [(0, "內部倉"), (1, "工地"),(2,"租料倉"),(3,"加工廠"),(4,"維修廠"),(5,"供應商"),(6,"其他")]
     """
     state = models.IntegerField(default=2, choices=constn_state)
     """

@@ -75,3 +75,24 @@ class ImportCarInfoView(ImportData2Generic):
                 value=item[3],
             )
 
+
+class ImportCarInfoByTotalView(ImportData2Generic):
+    def insertDB(self, item):
+        if  "car_number" not in item.keys() :
+            return
+        remark = f"{item['remark']}" if "remark" in item.keys() else ""
+        remark += f",{item['value']}" if "value" in item.keys() else ""
+
+        if CarInfo.objects.filter(car_number=item['car_number']).exists():
+            CarInfo.objects.filter(car_number=item['car_number']).update(
+                firm=item['car_firm'],
+                remark=remark
+            )
+        else :
+            CarInfo.objects.create(
+                car_number =item['car_number'],
+                firm=item['car_firm'],
+                remark=remark
+            )
+
+ 

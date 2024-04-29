@@ -120,3 +120,44 @@ class ConstnSeveView(SaveControlView):
             form.instance.done_date = timezone.now().date()
         else:
             form.instance.done_date = None
+
+
+
+class ImportSiteInfoByTotalView(ImportData2Generic):
+
+    def insertDB(self, item):
+        if "owner" not in item.keys() :
+            return 
+        
+        code= f"{item['code']}"
+        code= "0"+code if len(code) < 4 else code
+        if SiteInfo.objects.filter(code=code).exists():
+            SiteInfo.objects.filter(code=code).update(
+                owner=item["owner"],
+                name=item["name"]
+            )
+        else:
+            crate_date = datetime.now()
+            genre=self.get_site_genre(code)
+            SiteInfo.objects.create(
+                code=code,
+                owner=item["owner"],
+                name=item["name"] ,
+                crate_date=crate_date,
+                genre=genre,
+                state=1
+            )
+    
+    def get_site_genre(self,code:str) -> int:
+        genre_mapping = {
+            'A': 1,
+            'B': 2, 'C': 2, 'D': 2,
+            'E': 3, 'F': 3,
+            'G': 4,
+            'H': 5
+        }
+
+        if code.isdigit():
+            return 1
+
+        return genre_mapping.get(str(code[0]), 6)
