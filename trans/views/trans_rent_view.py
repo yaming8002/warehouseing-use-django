@@ -1,27 +1,8 @@
-import sys
-from datetime import date, datetime, timedelta
-from decimal import Decimal
-
-from django.core import serializers
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Q
-from django.http import JsonResponse
-from django.shortcuts import render
-from django.views import View
-from django.views.generic.edit import CreateView
-from django.views.generic.list import ListView
-from openpyxl import load_workbook
-
-from stock.models.steel_model import DoneSteelReport
-from stock.models.material_model import MatCat, Materials, MatSpec
+from stock.models.material_model import MatCat, Materials
 from stock.models.site_model import SiteInfo
-from trans.forms import CarinfoFrom
 from trans.models import CarInfo, TransLog, TransLogDetail
-from wcommon.utils.excel_tool import ImportDataGeneric
 from wcommon.utils.pagelist import PageListView
-from wcommon.utils.save_control import SaveControlView
-from wcommon.utils.uitls import excel_value_to_str, get_month_range
+
 
 class TransRentView(PageListView):
     model = TransLogDetail
@@ -78,7 +59,9 @@ class TransRentView(PageListView):
 
         # 使用过滤后的 log 过滤 detail
         log = log.filter(constn_site__in=construction.all(), carinfo__in=car.all())
-        detail = detail.filter(is_rent=True,material__in=material.all(), translog__in=log.all())
+        detail = detail.filter(
+            is_rent=True, material__in=material.all(), translog__in=log.all()
+        )
 
         return detail.all()
 

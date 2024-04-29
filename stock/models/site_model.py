@@ -1,6 +1,7 @@
 from django.db import models
 from wcommon.templatetags import constn_state, site_genre
 from django.utils import timezone
+from django.db.models import Q
 from wcommon.templatetags import site_genre
 
 
@@ -37,6 +38,21 @@ class SiteInfo(models.Model):
     def get_site_by_code(cls,code:str):
         return cls.objects.get(code=code)
     
+    @classmethod
+    def get_obj_by_value(cls, code=None, owner=None, name=None,genre=None):
+        query = Q()
+        if genre:
+            query &= Q(genre=genre)
+        if code:
+            query &= Q(code=code)
+        if owner:
+            query &= Q(owner=owner)
+        if name:
+            query &= Q(name=name)
+    
+        return cls.objects.filter(query)
+
+
     class Meta:
         unique_together = ("code", "name")
         ordering = ["code"]  # 按照 id 升序排序

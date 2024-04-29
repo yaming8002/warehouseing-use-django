@@ -1,17 +1,12 @@
-from datetime import datetime
 from decimal import Decimal
 
-from django.db import models, transaction
-from django.db.models import F
-from django.forms import model_to_dict
-
+from django.db import models
 from stock.models.material_model import Materials
 from stock.models.monthreport_model import MonthReport
 from stock.models.site_model import SiteInfo
 
 # # Create your models here.
 
-import sys
 
 
 class RailReport(MonthReport):

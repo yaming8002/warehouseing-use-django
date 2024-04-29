@@ -51,7 +51,6 @@ class Materials(models.Model):
                         | Q(mat_code3=code)
         )
   
-        # print(f"code{code},remark:{remark},unit:{unit}")
         if code=='999' :
             if remark is None or "出售" in remark or remark not in ng_spec_name :
                 remark = "無"
@@ -64,7 +63,6 @@ class Materials(models.Model):
             spec = MatSpec.objects.get(id=math.ceil(unit))
             quest &= Q(specification=spec)
 
-        # print(cls.objects.filter(quest).query)
         return cls.objects.get(quest)
 
     class Meta:

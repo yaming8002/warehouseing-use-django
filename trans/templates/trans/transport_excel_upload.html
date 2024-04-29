@@ -94,6 +94,7 @@
 
         // Upload when batch is full or at the end of array
         if (batchData.length === batchSize || rows[i].length < 2 || !rows[i][6]) {
+          $('#update_text').text("上傳中..." + i + "/" + rows.length);
             try {
                 await $.ajax({
                     url: url,

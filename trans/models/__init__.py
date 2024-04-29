@@ -1,2 +1,2 @@
-from .car import CarInfo
-from .trans import TransLog,TransLogDetail
+from .car_model import CarInfo
+from .trans_model import TransLog,TransLogDetail

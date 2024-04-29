@@ -22,7 +22,18 @@
           if (!isNaN(value) && value < 0) { // 检查是否为负数
               $(this).addClass("negative-value"); // 添加类以改变文本颜色
           }
-      });
+
+        });
+        $('#exceloutput').click(function() {
+          var fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
+          $('#base_table').tableExport({
+            type: 'excel',
+            mso: {
+              fileFormat: 'xlsx',
+            },
+            fileName: fileName // Using the captured file name
+          });
+        });
       });
     </script>
     {% block javascript %}<script></script>{% endblock %}
@@ -81,9 +92,13 @@
       --bs-table-color-type: : none !important;
       --bs-table-bg-type: none !important;
   }
-    </style>
-    {% block styles %}<style></style>{% endblock %}
-    <style></style>
+  .noshow{
+    display: none;
+  }
+  {% block styles %}
+
+  {% endblock %}
+  </style>
   </head>
   <body>
     <div class="m-3 p-3">

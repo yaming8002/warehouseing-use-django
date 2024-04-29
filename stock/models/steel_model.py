@@ -2,15 +2,13 @@ from datetime import datetime
 from decimal import Decimal
 
 from django.db import models, transaction
-from django.db.models import F, Q
-from django.utils.timezone import datetime
-
+from django.forms import model_to_dict
 
 from stock.models.material_model import Materials
 from stock.models.monthreport_model import MonthReport
 from stock.models.site_model import SiteInfo
-from wcommon.utils.uitls import excel_value_to_str, get_year_month
-from decimal import ROUND_HALF_UP
+from stock.models.stock_model import ConStock
+from wcommon.utils.uitls import get_year_month
 import logging
 
 # # Create your models here.
@@ -64,17 +62,7 @@ class SteelReport(MonthReport):
         value = all_unit if mat.is_divisible else all_quantity
         value = Decimal(value)
         cls.update_column_value(whse.id, not is_in, f"m_{mat.mat_code}", value)
-        original_value = getattr(report, f"m_{mat.mat_code}")
-        if is_in and site.genre > 1 and float(original_value) - float(value) < 0:
-            total_site = SiteInfo.objects.get(code="0000")
-            total = cls.get_current_by_site(total_site, year, month)
-            cls.update_column_value(total.id, not is_in, f"m_{mat.mat_code}", value)
-            DoneSteelReport.add_new_mat(
-                total_site, build_date, is_in, mat, all_quantity, all_unit
-            )
-            cls.objects.filter(id=report.id).delete()
-        else:
-            cls.update_column_value(report.id, not is_in, f"m_{mat.mat_code}", value)
+        cls.update_column_value(report.id, not is_in, f"m_{mat.mat_code}", value)
 
 
 class DoneSteelReport(MonthReport):
@@ -94,12 +82,21 @@ class DoneSteelReport(MonthReport):
         "14": "土壓計",
     }
 
+    turn_site = models.ForeignKey(
+        SiteInfo,
+        null=True,
+        related_name="steel_trun_site",
+        on_delete=models.CASCADE,
+        verbose_name="轉單",
+    )
+
     for k, v in static_column_code.items():
         locals()[f"m_{k}"] = models.DecimalField(
             max_digits=10, decimal_places=2, default=0.0, null=True, verbose_name=v
         )
 
     class Meta:
+        unique_together = ("siteinfo","turn_site", "year", "month", "done_type", "is_done")
         verbose_name = "變動資訊"
         verbose_name_plural = "變動資訊"
         ordering = ["done_type", "id"]  # 按照 id 升序排序
@@ -108,36 +105,44 @@ class DoneSteelReport(MonthReport):
     def add_new_mat(
         cls,
         site: SiteInfo,
+        turn_site: SiteInfo,
         build_date: datetime,
         is_in: bool,
         mat: Materials,
         all_quantity: Decimal,
         all_unit: Decimal,
+        remark:str
     ):
         y, m = build_date.year, build_date.month
+        stock_is_exist=SteelReport.get_current_by_site(site,y,m)
+        # if site.code == "F002":
+          #  print(ConStock.objects.filter(siteinfo=site,material=mat,quantity__gt=0).query)
+          #  print(site.genre < 2 , not is_in , mat.mat_code not in cls.static_column_code.keys() , not stock_is_exist)
+        if  site.genre < 2 or not is_in or mat.mat_code not in cls.static_column_code.keys() or not stock_is_exist :
+            return True
+    
+        
+        y, m = build_date.year, build_date.month
 
-        obj = cls.objects.filter(
-            siteinfo=site, year=y, month=m, done_type=2, is_done=True
+        report, _ = cls.objects.get_or_create(
+            siteinfo=site,
+            turn_site=turn_site,
+            year=y,
+            month=m,
+            done_type=2,
+            is_done=True
         )
-        if not obj.exists():
-            obj = cls.objects.create(
-                siteinfo=site, year=y, month=m, done_type=2, is_done=True
-            )
-        else:
-            obj = obj.first()
+        
         value = all_unit if mat.is_divisible else all_quantity
         value = Decimal(value)
-        cls.update_column_value(obj.id, True, f"m_{mat.mat_code}", value)
+        cls.update_column_value(report.id, True, f"m_{mat.mat_code}", value)
+        # print(model_to_dict(cls.objects.get(id=report.id)))
+        return False
 
     @classmethod
     def roll_back(
         cls,
-        site: SiteInfo,
-        build_date: datetime,
-        is_in: bool,
-        mat: Materials,
-        all_quantity: Decimal,
-        all_unit: Decimal,
+        site: SiteInfo
     ):
         cls.objects.filter(siteinfo=site).update(**{"is_done":False})
         report = SteelReport.get_current_by_site(site)
@@ -177,10 +182,8 @@ class DoneSteelReport(MonthReport):
             )
 
         for k, _ in done_report.static_column_code.items():
-            # print(f"{case_name}.m_{k}")
-            # print(request.POST.get(f"{case_name}.m_{k}"))
             value = Decimal(request.POST.get(f"{case_name}.m_{k}"))
-            # cls.update_column_value(done_report.id,True,f"m_{k}",value)
+
             setattr(done_report, f"m_{k}", value)
 
         done_report.save()

@@ -7,9 +7,9 @@ from stock.models.board_model import BoardReport
 from stock.models.material_model import Materials
 from stock.models.rail_model import RailReport
 from stock.models.site_model import SiteInfo
-from stock.models.steel_model import SteelReport
+from stock.models.steel_model import DoneSteelReport, SteelReport
 from stock.models.stock_model import ConStock, MainStock
-from trans.models.car import CarInfo
+from trans.models.car_model import CarInfo
 from wcommon.utils.uitls import excel_num_to_date, excel_value_to_str, get_month_range
 
 
@@ -146,15 +146,13 @@ class TransLogDetail(models.Model):
 
         is_stock_add = tran.transaction_type == "IN"
         MainStock.move_material(mat, quantity, all_unit, is_stock_add)
-        ConStock.move_material(
-            tran.constn_site, mat, quantity, all_unit, not is_stock_add
-        )
-        RailReport.add_report(
-            tran.constn_site, tran.build_date, is_stock_add, mat, quantity
-        )
-        SteelReport.add_report(
-            tran.constn_site, tran.build_date, is_stock_add, mat, quantity, all_unit
-        )
+
+        if DoneSteelReport.add_new_mat( tran.constn_site, tran.turn_site, tran.build_date, is_stock_add, mat, quantity, all_unit ,remark ):
+            """if this case not new material"""
+            ConStock.move_material( tran.constn_site, mat, quantity, all_unit, not is_stock_add )
+            SteelReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity, all_unit )
+            
+        RailReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity )
         BoardReport.add_report(tran.constn_site, remark, is_stock_add, mat, quantity)
 
     @classmethod

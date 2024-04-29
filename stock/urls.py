@@ -20,7 +20,7 @@ from stock.views import (
     StockView,
 )
 from stock.views.board_view import BoardControlView, get_board_edit_done
-from stock.views.constn_view import component_view
+from stock.views.constn_view import component_view, constn_diff_view
 from stock.views.site_view import ConstnSeveView
 from stock.views.steel_view import get_edit_remark
 from stock.views.stock_view import ConstnStockViewList
@@ -57,5 +57,7 @@ urlpatterns = [
     path("constn/pile/", steel_pile_view, name="steel_pile_view"),
     path("constn/brace/", steel_brace_view, name="steel_brace_view"),
     path("constn/component/", component_view, name="component_view"),
+    path("constn/constn_diff/", constn_diff_view, name="component_view"),
+    
 ]
 

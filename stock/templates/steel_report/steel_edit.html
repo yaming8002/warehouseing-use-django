@@ -50,59 +50,25 @@
       <table id="input_table" class="steel_table" style="width:1200px;">
         <tr>
           <th>項目</th>
-          <th>
-            H300
-            <br>
-            支撐(m)
-          </th>
-          <th>
-            H300
-            <br>
-            中柱(m)
-          </th>
-          <th>
-            H350
-            <br>
-            支撐(m)
-          </th>
-          <th>
-            H350
-            <br>
-            中柱(m)
-          </th>
-          <th>
-            H390
-            <br>
-            支撐(m)
-          </th>
-          <th>
-            H400
-            <br>
-            支撐(m)
-          </th>
-          <th>
-            H400
-            <br>
-            中柱(m)
-          </th>
-          <th>
-            H408
-            <br>
-            支撐(m)
-          </th>
-          <th>
-            H414
-            <br>
-            支撐(m)
-          </th>
-          <th>
-            H414
-            <br>
-            中柱(m)
-          </th>
-          <th>覆工板 1M *2M 覆工板(片)</th>
-          <th>覆工板 1M *3M 覆工板(片)</th>
-          <th>水泥覆工板 覆工板(片)</th>
+          <th>H300 <br>
+            支撐(m)</th>
+          <th>H300 <br>
+            中柱(m)</th>
+          <th>H350 <br>
+            支撐(m)</th>
+          <th>H350 <br>
+            中柱(m)</th>
+          <th>H400 <br>
+            支撐(m)</th>
+          <th>H400 <br>
+            中柱(m)</th>
+          <th>H408 <br>
+            支撐(m)</th>
+          <th>H414 <br>
+            支撐(m)</th>
+          <th>H414 <br>
+            中柱(m)</th>
+          <th>覆工板</th>      
           <th>千斤頂(個)</th>
           <th>土壓計(個)</th>
           <th>備註</th>
@@ -113,15 +79,12 @@
           <td id="o.m_301">{{ report.m_301 }}</td>
           <td id="o.m_350">{{ report.m_350 }}</td>
           <td id="o.m_351">{{ report.m_351 }}</td>
-          <td id="o.m_390">{{ report.m_390 }}</td>
           <td id="o.m_400">{{ report.m_400 }}</td>
           <td id="o.m_401">{{ report.m_401 }}</td>
           <td id="o.m_408">{{ report.m_408 }}</td>
           <td id="o.m_414">{{ report.m_414 }}</td>
           <td id="o.m_4141">{{ report.m_4141 }}</td>
           <td id="o.m_11">{{ report.m_11 }}</td>
-          <td id="o.m_84">{{ report.m_84 }}</td>
-          <td id="o.m_88">{{ report.m_88 }}</td>
           <td id="o.m_13">{{ report.m_13 }}</td>
           <td id="o.m_14">{{ report.m_14 }}</td>
           <td></td>
@@ -149,9 +112,6 @@
             <input type="text" id="change.m_351" name="change.m_351" value="0">
           </td>
           <td>
-            <input type="text" id="change.m_390" name="change.m_390" value="0">
-          </td>
-          <td>
             <input type="text" id="change.m_400" name="change.m_400" value="0">
           </td>
           <td>
@@ -168,12 +128,6 @@
           </td>
           <td>
             <input type="text" id="change.m_11" name="change.m_11" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_84" name="change.m_84" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_88" name="change.m_88" value="0">
           </td>
           <td>
             <input type="text" id="change.m_13" name="change.m_13" value="0">
@@ -218,12 +172,6 @@
           </td>
           <td>
             <input type="text"
-                   id="cut.m_390"
-                   name="cut.m_390"
-                   value="{{ report.m_390 }}">
-          </td>
-          <td>
-            <input type="text"
                    id="cut.m_400"
                    name="cut.m_400"
                    value="{{ report.m_400 }}">
@@ -254,12 +202,6 @@
           </td>
           <td>
             <input type="text" id="cut.m_11" name="cut.m_11" value="{{ report.m_11 }}">
-          </td>
-          <td>
-            <input type="text" id="cut.m_84" name="cut.m_84" value="{{ report.m_84 }}">
-          </td>
-          <td>
-            <input type="text" id="cut.m_88" name="cut.m_88" value="{{ report.m_88 }}">
           </td>
           <td>
             <input type="text" id="cut.m_13" name="cut.m_13" value="{{ report.m_13 }}">

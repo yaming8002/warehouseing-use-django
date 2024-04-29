@@ -1,8 +1,9 @@
 import json
 import logging
+
 # # Create your models here.
 import logging.config
-import sys
+
 from datetime import datetime, timedelta
 import traceback
 from django.conf import settings
@@ -10,12 +11,11 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from stock.models.steel_model import DoneSteelReport
 from stock.models.material_model import MatCat, Materials
 from stock.models.site_model import SiteInfo
 from trans.models import TransLog, TransLogDetail
 from wcommon.models.menu import SysInfo
-from wcommon.utils.excel_tool import ImportData2Generic, ImportDataGeneric
+from wcommon.utils.excel_tool import ImportData2Generic
 from wcommon.utils.pagelist import PageListView
 from wcommon.utils.uitls import excel_num_to_date, excel_value_to_str
 
@@ -31,9 +31,7 @@ class TrandportView(PageListView):
 
     def get_queryset(self):
         detail = TransLogDetail.objects.select_related()
-        log = TransLog.objects.select_related(
-            "constn_site", "turn_site", "carinfo"
-        )
+        log = TransLog.objects.select_related("constn_site", "turn_site", "carinfo")
         material = Materials.objects
 
         begin, end = self.get_month_range()
@@ -77,8 +75,8 @@ class TrandportView(PageListView):
         # 使用过滤后的 log 过滤 detail
         detail = detail.filter(
             is_rent=False, material__in=material.all(), translog__in=log.all()
-        ).order_by('id')
-        print(detail.query)
+        ).order_by("id")
+
         return detail.all()
 
     def get_context_data(self, **kwargs):
@@ -137,7 +135,6 @@ class ImportTransportView(ImportData2Generic):
     ]
 
     def post(self, request, *args, **kwargs):
-        
         jsonData = json.loads(request.body.decode("utf-8"))
         is_rent = jsonData["is_rent"]
         items = jsonData["jsonData"]
@@ -165,7 +162,6 @@ class ImportTransportView(ImportData2Generic):
         return JsonResponse(response_data)
 
     def insertDB(self, data):
-
         trans_end_date = SysInfo.get_value_by_name("trans_end_day")
         trans_end_date = datetime.strptime(trans_end_date, "%Y/%m/%d")
         self.end_date = trans_end_date
@@ -187,16 +183,20 @@ class ImportTransportView(ImportData2Generic):
 
                 tran = TransLog.create(code=trancode, item=item)
 
-                if mat_code and mat_code != "" :
+                if mat_code and mat_code != "":
                     TransLogDetail.create(tran, item, is_rent=False)
 
             except Exception as e:
                 # 处理可能的异常情况
-                # print(f"{trancode},is error {e} item{item}")
                 errordct = {"item": item, "e": str(e)}
                 self.error_list.append(errordct)
 
-                logger.info({"item": item, "e": f"{str(e)}\n{type(e).__name__}\n{traceback.format_exc()}"})
+                logger.info(
+                    {
+                        "item": item,
+                        "e": f"{str(e)}\n{type(e).__name__}\n{traceback.format_exc()}",
+                    }
+                )
 
     def insert_rent_DB(self, data):
         for item in data:
@@ -211,28 +211,32 @@ class ImportTransportView(ImportData2Generic):
 
             except Exception as e:
                 # 处理可能的异常情况
-                # print(f"{trancode},is error {e} item{item}")
                 errordct = {"item": item, "e": str(e)}
                 self.error_list.append(errordct)
-                logger.warning({"item": item, "e": f"{str(e)}\n{type(e).__name__}\n"+traceback.format_exc()})
+                logger.warning(
+                    {
+                        "item": item,
+                        "e": f"{str(e)}\n{type(e).__name__}\n" + traceback.format_exc(),
+                    }
+                )
 
     def get(self, request, *args, **kwargs):
         trans_end_day = SysInfo.objects.get(name="trans_end_day")
         if trans_end_day:  # 确保获取到了日期
-            latest_date =  datetime.strptime(trans_end_day.value,"%Y/%m/%d")
-        else :
-            latest_date =datetime.now() - timedelta(days=10)
+            latest_date = datetime.strptime(trans_end_day.value, "%Y/%m/%d")
+        else:
+            latest_date = datetime.now() - timedelta(days=10)
 
         excel_epoch = datetime(1899, 12, 30)
         delta = latest_date - excel_epoch
         excel_date = float(delta.days) + (float(delta.seconds) / 86400)
-    
+
         context = {
             "title": self.title,
             "action": self.action,
             "columns3": self.columns3,
             "columns4": self.columns4,
-            "end_date":excel_date
+            "end_date": excel_date,
         }
 
         return render(request, self.html_path, context)
@@ -285,7 +289,6 @@ class TransTurn(PageListView):
         if to_site_name:
             log = log.filter(turn_site__name__istartswith=to_site_name)
 
-        print(log.query)
         # 过滤 Materials
         if matinfo_core:
             material = material.filter(mat_code=matinfo_core)
@@ -308,22 +311,26 @@ class TransTurn(PageListView):
 
 
 def update_end_date(request):
-    log_date_dict = TransLog.objects.values("build_date").order_by("-build_date").first()
-    
+    log_date_dict = (
+        TransLog.objects.values("build_date").order_by("-build_date").first()
+    )
+
     if log_date_dict:  # 确保获取到了日期
         # 获取日期值
-        latest_date = log_date_dict['build_date']
-    else :
-        latest_date =datetime.now()
+        latest_date = log_date_dict["build_date"]
+    else:
+        latest_date = datetime.now()
         # 计算5天前的日期
     five_days_before = latest_date - timedelta(days=5)
 
     end_day = SysInfo.objects.get(name="trans_end_day")
-    end_day.value = f"{five_days_before.year}/{five_days_before.month}/{five_days_before.day}"
+    end_day.value = (
+        f"{five_days_before.year}/{five_days_before.month}/{five_days_before.day}"
+    )
     end_day.save()
 
     response_data = {
-        "success": False ,
+        "success": False,
         "msg": "上傳成功",
     }
 

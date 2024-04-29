@@ -46,7 +46,7 @@ class MaterialsView(PageListView):
         context["name"] = self.request.GET.get("name", "")
         context["category"] = self.request.GET.get("category_id", "")
         context["category_list"] = MatCat.objects.all()
-        print(context["category_list"])
+
         return context
 
 
@@ -97,7 +97,7 @@ class ImportMaterialView(ImportData2Generic):
                 )
 
         # mat = Materials(mat_code=code,name=str(item[1]))
-        print(f"code{code},mat_code2:{code1},mat_code3:{code2},name={item[3]}")
+  
         Materials.objects.create(
             mat_code=code,
             mat_code2=code1,

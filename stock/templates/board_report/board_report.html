@@ -55,9 +55,9 @@
   </form>
 {% endblock %}
 {% block table %}
-  <caption>{% if .mat_code == '22' %}鐵板
-     {% elif mat_code == '11' %}簍空覆工板
-     {% elif mat_code == '11' %}洗車板{% endif %}</caption>
+  <caption><h3>{% if mat_code == '22' %}鐵板{% endif %}
+     {% if mat_code == '11' %}簍空覆工板{% endif %}
+     {% if mat_code == '12' %}洗車板{% endif %}</h3></caption>
   <tr>
     <th>項次</th>
     <th>工地代號</th>

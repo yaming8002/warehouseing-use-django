@@ -7,7 +7,7 @@ from stock.models.material_model import Materials
 from stock.models.site_model import SiteInfo
 from django.db.models import Q
 
-from stock.models.steel_model import DoneSteelReport, SteelReport
+
 
 class StockBase(models.Model):
     siteinfo = models.ForeignKey(
@@ -29,17 +29,19 @@ class StockBase(models.Model):
     @classmethod
     def getItem(cls, site: SiteInfo, mat: Materials):
         try:
-            stock, created = cls.objects.get_or_create(
-                siteinfo=site,
-                material=mat
-            )
+            stock, created = cls.objects.get_or_create(siteinfo=site, material=mat)
             return stock
         except cls.MultipleObjectsReturned:
             stocks = cls.objects.filter(siteinfo=site, material=mat)
             # Handle the situation, e.g., by choosing the first one
             return stocks.first()
-    
-        
+
+    @classmethod
+    def move_material(cls, site, mat, quantity, unit, is_in=True):
+        stock = cls.getItem(site, mat)
+        stock.change_quantity_util(is_in, quantity, unit)
+        stock.save()
+
     def change_quantity_util(self, is_add=True, quantity=Decimal(0), unit=Decimal(0)):
         if is_add:
             self.quantity += quantity
@@ -49,10 +51,9 @@ class StockBase(models.Model):
             if unit != 0:
                 self.total_unit -= unit * quantity
         self.unit = unit if unit != 0 else self.unit
-       
 
     class Meta:
-        unique_together = ('siteinfo', 'material')
+        unique_together = ("siteinfo", "material")
         abstract = True
         ordering = ["siteinfo", "material"]  # 按照 id 升序排序
 
@@ -62,9 +63,7 @@ class MainStock(StockBase):
 
     @classmethod
     def move_material(cls, mat, quantity, unit, is_in=True):
-        stock = cls.getItem(SiteInfo.get_warehouse(), mat)
-        stock.change_quantity_util(is_in, quantity, unit)
-        stock.save()
+        super().move_material(SiteInfo.get_warehouse(), mat, quantity, unit, is_in)
 
     class Meta:
         unique_together = ["siteinfo", "material"]
@@ -73,32 +72,6 @@ class MainStock(StockBase):
 
 
 class ConStock(StockBase):
-
-
-    @classmethod
-    def move_material(cls, site, mat, quantity, unit, is_in=True):
-        stock = cls.getItem(site, mat)
-        stock.change_quantity_util(is_in, quantity, unit)
-        if site.genre > 1 and stock.quantity < 0 and mat.mat_code in SteelReport.static_column_code.keys() :
-            now = datetime.now()
-            y, m = now.year, now.month
-            check_done,_ = DoneSteelReport.objects.get_or_create(
-                    siteinfo=site,
-                    done_type = 2,
-                    year=y,
-                    month=m,
-                    is_done=True,
-            )
-            value = quantity*unit if unit else stock.quantity
-            DoneSteelReport.update_column_value(check_done.id, True, f"m_{mat.mat_code}", value)
-            total = SteelReport.get_current_by_site(SiteInfo.objects.get(code="0000"), y, m)
-            SteelReport.update_column_value(total.id,True,f"m_{mat.mat_code}",value)
-            stock.quantity = 0
-            stock.unit = 0
-            stock.total_unit = 0
-
-        stock.save()
-
     class Meta:
         unique_together = ["siteinfo", "material"]
         verbose_name = "建設庫存"

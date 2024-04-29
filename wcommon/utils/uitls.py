@@ -25,6 +25,7 @@ def tup_map_get_index(tup_list:[],val:str ):
         return 0 
 
 def get_month_range(today=None):
+    
     today = today if today else datetime.date.today()
     first_day_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     next_month = first_day_of_month + timedelta(days=31)

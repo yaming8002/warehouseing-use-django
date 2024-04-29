@@ -1,17 +1,19 @@
-import decimal
-import math
 from decimal import Decimal
 from typing import Any, Dict, List
-from django.db import models
-from django.db.models.functions import Coalesce
-from django.db.models import Case, F, Sum, Value, When
-from django.shortcuts import render
+
+from django.db.models import F, Sum
 
 from stock.models.material_model import Materials
-from stock.models.site_model import SiteInfo
 from trans.models import TransLog, TransLogDetail
 
-support_list = {"351-0": "中\nH350", "351-1": "中\nH350構台樑", "401-0": "中\nH400","401-1": "中\nH400構台樑"}
+support_list = {
+    "300-0": "中\nH300",
+    "301-1": "中\nH300構台樑",
+    "351-0": "中\nH350",
+    "351-1": "中\nH350構台樑",
+    "401-0": "中\nH400",
+    "401-1": "中\nH400構台樑",
+}
 # 初始化查询所用的字段字典
 values_dict = {
     "code": F("translog__code"),
@@ -32,8 +34,8 @@ def build_steel_pile_table(constn) -> Dict[str, Dict[str, any]]:
     steel_map = {}
     for key, name in support_list.items():
         # name = f"m_{mat_code}"
-        mat_code = key.split('-')[0]
-        construct_case =  key.split('-')[1] =='1'
+        mat_code = key.split("-")[0]
+        construct_case = key.split("-")[1] == "1"
         print(construct_case)
         steel_map[name] = {}
         tr_list: List[List[Any]] = [[] for _ in range(2)]
@@ -49,23 +51,17 @@ def build_steel_pile_table(constn) -> Dict[str, Dict[str, any]]:
         if construct_case:
             # 选择remark为"中構台"的项目
             queryset = transdefaullog.filter(
-                material__mat_code=mat_code,
-                remark__icontains="構台樑"
+                material__mat_code=mat_code, remark__icontains="構台樑"
             )
         else:
             # 选择remark不为"中構台"的项目
-            queryset = transdefaullog.filter(
-                material__mat_code=mat_code
-            ).exclude(
+            queryset = transdefaullog.filter(material__mat_code=mat_code).exclude(
                 remark__icontains="構台樑"
             )
 
-        total_quantity_and_unit = (
-            queryset.values(**values_dict)
-            .annotate(
-                total_quantity=Sum("quantity"),
-                total_unit=Sum("all_unit"),
-            )
+        total_quantity_and_unit = queryset.values(**values_dict).annotate(
+            total_quantity=Sum("quantity"),
+            total_unit=Sum("all_unit"),
         )
 
         for item in total_quantity_and_unit:
@@ -90,7 +86,9 @@ def build_steel_pile_table(constn) -> Dict[str, Dict[str, any]]:
     return steel_map
 
 
-steel_ng_map = {26: "H300", 27: "H350", 28: "H400",25: "鋼軌"}
+steel_ng_map = {26: "H300", 27: "H350", 28: "H400", 25: "鋼軌"}
+
+
 def build_steel_ng_table(constn) -> Dict[str, Dict[str, any]]:
     translog = TransLog.objects.filter(constn_site=constn)
     mats = Materials.objects.filter(mat_code=999)
@@ -111,17 +109,11 @@ def build_steel_ng_table(constn) -> Dict[str, Dict[str, any]]:
             "unit_out": Decimal(0),
         }
 
+        queryset = transdefaullog.filter(material__specification=key)
 
-        queryset = transdefaullog.filter(
-            material__specification=key
-        )
-
-        total_quantity_and_unit = (
-            queryset.values(**values_dict)
-            .annotate(
-                total_quantity=Sum("quantity"),
-                total_unit=Sum("all_unit"),
-            )
+        total_quantity_and_unit = queryset.values(**values_dict).annotate(
+            total_quantity=Sum("quantity"),
+            total_unit=Sum("all_unit"),
         )
 
         for item in total_quantity_and_unit:
@@ -142,7 +134,6 @@ def build_steel_ng_table(constn) -> Dict[str, Dict[str, any]]:
         steel_map[name]["table"] = transpose_list_of_lists(tr_list)
         steel_map[name]["level_summary"] = level_summary_of_lists(tr_list)
     return steel_map
-
 
 
 def transpose_list_of_lists(input_list):
