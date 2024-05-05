@@ -1,4 +1,6 @@
+from django.shortcuts import redirect
 from django.utils.deprecation import MiddlewareMixin
+from django.contrib.auth import logout
 
 class LoggingMiddleware(MiddlewareMixin):
     def process_request(self, request):
@@ -16,4 +18,16 @@ class LoggingMiddleware(MiddlewareMixin):
             print(f"Context data: {context_data}")
         else:
             print("No context data available.")
+        return response
+
+class LogoutOn302Middleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        # 檢查是否是導向到"/home/"的響應，並且狀態碼為302
+        if response.status_code == 302:
+            logout(request)
+            return redirect('login')
         return response

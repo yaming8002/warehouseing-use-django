@@ -41,7 +41,7 @@ class MonthReport(MonthData):
     )
     edit_date = models.DateTimeField(default=datetime.now)
     done_type = models.IntegerField(default=0, choices=done_type_map)
-    remark = models.TextField(null=True, verbose_name="說明")
+    remark = models.CharField( max_length=255, null=True, verbose_name="說明")
     is_done = models.BooleanField(default=False, verbose_name="結案")
 
     @classmethod

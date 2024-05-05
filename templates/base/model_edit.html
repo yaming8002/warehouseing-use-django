@@ -96,10 +96,11 @@ th {
         </div>
         <div class="modal-body">
           <!-- 表單內容將會透過 jQuery 載入 -->
-          <div class="modal-body">
+          {% load crispy_forms_tags %}
+          <div class="modal-body" width="300px">
             {% block form %}
               <form action="{{ action }}" method="post">
-                {% csrf_token %} {{ form.as_div }}
+                {% csrf_token %} {{ form_control.as_div }}
               </form>
             {% endblock %}
           </div>

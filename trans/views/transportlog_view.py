@@ -10,9 +10,12 @@ from django.conf import settings
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views import View
 
 from stock.models.material_model import MatCat, Materials
 from stock.models.site_model import SiteInfo
+
+# from trans.forms import TransLogDetailForm
 from trans.models import TransLog, TransLogDetail
 from wcommon.models.menu import SysInfo
 from wcommon.utils.excel_tool import ImportData2Generic
@@ -177,8 +180,11 @@ class ImportTransportView(ImportData2Generic):
                     self.end_date if self.end_date > edit_date else edit_date
                 )
                 remark = excel_value_to_str(item[20])
+
                 if remark is not None and "作廢" in remark:
-                    TransLogDetail.rollback(trancode)
+                    if TransLog.objects.filter(code=trancode).exists():
+                        tran = TransLog.objects.get(code=trancode)
+                        TransLogDetail.rollback(tran)
                     continue
 
                 tran = TransLog.create(code=trancode, item=item)
@@ -330,8 +336,42 @@ def update_end_date(request):
     end_day.save()
 
     response_data = {
-        "success": False,
+        "success": True,
         "msg": "上傳成功",
+    }
+
+    return JsonResponse(response_data)
+
+
+# class TransDetialControlView(SaveControlView):
+#     name = "進出料資訊"
+#     model = TransLogDetail
+#     form_class = TransLogDetailForm
+
+
+def trans_detial_rollback_view(request):
+    id = request.GET.get("id")
+    detail = TransLogDetail.objects.get(id=id)
+    if detail.is_rollback:
+        return JsonResponse(
+            {
+                "success": True,
+                "msg": "已經作廢",
+            }
+        )
+    TransLogDetail.rollback(detail.translog, detail.id)
+    latest_date = detail.translog.build_date
+    five_days_before = latest_date - timedelta(days=5)
+
+    end_day = SysInfo.objects.get(name="trans_end_day")
+    end_day.value = (
+        f"{five_days_before.year}/{five_days_before.month}/{five_days_before.day}"
+    )
+    print(end_day.value)
+    end_day.save()
+    response_data = {
+        "success": True,
+        "msg": "作廢成功",
     }
 
     return JsonResponse(response_data)

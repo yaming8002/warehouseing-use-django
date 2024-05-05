@@ -45,6 +45,8 @@ DEBUG = True
 ALLOWED_HOSTS = ALLOWED_HOSTS_VALUE
 CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_VALUE  # 使用環境變數的值
 # Application definition
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 INSTALLED_APPS = [
     "import_export",
@@ -53,6 +55,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "crispy_forms",
+    "crispy_bootstrap4",
     "wcommon",
     "stock",
     "trans",

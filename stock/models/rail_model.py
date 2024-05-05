@@ -46,3 +46,5 @@ class RailReport(MonthReport):
         cls.update_column_value(report.id,True,column,all_quantity)
         cls.update_column_value(report.id,True,total_col,all_quantity)
         cls.update_column_value(whse.id,is_in,f"in_{mat.specification.id}",all_quantity)
+
+

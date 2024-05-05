@@ -82,6 +82,7 @@ async function handleFileProcessing(file) {
         const index_rows = XLSX.utils.sheet_to_json(workbook.Sheets["Index"], {
             header: 1
         });
+        
         var carbcData = index_rows.slice(1, 2000).map(row => ({
             car_number: row[20],  // B 列
             car_firm: row[21],   // C 列

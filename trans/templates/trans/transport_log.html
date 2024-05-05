@@ -11,15 +11,31 @@
 
   });
   
-  function upload(event) {
-    // 向後端發送 AJAX 請求
+  function editRow(id) {
+    // 轉換姓名欄位
+  
     $.ajax({
-      url: '/transport_log/uploadexcel/',
+      url: '/transport_log/edit/',
       method: 'GET',
+      data: { id: id },
       success: function (data) {
-        console.log(data)
         $('#modalContainer').html(data)
         $('#createModal').modal('show')
+      },
+      error: function (error) {
+        console.error('Error loading modal content: ', error)
+      }
+    })
+  }
+  function removeRow(id) {
+    // 轉換姓名欄位
+  
+    $.ajax({
+      url: '/transport_log/remove/',
+      method: 'GET',
+      data: { id: id },
+      success: function (data) {
+        alert(data.msg) ;
       },
       error: function (error) {
         console.error('Error loading modal content: ', error)
@@ -53,11 +69,11 @@
     {% csrf_token %}
     <p>
       <label for="begin">開始時間</label>
-      <input type="date" id="begin" name="begin" value="{{begin|date:'Y-m-d'}}" />
+      <input type="date" id="begin" name="begin" value="{{ begin|date:'Y-m-d' }}" />
       <label for="end">結束時間</label>
-      <input type="date" id="end" name="end" value="{{end|date:'Y-m-d'}}" />
+      <input type="date" id="end" name="end" value="{{ end|date:'Y-m-d' }}" />
       <label for="code">單號</label>
-      <input type="text" id="code" name="code" value="{{request.GET.code}}" />
+      <input type="text" id="code" name="code" value="{{ request.GET.code }}" />
       <label for ="tran_type">進出料</label>
       <select id="tran_type" name="tran_type">
         <option value>全部</option>
@@ -68,19 +84,37 @@
     </p>
     <p>
       <label for="constn_id">工地代號</label>
-      <input type="text" id="constn_id" name="constn_id" value="{{request.GET.constn_id}}" />
+      <input type="text"
+             id="constn_id"
+             name="constn_id"
+             value="{{ request.GET.constn_id }}" />
       <label for="constn_name">工地名稱</label>
-      <input type="text" id="constn_name" name="constn_name" value="{{request.GET.constn_name}}" />
+      <input type="text"
+             id="constn_name"
+             name="constn_name"
+             value="{{ request.GET.constn_name }}" />
       <label for="car_firm">吊卡車公司</label>
-      <input type="text" id="car_firm" name="car_firm" value="{{request.GET.car_firm}}" />
+      <input type="text"
+             id="car_firm"
+             name="car_firm"
+             value="{{ request.GET.car_firm }}" />
       <label for="car_number">車牌號碼</label>
-      <input type="text" id="car_number" name="car_number"  value="{{request.GET.car_number}}" />
+      <input type="text"
+             id="car_number"
+             name="car_number"
+             value="{{ request.GET.car_number }}" />
     </p>
     <p>
       <label for="matinfo_core">物料編號</label>
-      <input type="text" id="matinfo_core" name="matinfo_core" value="{{request.GET.matinfo_core}}" />
+      <input type="text"
+             id="matinfo_core"
+             name="matinfo_core"
+             value="{{ request.GET.matinfo_core }}" />
       <label for="matinfo_id">物料名稱</label>
-      <input type="text" id="matinfo_name" name="matinfo_name" value="{{request.GET.matinfo_name}}" />
+      <input type="text"
+             id="matinfo_name"
+             name="matinfo_name"
+             value="{{ request.GET.matinfo_name }}" />
       <label for="matinfo_cat">物料類型</label>
       <select id="matinfo_cat" name="matinfo_cat">
         <option value>全部</option>
@@ -92,12 +126,13 @@
     </p>
     <input type="submit" value="查詢" />
     <button type="button" onclick="upload(event)">上傳EXCEL</button>
-
   </form>
   <div id="modalContainer"></div>
 {% endblock %}
 {% block table %}
-  <caption><h3>進出總表</h3></caption>
+  <caption>
+    <h3>進出總表</h3>
+  </caption>
   <thead>
     <tr>
       <th rowspan="2">日期</th>
@@ -108,6 +143,7 @@
       <th rowspan="2">施工層別</th>
       <th colspan="2">吊卡車公司</th>
       <th colspan="1">經手人</th>
+      <th rowspan="2">編輯</th>
     </tr>
     <tr>
       <th>工地編號</th>
@@ -132,12 +168,14 @@
       <tr>
         <td>{{ item.translog.build_date|date:"Y/m/d" }}</td>
         <td>{{ item.translog.constn_site.code }}</td>
-        <td>{{ item.translog.turn_site.name }}</td>
+        <td>{{ item.translog.turn_site.code }}</td>
         <td>{{ item.translog.constn_site.owner }}</td>
         <td>{{ item.translog.constn_site.name }}</td>
         <td>{{ item.translog.code }}</td>
         <td>{{ item.material.name }}({{ item.material.mat_code }})</td>
-        <td> {% if item.remark %} {{ item.all_unit }} {% endif %}</td>
+        <td>
+          {% if item.remark %}{{ item.all_unit }}{% endif %}
+        </td>
         <td>{{ item.material.unit_of_division }}</td>
         <td {% if item.translog.transaction_type == "OUT" %}style='color:red;'{% endif %}>
           {% if item.translog.transaction_type == "OUT" %}-{% endif %}
@@ -150,12 +188,20 @@
           {% endif %}
         </td>
         {% load custom_filters %}
-        <td> {% if item.remark|is_not_none %}{{ item.remark }}{% endif %}</td>
-        <td>{% if item.level %}{{ item.level }}{% endif %}</td>
+        <td>
+          {% if item.remark|is_not_none %}{{ item.remark }}{% endif %}
+          {% if item.is_rollback %}已作廢{% endif %}
+        </td>
+        <td>
+          {% if item.level %}{{ item.level }}{% endif %}
+        </td>
         <td>{{ item.translog.carinfo.firm }}</td>
         <td>{{ item.translog.carinfo.car_number }}</td>
-         <!--<td>{{ item.transportlog.member }}</td>-->
+        <!--<td>{{ item.transportlog.member }}</td>-->
         <td>{{ item.translog.member }}</td>
+        <td>
+          <a href="#" onclick="removeRow({{ item.id }})">作廢</a>
+        </td>
       </tr>
     {% endfor %}
   </tbody>

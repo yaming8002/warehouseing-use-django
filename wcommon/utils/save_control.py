@@ -25,7 +25,7 @@ class SaveControlView(FormView):
         context = {
             'title': title,
             'action':request.path +action_id ,  # 设置 action 为当前 URL
-            'form': form
+            'form_control': form
         }
         return render(request, 'base/model_edit.html', context)
 

@@ -57,6 +57,10 @@ class BoardReport(MonthReport):
             siteinfo=site, mat_code=mat_code, defaults={"mat_code2": mat_code2}
         )
         return obj
+    
+    class Meta:
+        unique_together = ("siteinfo", "year", "month", "done_type", "is_done","remark")
+        abstract = True
 
     @classmethod
     def add_report(

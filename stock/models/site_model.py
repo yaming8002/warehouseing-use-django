@@ -2,7 +2,6 @@ from django.db import models
 from wcommon.templatetags import constn_state, site_genre
 from django.utils import timezone
 from django.db.models import Q
-from wcommon.templatetags import site_genre
 
 
 class SiteInfo(models.Model):

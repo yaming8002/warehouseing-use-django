@@ -103,8 +103,8 @@
         <td>{{ steel.output.quantity |floatformat:"2" }}</td>
         <td>{{ steel.output.unit |floatformat:"2" }}</td>
         <td>{{ steel.ng_value |floatformat:"2" }}</td>
-        <td>{{ steel.input.quantity|custom_subtract:steel.output.quantity |floatformat:"2" }}</td>
-        <td>{{ steel.input.unit|custom_subtract:steel.output.unit |floatformat:"2" }}</td>
+        <td>{{ steel.input.quantity|subtract:steel.output.quantity |floatformat:"2" }}</td>
+        <td>{{ steel.input.unit|subtract:steel.output.unit |floatformat:"2" }}</td>
         {% if steel.code == "300" %}<td class="noshow"  colspan="4"  rowspan="11"></td>{% endif %}
       </tr>
     {% endfor %}
@@ -144,7 +144,7 @@
         <td></td>
         <td>{{ item.output.quantity |floatformat:"2" }}</td>
         <td></td>
-        <td>{{ item.input.quantity|custom_subtract:item.output.quantity |floatformat:"2" }}</td>
+        <td>{{ item.input.quantity|subtract:item.output.quantity |floatformat:"2" }}</td>
         <td colspan=2></td>
         {% if item.code == "10" %}
           <td colspan="2"  rowspan="20" class="noshow"></td>

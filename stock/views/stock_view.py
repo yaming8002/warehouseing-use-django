@@ -71,7 +71,7 @@ class ConstnStockViewList(PageListView):
     title_name = "工地庫存"
 
     def get_queryset(self):
-        constn = SiteInfo.objects.filter(genre=1)
+        constn = SiteInfo.objects.filter()
         owner = self.request.GET.get("owner")
         code = self.request.GET.get("code")
         address = self.request.GET.get("address")
