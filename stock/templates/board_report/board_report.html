@@ -1,5 +1,5 @@
 {% extends 'base/base_table.html' %}{{ '' }}
-{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block title %}{{ title }} {{ title }}{% endblock %}
 {% block javascript %}
   <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
   <script type="text/javascript"
@@ -110,7 +110,7 @@
     </tr>
   {% endfor %}
   {% if kh_report  %}
-  <tr>
+  <tr class="table-warning">
     <th colspan="4">{{ kh_report.siteinfo.name }}</th>
     <th>{{ kh_report.quantity | floatformat:"0" }}</th>
     {% if request.GET.mat_code == '22' %}
@@ -126,13 +126,14 @@
   </tr>
   {% endif %}
   {% if lk_report  %}
-  <tr>
+  <tr class="table-warning">
     <th colspan="4">{{ lk_report.siteinfo.name }}</th>
     <th>{{ lk_report.quantity | floatformat:"0" }}</th>
     {% if request.GET.mat_code == '22' %}
       <th>{{ lk_report.quantity2 | floatformat:"0" }}</th>
       <th>{{ lk_report.quantity|add:lk_report.quantity2 | floatformat:"0" }}</th>
       <th></th>
+
     {% endif %}
     <th></th>
     <th></th>

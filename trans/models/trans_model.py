@@ -175,15 +175,11 @@ class TransLogDetail(models.Model):
         BoardReport.add_report(tran.constn_site, remark, is_stock_add, mat, quantity)
 
     @classmethod
-    def rollback(cls, tran , detial_id=None):
+    def rollback(cls, tran:TransLog, detial_id=None):
         if detial_id :
-            detials = (
-                cls.objects.select_related("translog").filter(id=detial_id).all()
-            )
+            detials = cls.objects.select_related("translog").filter(id=detial_id).all()
         else:
-            detials = (
-                cls.objects.select_related("translog").filter(translog=tran).all()
-            )
+            detials = cls.objects.select_related("translog").filter(translog=tran).all()
         for detail in detials:
             cls.objects.select_related("translog").filter(translog__code=tran, material=detail.material).exclude(id=detail.id).delete()
             detail.is_rollback = True

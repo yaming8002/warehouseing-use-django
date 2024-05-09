@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+import sys
 
 from django.db import models, transaction
 from django.forms import model_to_dict
@@ -54,7 +55,10 @@ class SteelReport(MonthReport):
     ):
         if mat.mat_code not in cls.static_column_code.keys():
             return
-
+        if site.code=="1542":
+            print("".join(["=====" for x in range(30)]))
+            print(model_to_dict(mat))
+            sys.exit(0)
         year, month = build_date.year, build_date.month
         report = cls.get_current_by_site(site, year, month)
         whse = cls.get_current_by_site(SiteInfo.objects.get(code="0001"), year, month)
@@ -114,15 +118,8 @@ class DoneSteelReport(MonthReport):
         remark:str
     ):
         y, m = build_date.year, build_date.month
-        stock_is_exist=SteelReport.get_current_by_site(site,y,m)
-        # if site.code == "F002":
-          #  print(ConStock.objects.filter(siteinfo=site,material=mat,quantity__gt=0).query)
-          #  print(site.genre < 2 , not is_in , mat.mat_code not in cls.static_column_code.keys() , not stock_is_exist)
-        if  site.genre < 2 or not is_in or mat.mat_code not in cls.static_column_code.keys() or not stock_is_exist :
+        if  site.genre ==1 or not is_in or mat.mat_code not in cls.static_column_code.keys() :
             return True
-    
-        
-        y, m = build_date.year, build_date.month
 
         report, _ = cls.objects.get_or_create(
             siteinfo=site,
@@ -136,6 +133,7 @@ class DoneSteelReport(MonthReport):
         value = all_unit if mat.is_divisible else all_quantity
         value = Decimal(value)
         cls.update_column_value(report.id, True, f"m_{mat.mat_code}", value)
+        # SteelReport = cls.get_current_by_site(SiteInfo.objects.get(code="0001"), y, m)
         # print(model_to_dict(cls.objects.get(id=report.id)))
         return False
 

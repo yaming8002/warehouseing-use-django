@@ -101,18 +101,18 @@
     <td>{{ item.siteinfo.code }}</td>
     <td>{{ item.siteinfo.owner }}</td>
     <td>{{ item.siteinfo.name }}</td>
-    <td class="value">{{ item.m_300 }}</td>
-    <td class="value">{{ item.m_301 }}</td>
-    <td class="value">{{ item.m_350 }}</td>
-    <td class="value">{{ item.m_351 }}</td>
-    <td class="value">{{ item.m_400 }}</td>
-    <td class="value">{{ item.m_401 }}</td>
-    <td class="value">{{ item.m_408 }}</td>
-    <td class="value">{{ item.m_414 }}</td>
-    <td class="value">{{ item.m_4141 }}</td>    
-    <td class="value">{{ item.m_11 |floatformat:"0"}}</td>
-    <td class="value">{{ item.m_13 |floatformat:"0"}}</td>
-    <td class="value">{{ item.m_14 |floatformat:"0"}}</td>
+    <td class="value">{% if item.m_300 != 0 %}{{ item.m_300 }}{% endif%}</td>
+    <td class="value">{% if item.m_301 != 0 %}{{ item.m_301 }}{% endif%}</td>
+    <td class="value">{% if item.m_350 != 0 %}{{ item.m_350 }}{% endif%}</td>
+    <td class="value">{% if item.m_351 != 0 %}{{ item.m_351 }}{% endif%}</td>
+    <td class="value">{% if item.m_400 != 0 %}{{ item.m_400 }}{% endif%}</td>
+    <td class="value">{% if item.m_401 != 0 %}{{ item.m_401 }}{% endif%}</td>
+    <td class="value">{% if item.m_408 != 0 %}{{ item.m_408 }}{% endif%}</td>
+    <td class="value">{% if item.m_414 != 0 %}{{ item.m_414 }}{% endif%}</td>
+    <td class="value">{% if item.m_4141 != 0 %}{{ item.m_4141 }}{% endif%}</td>
+    <td class="value">{% if item.m_11 != 0 %}{{ item.m_11 |floatformat:"0"}}{% endif%}</td>
+    <td class="value">{% if item.m_13 != 0 %}{{ item.m_13 |floatformat:"0"}}{% endif%}</td>
+    <td class="value">{% if item.m_14 != 0 %}{{ item.m_14 |floatformat:"0"}}{% endif%}</td>
     <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a></td>
   </tr>
   {% endfor %}

@@ -21,6 +21,7 @@ from stock.views import (
 )
 from stock.views.board_view import BoardControlView, get_board_edit_done
 from stock.views.constn_view import component_view, constn_diff_view
+from stock.views.materials_view import DownloadMaterialView
 from stock.views.site_view import ConstnSeveView, ImportSiteInfoByTotalView
 from stock.views.steel_view import get_edit_remark
 from stock.views.stock_view import ConstnStockViewList
@@ -30,6 +31,11 @@ urlpatterns = [
     path(
         "material/uploadexcel/",
         ImportMaterialView.as_view(),
+        name="material_uploadexcel",
+    ),
+    path(
+        "material/download/",
+        DownloadMaterialView.as_view(),
         name="material_uploadexcel",
     ),
     path("material/save/", MaterialSeveView.as_view(), name="material_sabe"),

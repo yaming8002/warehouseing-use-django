@@ -104,33 +104,33 @@
       <td>
         {% if item.done_type == 1 %}是{% endif %}
       </td>
-      <td class='table-danger' >{{ item.out_5 |floatformat:"0" }}</td>
-      <td class='table-danger' >{{ item.out_6 |floatformat:"0" }}</td>
-      <td class='table-danger' >{{ item.out_7 |floatformat:"0" }}</td>
-      <td class='table-danger' >{{ item.out_8 |floatformat:"0" }}</td>
-      <td class='table-danger' >{{ item.out_9 |floatformat:"0" }}</td>
-      <td class='table-danger' >{{ item.out_10 |floatformat:"0" }}</td>
-      <td class='table-danger' >{{ item.out_11 |floatformat:"0" }}</td>
-      <td class='table-danger' >{{ item.out_12 |floatformat:"0" }}</td>
-      <td class='table-danger' >{{ item.out_13 |floatformat:"0" }}</td>
-      <td class='table-danger' >{{ item.out_14 |floatformat:"0" }}</td>
-      <td class='table-danger' >{{ item.out_15 |floatformat:"0" }}</td>
-      <td class='table-danger' >{{ item.out_16 |floatformat:"0" }}</td>
+      <td class='table-danger' >{% if item.out_5 != 0 %}{{ item.out_5 |floatformat:"0" }}{% endif%}</td>
+      <td class='table-danger' >{% if item.out_6 != 0 %}{{ item.out_6 |floatformat:"0" }}{% endif%}</td>
+      <td class='table-danger' >{% if item.out_7 != 0 %}{{ item.out_7 |floatformat:"0" }}{% endif%}</td>
+      <td class='table-danger' >{% if item.out_8 != 0 %}{{ item.out_8 |floatformat:"0" }}{% endif%}</td>
+      <td class='table-danger' >{% if item.out_9 != 0 %}{{ item.out_9 |floatformat:"0" }}{% endif%}</td>
+      <td class='table-danger' >{% if item.out_10 != 0 %}{{ item.out_10 |floatformat:"0" }}{% endif%}</td>
+      <td class='table-danger' >{% if item.out_11 != 0 %}{{ item.out_11 |floatformat:"0" }}{% endif%}</td>
+      <td class='table-danger' >{% if item.out_12 != 0 %}{{ item.out_12 |floatformat:"0" }}{% endif%}</td>
+      <td class='table-danger' >{% if item.out_13 != 0 %}{{ item.out_13 |floatformat:"0" }}{% endif%}</td>
+      <td class='table-danger' >{% if item.out_14 != 0 %}{{ item.out_14 |floatformat:"0" }}{% endif%}</td>
+      <td class='table-danger' >{% if item.out_15 != 0 %}{{ item.out_15 |floatformat:"0" }}{% endif%}</td>
+      <td class='table-danger' >{% if item.out_16 != 0 %}{{ item.out_16 |floatformat:"0" }}{% endif%}</td>
       <td class='table-danger' >{{ item.out_total  |floatformat:"0" }}</td>
-      <td class='table-success' >{{ item.in_5  |floatformat:"0" }}</td>
-      <td class='table-success' >{{ item.in_6  |floatformat:"0" }}</td>
-      <td class='table-success' >{{ item.in_7  |floatformat:"0" }}</td>
-      <td class='table-success' >{{ item.in_8  |floatformat:"0" }}</td>
-      <td class='table-success' >{{ item.in_9  |floatformat:"0" }}</td>
-      <td class='table-success' >{{ item.in_10  |floatformat:"0" }}</td>
-      <td class='table-success' >{{ item.in_11  |floatformat:"0" }}</td>
-      <td class='table-success' >{{ item.in_12  |floatformat:"0" }}</td>
-      <td class='table-success' >{{ item.in_13  |floatformat:"0" }}</td>
-      <td class='table-success' >{{ item.in_14  |floatformat:"0" }}</td>
-      <td class='table-success' >{{ item.in_15  |floatformat:"0" }}</td>
-      <td class='table-success' >{{ item.in_16  |floatformat:"0" }}</td>
+      <td class='table-success' >{% if item.in_5 != 0 %}{{ item.in_5  |floatformat:"0" }}{% endif%}</td>
+      <td class='table-success' >{% if item.in_6 != 0 %}{{ item.in_6  |floatformat:"0" }}{% endif%}</td>
+      <td class='table-success' >{% if item.in_7 != 0 %}{{ item.in_7  |floatformat:"0" }}{% endif%}</td>
+      <td class='table-success' >{% if item.in_8 != 0 %}{{ item.in_8  |floatformat:"0" }}{% endif%}</td>
+      <td class='table-success' >{% if item.in_9 != 0 %}{{ item.in_9  |floatformat:"0" }}{% endif%}</td>
+      <td class='table-success' >{% if item.in_10 != 0 %}{{ item.in_10  |floatformat:"0" }}{% endif%}</td>
+      <td class='table-success' >{% if item.in_11 != 0 %}{{ item.in_11  |floatformat:"0" }}{% endif%}</td>
+      <td class='table-success' >{% if item.in_12 != 0 %}{{ item.in_12  |floatformat:"0" }}{% endif%}</td>
+      <td class='table-success' >{% if item.in_13 != 0 %}{{ item.in_13  |floatformat:"0" }}{% endif%}</td>
+      <td class='table-success' >{% if item.in_14 != 0 %}{{ item.in_14  |floatformat:"0" }}{% endif%}</td>
+      <td class='table-success' >{% if item.in_15 != 0 %}{{ item.in_15  |floatformat:"0" }}{% endif%}</td>
+      <td class='table-success' >{% if item.in_16 != 0 %}{{ item.in_16  |floatformat:"0" }}{% endif%}</td>
       <td class='table-success' >{{ item.in_total |floatformat:"0" }}</td>
-      <td>{{ item.rail_ng |floatformat:"0" }}</td>
+      <td>{% if item.rail_ng != 0 %}{{ item.rail_ng |floatformat:"0" }}{% endif%}</td>
       <td>
         <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a>
       </td>

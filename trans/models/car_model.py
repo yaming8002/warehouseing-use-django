@@ -21,6 +21,8 @@ class CarInfo(models.Model):
     def create(cls, car_number, firm=None, remark=None, value=None):
         if car_number is None:
             return None
+        elif firm and cls.objects.filter(car_number=car_number,firm=firm).exists():
+            return cls.objects.get(car_number=car_number,firm=firm)
         elif firm is None and cls.objects.filter(car_number=car_number).exists():
             return cls.objects.get(car_number=car_number)
         elif firm is None:

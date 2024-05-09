@@ -64,27 +64,28 @@
         <th class="table-success">備註</th>
     </tr>
     {% for key, tran_map in steel_pile_table.items %}
+     {% if tran_map.max_length > 2 %}
       <tr style=" border-top: 2px solid #000;" >
         <th class="s5"
             dir="ltr"
             rowspan="{{ tran_map.max_length }}"
-            style="vertical-align: middle">{{ key }}</th>
+            style="vertical-align: middle">{{ key }} </th>
       </tr>
       {% for row in tran_map.table %}
         <tr style="height: 20px">
           {% for item in row %}
             {% if item %}
-              <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.build_date | date:"Y/m/d" }}</td>
-              <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.total_quantity |floatformat:"2" }}</td>
-              <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.total_unit |floatformat:"2" }}</td>
-              <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.code }}</td>
-              <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.remake }}</td>
+              <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.build_date | date:"Y/m/d" }}</td>
+              <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.total_quantity |floatformat:"2" }}</td>
+              <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.total_unit |floatformat:"2" }}</td>
+              <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.code }}</td>
+              <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.remake }}</td>
             {% else %}
-              <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-              <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-              <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-              <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-              <td  {% if item.transaction_type == "IN" %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
+              <td  {% if forloop.counter == 2  %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
+              <td  {% if forloop.counter == 2  %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
+              <td  {% if forloop.counter == 2  %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
+              <td  {% if forloop.counter == 2  %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
+              <td  {% if forloop.counter == 2  %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
             {% endif %}
           {% endfor %}
           {% if forloop.first %}
@@ -106,6 +107,7 @@
           <th rowspan="{{ tran_map.summary.max_length }}">0</th>
         {% endif %}
       </tr>
+      {% endif %}
       {% endfor %}
       <tr ><td class="separator"></td></tr>
       <tr class='table-warning'><td colspan="13">NG 廢鐵</td></tr>
@@ -113,8 +115,8 @@
         <th rowspan="2">規格:</th>
         <th colspan="5" class="table-danger" >出料</th>
         <th colspan="5" class="table-success" >入料</th>
-        <th rowspan="2" >支差異</th>
-        <th rowspan="2" >M差異</th>
+        <th rowspan="2" ></th>
+        <th rowspan="2" ></th>
       </tr>
       <tr style="height: 20px">
           <th class="table-danger" >日期</th>
@@ -129,6 +131,7 @@
           <th class="table-success">備註</th>
       </tr>
       {% for key, tran_map in steel_ng_table.items %}
+      {% if tran_map.max_length > 2 %}
         <tr style=" border-top: 2px solid #000;" >
           <th class="s5"
               dir="ltr"
@@ -153,9 +156,9 @@
               {% endif %}
             {% endfor %}
             {% if forloop.first %}
-              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_count |floatformat:"2" }}</th>
-              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_unit |floatformat:"2" }}</th>
-            {% endif %}
+            <th rowspan="{{ tran_map.summary.max_length }}"></th>
+            <th rowspan="{{ tran_map.summary.max_length }}"></th>
+          {% endif %}
           </tr>
         {% endfor %}
         <tr style="height: 20px">
@@ -171,6 +174,7 @@
             <th rowspan="{{ tran_map.summary.max_length }}">0</th>
           {% endif %}
         </tr>
+        {% endif %}
     </tbody>
   {% endfor %}
 {% endblock %}

@@ -18,12 +18,15 @@ class BoardControlView(MonthListView):
 
     def get_queryset(self):
         mat_code =self.request.GET.get("mat_code")
-        mat_code = mat_code if mat_code else '22'
+        if mat_code is None:
+            return None
         query = Q(close=False) & Q(siteinfo_id__gte=4) & Q(mat_code = mat_code)
         return BoardReport.objects.filter(query).all() 
 
     def get_whse_martials(self, context):
         mat_code =self.request.GET.get("mat_code")
+        if mat_code is None:
+            return None
         mat_code = mat_code if mat_code else '22'
         obj_board= BoardReport.objects.select_related("siteinfo").filter( Q(mat_code = mat_code))
         context['mat_code'] = mat_code
@@ -49,7 +52,7 @@ def get_board_edit_done(request):
         split_year_month = [int(x) for x in year_month.split('-')]
         context['year'] = split_year_month[0]
         context['month'] = split_year_month[1]
-        context['title'] = '結案編輯'
+        context['title'] = '編輯'
 
         return render(request,'board_report/board_edit.html',context)
     else :

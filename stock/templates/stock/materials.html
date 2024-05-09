@@ -48,6 +48,11 @@
         }
       })
     }
+
+    function download(id) {
+      // 直接變更瀏覽器的位置到下載 URL，附帶必要的查詢參數
+      window.location.href = '/material/download/?id=' + id;
+    }
   </script>
 {% endblock %} {% block form %}
   <!-- Corrected form tag and added trailing slash to action attribute -->
@@ -70,10 +75,14 @@
             {{ category.name }}</option>
         {% endfor %}
       </select>
+      <label for="is_detail">包含規格類型</label>
+      <input type="checkbox" name="is_detail" id="is_detail" {% if request.GET.is_detail == "on" %}checked{% endif %}/>
+
     </p>
     <input type="submit" value="查詢" />
     <button type="button" onclick="addMaterial(event)">新增</button>
     <button type="button" onclick="upload(event)">上傳EXCEL</button>
+    <button type="button" onclick="download()">匯出EXCEL</button>
   </form>
   <div id="modalContainer"></div>
 {% endblock %} {% block table %}

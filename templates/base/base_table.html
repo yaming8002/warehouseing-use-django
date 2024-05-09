@@ -24,6 +24,14 @@
           }
 
         });
+
+        $("#base_table th").each(function () {
+          var value = parseFloat($(this).text()); // 尝试将内容转换为浮点数
+          if (!isNaN(value) && value < 0) { // 检查是否为负数
+              $(this).addClass("negative-value"); // 添加类以改变文本颜色
+          }
+
+        });
         $('#exceloutput').click(function() {
           var fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
           $('#base_table').tableExport({

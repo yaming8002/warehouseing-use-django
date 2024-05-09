@@ -31,7 +31,12 @@ class RailReport(MonthReport):
     def add_report(
         cls, site: SiteInfo, build_date, is_in: bool, mat: Materials, all_quantity: Decimal
     ):
-        if mat.mat_code != "3050":
+        if mat.mat_code =="999" and mat.specification.id == 25 :
+            year, month = build_date.year, build_date.month
+            report = cls.get_current_by_site(site, year, month)
+            cls.update_column_value(report.id,True,"rail_ng",all_quantity)
+
+        if mat.mat_code != "3050"  :
             return
         year, month = build_date.year, build_date.month
         report = cls.get_current_by_site(site, year, month)

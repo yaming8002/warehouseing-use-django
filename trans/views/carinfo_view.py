@@ -80,19 +80,28 @@ class ImportCarInfoByTotalView(ImportData2Generic):
     def insertDB(self, item):
         if  "car_number" not in item.keys() :
             return
-        remark = f"{item['remark']}" if "remark" in item.keys() else ""
-        remark += f",{item['value']}" if "value" in item.keys() else ""
+        car_number = f"{item['car_number']}"
+        remark = f"{item.get('remark', '')},{item.get('value', '')}"
+        firm =f"{item.get('car_firm', '')}"
 
-        if CarInfo.objects.filter(car_number=item['car_number']).exists():
-            CarInfo.objects.filter(car_number=item['car_number']).update(
-                firm=item['car_firm'] if "car_firm" in item.keys() else "",
-                remark=remark
-            )
-        else :
-            CarInfo.objects.create(
-                car_number =item['car_number'],
-                firm=item['car_firm'] if "car_firm" in item.keys() else "",
-                remark=remark
-            )
+        CarInfo.objects.get_or_create(
+            car_number =car_number,
+            firm=firm,
+            defaults={
+                "remark":remark
+            }
+        )
+        
+        # if CarInfo.objects.filter(car_number=item['car_number']).exists():
+        #     CarInfo.objects.filter(car_number=item['car_number']).update(
+        #         firm=firm,
+        #         remark=remark
+        #     )
+        # else :
+        #     CarInfo.objects.create(
+        #         car_number =item['car_number'],
+        #         firm=item['car_firm'] if "car_firm" in item.keys() else "",
+        #         remark=remark
+        #     )
 
  

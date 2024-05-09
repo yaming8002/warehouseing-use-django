@@ -7,11 +7,6 @@ async function totalUpload(file) {
         $("#base_table tbody").empty();
         showSpinner();
         $('#update_text').text("EXCEL 分析中....");
-
-        // await updateCarInfo(file);
-        // await updateSiteInfo(file);
-        // simulateAsyncOperation();
-        // performActions();
         handleFileProcessing(file);
     } else {
         // 如果沒有選擇檔，則提示用戶
@@ -84,10 +79,10 @@ async function handleFileProcessing(file) {
         });
         
         var carbcData = index_rows.slice(1, 2000).map(row => ({
-            car_number: row[20],  // B 列
-            car_firm: row[21],   // C 列
-            remark: row[22],  // B 列
-            value: row[23]   // C 列
+            car_number: row[19],  // U 列
+            car_firm: row[20],   // V 列
+            remark: row[21],  // W 列
+            value: row[22]   // X 列
         }));
 
         await $.ajax({
@@ -105,9 +100,9 @@ async function handleFileProcessing(file) {
         });
 
         var siteinfo = index_rows.slice(2, 2000).map(row => ({
-            code: row[9],  // B 列
-            owner: row[10],  // B 列
-            name: row[11]   // C 列
+            code: row[9],  // K 列
+            owner: row[10],  // L 列
+            name: row[11]   // M 列
         }));
 
         let i = 0
@@ -150,81 +145,6 @@ async function handleFileProcessing(file) {
             }
         }
 
-    };
-    await reader.readAsArrayBuffer(file);
-}
-
-async function updateSiteInfo(file) {
-    const csrftoken = getCookie('csrftoken');
-    const reader = new FileReader();
-    $('#update_text').text("上傳工地資料");
-    reader.onload = async function (e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-
-        const worksheet = workbook.Sheets["Index"];
-        // Use total_rows for consistency and clear naming
-        const total_rows = XLSX.utils.sheet_to_json(worksheet, {
-            header: 1
-        });
-
-        var carbcData = total_rows.slice(1, 2000).map(row => ({
-            car_number: row[20],  // B 列
-            car_firm: row[21],   // C 列
-            remark: row[22],  // B 列
-            value: row[23]   // C 列
-        }));
-
-        var rows = total_rows.slice(2, 2000).map(row => ({
-            code: row[9],  // B 列
-            owner: row[10],  // B 列
-            name: row[11]   // C 列
-        }));
-
-        var bcData = []
-        let i = 0
-        try {
-            await $.ajax({
-                url: '/carinfo/uploadexcelByTotal/',  // 替換為你的後台地址
-                type: 'POST',
-                contentType: 'application/json',
-                headers: { 'X-CSRFToken': csrftoken },
-                data: JSON.stringify(carbcData),
-                success: function (response) {
-                    console.log('Data uploaded successfully:', response);
-                },
-                error: function (xhr, status, error) {
-                    console.log('Error uploading data:', error);
-                }
-            });
-
-            for (; i < rows.length; i += 100) {
-                var bcData = rows.slice(i, i + 200);
-                $.ajax({
-                    url: '/constn/uploadexcelByTotal/',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    headers: { 'X-CSRFToken': csrftoken },
-                    data: JSON.stringify(bcData)
-                });
-                console.log(`Batch ${i + 1} uploaded successfully:`);
-            }
-            bcData = rows.slice(i);
-            await $.ajax({
-                url: '/constn/uploadexcelByTotal/',
-                type: 'POST',
-                contentType: 'application/json',
-                headers: { 'X-CSRFToken': csrftoken },
-                data: JSON.stringify(bcData),
-                success: function (response) {
-                    console.log('Data uploaded successfully:', response);
-                    conditionMet = false;
-                }
-            });
-        } catch (error) {
-            console.error(`Error uploading batch ${i + 1}:`, error.statusText);
-            // Optionally, break the loop or handle retries here
-        }
     };
     await reader.readAsArrayBuffer(file);
 }
