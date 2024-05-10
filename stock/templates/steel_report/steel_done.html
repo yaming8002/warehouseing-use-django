@@ -167,19 +167,21 @@
       <td>{{ item.siteinfo.code }}</td>
       <td>{{ item.siteinfo.owner }}</td>
       <td>{% if item.siteinfo.name %}{{ item.siteinfo.name }}{% endif %}</td>
-      <td>{{ item.m_300 }}</td>
-      <td>{{ item.m_301 }}</td>
-      <td>{{ item.m_350 }}</td>
-      <td>{{ item.m_351 }}</td>
-      <td>{{ item.m_400 }}</td>
-      <td>{{ item.m_401 }}</td>
-      <td>{{ item.m_408 }}</td>
-      <td>{{ item.m_414 }}</td>
-      <td>{{ item.m_4141 }}</td>
-      <td>{{ item.m_11 |floatformat:"0" }}</td>
-      <td>{{ item.m_13 |floatformat:"0" }}</td>
-      <td>{{ item.m_14 |floatformat:"0" }}</td>
-      <td colspan='6'>{% if item.remark %}{{ item.remark }}{% endif %}</td>
+      <td>{% if item.m_300 != 0 %}{{ item.m_300 }}{% endif%}</td>
+      <td>{% if item.m_301 != 0 %}{{ item.m_301 }}{% endif%}</td>
+      <td>{% if item.m_350 != 0 %}{{ item.m_350 }}{% endif%}</td>
+      <td>{% if item.m_351 != 0 %}{{ item.m_351 }}{% endif%}</td>
+      <td>{% if item.m_400 != 0 %}{{ item.m_400 }}{% endif%}</td>
+      <td>{% if item.m_401 != 0 %}{{ item.m_401 }}{% endif%}</td>
+      <td>{% if item.m_408 != 0 %}{{ item.m_408 }}{% endif%}</td>
+      <td>{% if item.m_414 != 0 %}{{ item.m_414 }}{% endif%}</td>
+      <td>{% if item.m_4141 != 0 %}{{ item.m_4141 }}{% endif%}</td>
+      <td>{% if item.m_11 != 0 %}{{ item.m_11 |floatformat:"0" }}{% endif%}</td>
+      <td>{% if item.m_13 != 0 %}{{ item.m_13 |floatformat:"0" }}{% endif%}</td>
+      <td>{% if item.m_13 != 0 %}{{ item.m_13 |floatformat:"0" }}{% endif%}</td>
+      <td colspan='6' style="text-align:left" >{% if item.remark %}{{ item.remark }}<br>{% endif %}
+        {% if item.turn_site_id %}目的地:[{{item.turn_site.code}}]{{item.turn_site.owner}}{% endif %}
+      </td>
       <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯說明</a>{% if item.done_type > 2 %} <a href="#" onclick="rollback({{ item.id }})">退回</a>{% endif %}</td>
     </tr>
   {% endfor %}

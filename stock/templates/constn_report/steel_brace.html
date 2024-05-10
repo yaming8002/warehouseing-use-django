@@ -59,12 +59,12 @@
 </form>
 {% endblock %}
 {% block table %}
-<caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}</caption>
+<caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}-支撐</caption>
 {% for key, tran_map in steel_pile_table.items %}
 {% if tran_map.max_length > 2 %}
 <tbody>
   <tr>
-    <th class="s2" dir="ltr">規格:  {{request.GET.level}} </th>
+    <th class="s2" dir="ltr">規格: </th>
     {% get_level as levels %}
     {% for level in levels %}
       {% if level.0 <= table_level %}

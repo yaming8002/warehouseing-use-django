@@ -88,7 +88,7 @@ def component_view(request):
             genre=1, owner=owner, code=code, name=name
         )
         print(constn_obj.query)
-        get_level_val = request.GET.get("level")
+        get_level_val = request.POST.get("level")
         table_level = int(get_level_val) if get_level_val else table_level
 
         selected_items_map = {key: component_map[key] for key in selected_items}

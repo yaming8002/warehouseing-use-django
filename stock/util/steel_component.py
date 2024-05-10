@@ -213,11 +213,6 @@ def build_component_table(constn, level, map_list) -> Dict[str, Dict[str, any]]:
         }
 
         for seat in range(level):
-            print(
-                transdefaullog.filter(
-                    material__mat_code=mat_code, level=(seat + 1)
-                ).query
-            )
             total_quantity_and_unit = (
                 transdefaullog.filter(material__mat_code=mat_code, level=(seat + 1))
                 .values(**values_dict)

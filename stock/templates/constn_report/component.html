@@ -81,10 +81,7 @@
       <label for="level">層數</label>
       <select id="level" name="level">
         {% get_level as levels %}
-        {% for level in levels %}
-          <option value="{{ level.0 }}"
-                  {% if table_level == level.0 %}selected{% endif %}>{{ level.1 }}</option>
-        {% endfor %}
+        {% for level in levels %}<option value="{{ level.0 }}"  {% if table_level == level.0 %} selected {% endif %} >{{ level.1 }}</option>{% endfor %}
       </select>
     </p>
     <p>
@@ -92,7 +89,7 @@
              class="form-check-input"
              id="check_all"
              name="is_all"
-             {% if request.POST.is_all %}checked{% endif %}>
+             {% if request.POST.is_all or request.method == 'GET' %}checked{% endif %}>
       <label for="check_all">全選</label>
       <div id="check_list">
         <table style="border: none;">
@@ -104,7 +101,7 @@
               id="group_{{ mat.topic }}"
               value="{{ mat.topic }}"
               name="{{ mat.topic }}"
-              {% if mat.topic in  request.POST %}checked{% endif %}>
+              {% if mat.topic in request.POST or request.method == 'GET' %}checked{% endif %}>
           <label class="form-check-label" for="{{ item.key }}">{{ mat.name }}</label>
           </td>
           </tr>
@@ -117,7 +114,7 @@
                        id="{{ item.key }}"
                        name="selected_items"
                        value="{{ item.key }}"
-                       {% if item.key in selected_items %}checked{% endif %}>
+                       {% if item.key in selected_items or request.method == 'GET' %}checked{% endif %}>
                 <label class="form-check-label" for="{{ item.key }}">{{ item.value }}</label>
               </td>
               {% if forloop.counter|divisibleby:8 and not forloop.last %}
@@ -136,7 +133,7 @@
   </form>
 {% endblock %}
 {% block table %}
-  <caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}</caption>
+  <caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}-配件</caption>
  
   {% for key, tran_map in steel_pile_table.items %}
     {% if tran_map.max_length > 2 %}
