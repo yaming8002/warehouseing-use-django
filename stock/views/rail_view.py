@@ -4,14 +4,14 @@ from decimal import Decimal
 from typing import Dict, List
 
 from django.db.models import Q
-from django.forms import model_to_dict
+from django.forms import ValidationError, model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 
 from stock.models import RailReport
 from stock.models.site_model import SiteInfo
-from wcommon.utils import MonthListView
-from wcommon.utils.uitls import get_year_month
+from wcom.utils import MonthListView
+from wcom.utils.uitls import get_year_month
 
 
 class RailControlView(MonthListView):
@@ -19,7 +19,7 @@ class RailControlView(MonthListView):
 
     def get_queryset(self):
         year,month = self.get_year_month()
-        query =  (Q(siteinfo__id__gt=4) & (Q(year__lt=year) | Q(year=year, month__lte=month)) )
+        query =  (Q(siteinfo__id__gt=3) & (Q(year__lt=year) | Q(year=year, month__lte=month)) )
         return RailReport.get_current_by_query(query)
 
     def get_whse_martials(self,context ):
@@ -60,6 +60,7 @@ def get_rail_edit_done(request):
 
         context = {'report':report,'sum':sum}
         context['title'] = '結案編輯'
+        context['yearMonth'] = f'{report.year}-{report.month:02d}'
 
         return render(request,'rail_report/rail_edit.html',context)
     else :
@@ -67,8 +68,8 @@ def get_rail_edit_done(request):
         selled =   request.POST.get('selled')
         remark = request.POST.get('remark')
         isdone = request.POST.get('isdone')
-        year,month = get_year_month()
-        report = RailReport.get_current_by_site(SiteInfo.objects.get(id=site_id))
+        year,month = get_year_month(request.POST.get('yearMonth'))
+        report = RailReport.get_current_by_site(SiteInfo.objects.get(id=site_id), year,month)
         report.done_type = 1 if selled is not None and selled == 'on' else 0
 
         report.remark = remark 
@@ -81,6 +82,10 @@ def get_rail_edit_done(request):
             report.month = month
         
         report.save()
+
+        q = Q(siteinfo=report.siteinfo) & ((Q(year=report.year, month__gt=report.month) | Q(year__gt=report.year)))
+        RailReport.objects.filter(q).delete()
+
         if report.is_done:
             rail_update__total(report,False)
         context = {'msg':"成功"}
@@ -104,8 +109,10 @@ class RailDoneView(MonthListView):
 
 def rail_done_withdraw(request):
     if request.method == 'GET':
-        site_id = request.GET.get('site_id') 
-        report = RailReport.get_current_by_site(SiteInfo.objects.get(id=site_id))
+        # site_id = request.GET.get('site_id') 
+        id = request.GET.get('id') 
+        print(id)
+        report = RailReport.objects.get(id=id)
         report.is_done = False
         report.siteinfo.is_rail_done = False
         report.siteinfo.save()

@@ -174,7 +174,7 @@
         <td>{{ item.translog.code }}</td>
         <td>{{ item.material.name }}({{ item.material.mat_code }})</td>
         <td>
-          {% if item.remark %}{{ item.all_unit }}{% endif %}
+          {% if item.unit %}{{ item.unit }}{% endif %}
         </td>
         <td>{{ item.material.unit_of_division }}</td>
         <td {% if item.translog.transaction_type == "OUT" %}style='color:red;'{% endif %}>

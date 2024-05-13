@@ -46,6 +46,7 @@
       <label for="mat_code">物料:</label>
       <select id="mat_code" name="mat_code">
         <option value='22' {% if mat_code == '22' %}selected{% endif %}>鐵板</option>
+        <option value='-22' {% if mat_code == '-22' %}selected{% endif %}>鐵板遺失</option>
         <option value='11' {% if mat_code == '11' %}selected{% endif %}>簍空覆工板</option>
         <option value='12' {% if mat_code == '12' %}selected{% endif %}>洗車板</option>
       </select>
@@ -56,6 +57,7 @@
 {% endblock %}
 {% block table %}
   <caption><h3>{% if mat_code == '22' %}鐵板{% endif %}
+     {% if mat_code == '-22' %}鐵板遺失{% endif %}
      {% if mat_code == '11' %}簍空覆工板{% endif %}
      {% if mat_code == '12' %}洗車板{% endif %}</h3></caption>
   <tr>
@@ -63,31 +65,29 @@
     <th>工地代號</th>
     <th>業主</th>
     <th>名稱</th>
-    {% if  mat_code == '22' %}
+    {% if  '22' in mat_code  %}
       <th>鐵板 全</th>
       <th>鐵板 半</th>
       <th>總計</th>
       <th>完成支撐</th>
       <th>簽單</th>
-      <th>遺失</th>
     {% else %}
       <th>數量</th>
       <th>完工</th>
-      <th>遺失</th>
     {% endif %}
     <th>現場人員</th>
     <th>備註</th>
     <th>編輯</th>
   </tr>
   {% for item in list %}
-
+  
     <tr >
       <td>{{ forloop.counter }}</td>
       <td>{{ item.siteinfo.code }}</td>
       <td>{{ item.siteinfo.owner }}</td>
       <td>{{ item.siteinfo.name }}</td>
       <td>{{ item.quantity | floatformat:"0" }}</td>
-      {% if mat_code == '22' %}
+      {% if '22' in mat_code  %}
         <td>{{ item.quantity2 | floatformat:"0" }}</td>
         <td>{{ item.quantity|add:item.quantity2 | floatformat:"0" }}</td>
         <td>
@@ -96,9 +96,6 @@
       {% endif %}
       <td>
         {% if item.is_done %}O{% endif %}
-      </td>
-      <td>
-        {% if item.is_lost %}O{% endif %}
       </td>
       <td>
         {% if item.siteinfo.member %}{{ item.siteinfo.member }}{% endif %}

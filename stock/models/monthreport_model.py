@@ -15,7 +15,7 @@ from django.forms.models import model_to_dict
 
 from stock.models.site_model import SiteInfo
 
-from wcommon.templatetags import done_type_map
+from wcom.templatetags import done_type_map
 
 logging.config.dictConfig(settings.LOGGING)
 

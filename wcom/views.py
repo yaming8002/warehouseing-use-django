@@ -15,16 +15,16 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 
-from wcommon.forms.accountform import AddMuserForm
-from wcommon.models import Menu, Muser, UserGroup
-from wcommon.templatetags import menu_category
-from wcommon.utils.pagelist import PageListView
-from wcommon.forms.accountform import AddMuserForm, CustomPasswordChangeForm
-from wcommon.models import Menu, Muser, UserGroup
-from wcommon.models.menu import SysInfo
-from wcommon.templatetags import menu_category
-from wcommon.utils.pagelist import PageListView
-from wcommon.utils.save_control import SaveControlView
+from wcom.forms.accountform import AddMuserForm
+from wcom.models import Menu, Muser, UserGroup
+from wcom.templatetags import menu_category
+from wcom.utils.pagelist import PageListView
+from wcom.forms.accountform import AddMuserForm, CustomPasswordChangeForm
+from wcom.models import Menu, Muser, UserGroup
+from wcom.models.menu import SysInfo
+from wcom.templatetags import menu_category
+from wcom.utils.pagelist import PageListView
+from wcom.utils.save_control import SaveControlView
 
 logger = logging.getLogger(__name__)
 
@@ -177,7 +177,7 @@ class MuserCreateView(CreateView):
 
 class GroupListView(PageListView):
     model = UserGroup
-    template_name = "wcommon/group_list.html"
+    template_name = "wcom/group_list.html"
     title_name = "群組六表"
     # context_object_name = "groups"
 
@@ -206,7 +206,7 @@ def group_add(request):
 
         context["menu_category"] = menu_category
 
-        return render(request, "wcommon/group_menu.html", context)
+        return render(request, "wcom/group_menu.html", context)
     else:
         group = UserGroup(name=request.POST.get("group_name"))
         group.save()
@@ -250,7 +250,7 @@ def group_edit(request):
         )
         context["group"] = group
 
-        return render(request, "wcommon/group_menu.html", context)
+        return render(request, "wcom/group_menu.html", context)
     else:
         group = UserGroup.objects.get(id=request.POST.get("group_id"))
         group.name = request.POST.get("group_name")

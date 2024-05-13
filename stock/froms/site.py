@@ -3,7 +3,7 @@ from django.utils import timezone
 from stock.models.site_model import SiteInfo
 
 
-from wcommon.templatetags import constn_state
+from wcom.templatetags import constn_state
 
 
 class SiteInfoForm(forms.ModelForm):

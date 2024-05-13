@@ -8,8 +8,8 @@ from django.forms import model_to_dict
 from stock.models.material_model import Materials
 from stock.models.monthreport_model import MonthReport
 from stock.models.site_model import SiteInfo
-from stock.models.stock_model import ConStock
-from wcommon.utils.uitls import get_year_month
+from stock.models.stock_model import Stock
+from wcom.utils.uitls import get_year_month
 import logging
 
 # # Create your models here.
@@ -33,9 +33,9 @@ class SteelReport(MonthReport):
         "408": "H408*400",
         "414": "H414*405",
         "4141": "H414中柱",
-        "11": "覆工板",
-        "13": "千斤頂",
-        "14": "土壓計",
+        "92": "覆工板",
+        "12": "千斤頂",
+        "13": "土壓計",
     }
 
     for k, v in static_column_code.items():
@@ -81,9 +81,9 @@ class DoneSteelReport(MonthReport):
         "408": "H408*400",
         "414": "H414*405",
         "4141": "H414中柱",
-        "11": "覆工板",
-        "13": "千斤頂",
-        "14": "土壓計",
+        "92": "覆工板",
+        "12": "千斤頂",
+        "13": "土壓計",
     }
 
     turn_site = models.ForeignKey(

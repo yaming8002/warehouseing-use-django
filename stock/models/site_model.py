@@ -1,5 +1,5 @@
 from django.db import models
-from wcommon.templatetags import constn_state, site_genre
+from wcom.templatetags import constn_state, site_genre
 from django.utils import timezone
 from django.db.models import Q
 

@@ -4,8 +4,8 @@ from django import forms
 from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
 from django.utils.translation import gettext_lazy as _
 
-from wcommon.models.account import Muser
-from wcommon.models.user_group import UserGroup
+from wcom.models.account import Muser
+from wcom.models.user_group import UserGroup
 
 
 class AddMuserForm(UserCreationForm):

@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "crispy_forms",
     "crispy_bootstrap4",
-    "wcommon",
+    "wcom",
     "stock",
     "trans",
 ]
@@ -70,9 +70,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "wcommon.middleware.LoginRequiredMiddleware",
-    "wcommon.middleware.AuthenticationMiddleware",
-    "wcommon.middleware.LoggingMiddleware",
+    "wcom.middleware.LoginRequiredMiddleware",
+    "wcom.middleware.AuthenticationMiddleware",
+    "wcom.middleware.LoggingMiddleware",
 ]
 
 ROOT_URLCONF = "warehousing_server.urls"
@@ -186,7 +186,7 @@ USE_TZ = False
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = "wcommon.Muser"  # 'myapp' 是您的應用程序的名稱
+AUTH_USER_MODEL = "wcom.Muser"  # 'myapp' 是您的應用程序的名稱
 LOGOUT_REDIRECT_URL = "/login/"  # 轉跳到登入畫面
 LOGIN_URL = "/login/"  # 轉跳到登入畫面
 APPEND_SLASH = False

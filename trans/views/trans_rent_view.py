@@ -1,7 +1,7 @@
 from stock.models.material_model import MatCat, Materials
 from stock.models.site_model import SiteInfo
 from trans.models import CarInfo, TransLog, TransLogDetail
-from wcommon.utils.pagelist import PageListView
+from wcom.utils.pagelist import PageListView
 
 
 class TransRentView(PageListView):

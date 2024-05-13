@@ -7,6 +7,26 @@
     <div>工地 : {{ report.siteinfo.name }} </div>
     <div>業主 : {{ report.siteinfo.owner }}</div>
     <div>
+      <label for="yearMonthInput">結案月份:</label>
+      <input type="month"
+             id="yearMonthInput"
+             name="yearMonth"
+             value='{{ yearMonth }}'>
+    </div>
+    <div>
+      <label for='selled'>是否賣斷</label>
+      <input id="selled" name="selled" type='checkbox' {% if report.done_type == 1 %} checked {% endif %}>
+    </div>
+    <div>
+      <label for='isdone'>是否結案</label>
+      <input id="isdone" name="isdone" type='checkbox'>
+    </div>
+    <div style="with:100%">
+      <label for="remark">說明</label>
+      <br>
+      <textarea style="with:100%" id="remark" name="remark" row="5" >{% if report.remark %}{{report.remark}}{% endif %}</textarea>
+    </div>
+    <div>
       <table>
         <tr>
           <th>項目</th>
@@ -74,18 +94,6 @@
         </tr>
       </table>
     </div>
-    <div>
-      <label for='selled'>是否賣斷</label>
-      <input id="selled" name="selled" type='checkbox' {% if report.done_type == 1 %} checked {% endif %}>
-    </div>
-    <div>
-      <label for='isdone'>是否結案</label>
-      <input id="isdone" name="isdone" type='checkbox'>
-    </div>
-    <div style="with:100%">
-      <label for="remark">說明</label>
-      <br>
-      <textarea style="with:100%" id="remark" name="remark" row="5" >{% if report.remark %}{{report.remark}}{% endif %}</textarea>
-    </div>
+
   </form>
 {% endblock %}

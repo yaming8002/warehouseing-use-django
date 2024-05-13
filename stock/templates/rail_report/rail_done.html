@@ -22,13 +22,13 @@
     
     }
 
-    function editRow(id) {
+    function editRow(id,site_id) {
       // 退回
       if (confirm("您确定要退回此信息吗？")) {
         $.ajax({
             url: '/rail_done/withdraw/',
             method: 'GET',
-            data: { 'site_id': id },
+            data: { 'id':id, 'site_id': site_id },
             success: function(data) {
               alert('已取消結案') ;
               $('#search').submit() ;
@@ -120,7 +120,7 @@
       <td>{{ item.out_16|floatformat:"0" }}</td>
       <td>{{ item.out_total|floatformat:"0" }}</td>
       <td rowspan='3'>
-        <a href="#" onclick="editRow({{ item.siteinfo.id }})">退回</a>
+        <a href="#" onclick="editRow({{item.id}},{{ item.siteinfo.id }})">退回</a>
       </td>
     </tr>
     <tr>

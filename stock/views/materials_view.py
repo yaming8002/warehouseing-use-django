@@ -16,10 +16,10 @@ from openpyxl.worksheet.datavalidation import DataValidation
 from stock.froms.material import MaterialsForm
 from stock.models.material_model import MatCat, Materials, MatSpec
 from warehousing_server import settings
-from wcommon.utils.excel_tool import ImportData2Generic, ImportDataGeneric
-from wcommon.utils.pagelist import PageListView
-from wcommon.utils.save_control import SaveControlView
-from wcommon.utils.uitls import excel_value_to_str
+from wcom.utils.excel_tool import ImportData2Generic, ImportDataGeneric
+from wcom.utils.pagelist import PageListView
+from wcom.utils.save_control import SaveControlView
+from wcom.utils.uitls import excel_value_to_str
 
 logger = logging.getLogger(__name__)
 

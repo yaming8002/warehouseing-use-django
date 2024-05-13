@@ -11,7 +11,7 @@ from stock.models import SteelReport
 from stock.models.site_model import SiteInfo
 from stock.models.steel_model import DoneSteelReport
 from stock.models.steel_pillar import SteelPillar
-from wcommon.utils import MonthListView
+from wcom.utils import MonthListView
 
 static_column_code = [
         "300",
@@ -23,9 +23,9 @@ static_column_code = [
         "414",
         "4141",
         "408",
-        "11",
+        "92",
+        "12",
         "13",
-        "14",
 ]
 
 class SteelControlView(MonthListView):

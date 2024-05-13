@@ -1,22 +1,10 @@
-from datetime import date, datetime, timedelta
-from decimal import Decimal
 
-from django.core import serializers
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Q
-from django.http import JsonResponse
-from django.shortcuts import render
-from django.views.generic.edit import CreateView
-from django.views.generic.list import ListView
-
-from stock.models.material_model import MatCat, Materials, MatSpec
-from stock.models.site_model import SiteInfo
 from trans.forms import CarinfoFrom
 from trans.models import CarInfo
-from wcommon.utils.excel_tool import ImportData2Generic, ImportDataGeneric
-from wcommon.utils.pagelist import PageListView
-from wcommon.utils.save_control import SaveControlView
-from wcommon.utils.uitls import excel_value_to_str
+from wcom.utils.excel_tool import ImportData2Generic
+from wcom.utils.pagelist import PageListView
+from wcom.utils.save_control import SaveControlView
+from wcom.utils.uitls import excel_value_to_str
 
 
 class CarListView(PageListView):

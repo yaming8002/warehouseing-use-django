@@ -8,9 +8,9 @@ from stock.models.material_model import Materials
 from stock.models.rail_model import RailReport
 from stock.models.site_model import SiteInfo
 from stock.models.steel_model import DoneSteelReport, SteelReport
-from stock.models.stock_model import ConStock, MainStock
+from stock.models.stock_model import Stock
 from trans.models.car_model import CarInfo
-from wcommon.utils.uitls import excel_num_to_date, excel_value_to_str, get_month_range
+from wcom.utils.uitls import excel_num_to_date, excel_value_to_str, get_month_range
 
 
 class TransLog(models.Model):
@@ -164,11 +164,11 @@ class TransLogDetail(models.Model):
 
 
         is_stock_add = tran.transaction_type == "IN"
-        MainStock.move_material(mat, quantity, all_unit, is_stock_add)
+        Stock.move_material(tran.constn_site ,mat, quantity, all_unit, is_stock_add)
 
         if DoneSteelReport.add_new_mat( tran.constn_site, tran.turn_site, tran.build_date, is_stock_add, mat, quantity, all_unit ,remark ):
             """if this case not new material"""
-            ConStock.move_material( tran.constn_site, mat, quantity, all_unit, not is_stock_add )
+            Stock.move_material( tran.constn_site, mat, quantity, all_unit, not is_stock_add )
             SteelReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity, all_unit )
             
         RailReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity )
@@ -189,11 +189,11 @@ class TransLogDetail(models.Model):
             quantity = detail.quantity
             all_unit = detail.all_unit
             remark = detail.remark
-            MainStock.move_material(mat, quantity, all_unit, is_stock_add)
+            Stock.move_material(mat, quantity, all_unit, is_stock_add)
 
             if DoneSteelReport.add_new_mat( tran.constn_site, tran.turn_site, tran.build_date, is_stock_add, mat, quantity, all_unit ,remark ):
                 """if this case not new material"""
-                ConStock.move_material( tran.constn_site, mat, quantity, all_unit, not is_stock_add )
+                Stock.move_material( tran.constn_site, mat, quantity, all_unit, not is_stock_add )
                 SteelReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity, all_unit )
                 
             RailReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity )

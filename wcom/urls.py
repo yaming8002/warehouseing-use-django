@@ -1,4 +1,4 @@
-from wcommon.views import (
+from wcom.views import (
     AccountLogin,
     AccountLogout,
     CustomPasswordChangeView,

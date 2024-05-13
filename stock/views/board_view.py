@@ -9,8 +9,8 @@ from django.shortcuts import render
 
 from stock.models.board_model import BoardReport
 from stock.models.site_model import SiteInfo
-from wcommon.utils import MonthListView
-from wcommon.utils.uitls import get_year_month
+from wcom.utils import MonthListView
+from wcom.utils.uitls import get_year_month
 
 
 class BoardControlView(MonthListView):
@@ -20,8 +20,15 @@ class BoardControlView(MonthListView):
         mat_code =self.request.GET.get("mat_code")
         if mat_code is None:
             return None
-        query = Q(close=False) & Q(siteinfo_id__gte=4) & Q(mat_code = mat_code)
-        return BoardReport.objects.filter(query).all() 
+        query = Q(close=False) & Q(siteinfo_id__gte=4)
+
+        if "-" not in mat_code : 
+            query =query& Q(mat_code = mat_code) & Q(is_lost = False)
+        else:
+            mat_code = mat_code.replace("-","")
+            query =query& Q(mat_code = mat_code) & Q(is_lost = True)
+
+        return BoardReport.objects.filter(query).order_by("is_done").all() 
 
     def get_whse_martials(self, context):
         mat_code =self.request.GET.get("mat_code")
@@ -33,7 +40,6 @@ class BoardControlView(MonthListView):
         context['lk_report'] = obj_board.get(siteinfo__code="0001") if obj_board.filter(siteinfo__code="0001").exists() else None
         context['kh_report'] = obj_board.get(siteinfo__code="0003") if obj_board.filter(siteinfo__code="0003").exists() else None
         # context['lk_report'] = BoardReport.objects.get(siteinfo__code="0001")
-
 
 
     def get_context_data(self, **kwargs):

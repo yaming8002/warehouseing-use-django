@@ -17,10 +17,10 @@ from stock.models.site_model import SiteInfo
 
 # from trans.forms import TransLogDetailForm
 from trans.models import TransLog, TransLogDetail
-from wcommon.models.menu import SysInfo
-from wcommon.utils.excel_tool import ImportData2Generic
-from wcommon.utils.pagelist import PageListView
-from wcommon.utils.uitls import excel_num_to_date, excel_value_to_str
+from wcom.models.menu import SysInfo
+from wcom.utils.excel_tool import ImportData2Generic
+from wcom.utils.pagelist import PageListView
+from wcom.utils.uitls import excel_num_to_date, excel_value_to_str
 
 logging.config.dictConfig(settings.LOGGING)
 

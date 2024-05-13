@@ -6,7 +6,7 @@ from django.forms import model_to_dict
 from stock.models.material_model import Materials
 from stock.models.monthreport_model import MonthData
 from stock.models.site_model import SiteInfo
-from stock.models.stock_model import MainStock
+from stock.models.stock_model import Stock
 
 class SteelPillar(MonthData):
     edit_date = models.DateTimeField(default=datetime.now)
@@ -35,7 +35,7 @@ class SteelPillar(MonthData):
         if mat.mat_code not in ("301", "351", "401"):
             return
         sp, _ = cls.objects.get_or_create(mat_code=mat.mat_code, year=year, month=month)
-        stock = MainStock.getItem(SiteInfo.get_warehouse(), mat)
+        stock = Stock.getItem(SiteInfo.get_warehouse(), mat)
         setattr(sp, f"l_{mat.specification.id}", stock.quantity)
 
         sp.save()

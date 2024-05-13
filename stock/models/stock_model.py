@@ -9,7 +9,7 @@ from django.db.models import Q
 
 
 
-class StockBase(models.Model):
+class Stock(models.Model):
     siteinfo = models.ForeignKey(
         SiteInfo, on_delete=models.CASCADE, verbose_name="倉庫"
     )
@@ -25,6 +25,7 @@ class StockBase(models.Model):
     total_unit = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="總單位量"
     )
+    date_tag = models.DateField(null=True, verbose_name="時間標籤")
 
     @classmethod
     def getItem(cls, site: SiteInfo, mat: Materials):
@@ -53,26 +54,6 @@ class StockBase(models.Model):
         self.unit = unit if unit != 0 else self.unit
 
     class Meta:
-        unique_together = ("siteinfo", "material")
-        abstract = True
+        unique_together = ["siteinfo", "material"]
         ordering = ["siteinfo", "material"]  # 按照 id 升序排序
 
-
-class MainStock(StockBase):
-    date_tag = models.DateField(null=True, verbose_name="時間標籤")
-
-    @classmethod
-    def move_material(cls, mat, quantity, unit, is_in=True):
-        super().move_material(SiteInfo.get_warehouse(), mat, quantity, unit, is_in)
-
-    class Meta:
-        unique_together = ["siteinfo", "material"]
-        verbose_name = "主庫存"
-        verbose_name_plural = "主庫存"
-
-
-class ConStock(StockBase):
-    class Meta:
-        unique_together = ["siteinfo", "material"]
-        verbose_name = "建設庫存"
-        verbose_name_plural = "建設庫存"

@@ -14,21 +14,21 @@ from django.views.generic.list import ListView
 from stock.froms.material import MaterialsForm
 from stock.models.material_model import MatCat, Materials, MatSpec
 from stock.models.site_model import SiteInfo
-from stock.models.stock_model import ConStock, MainStock
-from wcommon.templatetags import constn_state
-from wcommon.utils import ImportDataGeneric
-from wcommon.utils import PageListView
-from wcommon.utils.save_control import SaveControlView
+from stock.models.stock_model import  Stock
+from wcom.templatetags import constn_state
+from wcom.utils import ImportDataGeneric
+from wcom.utils import PageListView
+from wcom.utils.save_control import SaveControlView
 
 logger = logging.getLogger(__name__)
 
 class StockView(PageListView):
-    model = MainStock 
+    model = Stock 
     template_name = "stock/stock.html"
     title_name = "庫存"
     
     def get_queryset(self):
-        stock_obj = MainStock.objects
+        stock_obj = Stock.objects
         site_obj = SiteInfo.objects.filter(genre=0)
         mat_obj = Materials.objects.select_related('category', 'specification').filter(~Q(specification=23))
         siteinfo = self.request.GET.get("siteinfo")
@@ -66,7 +66,7 @@ def getMatrtialData(request):
         return JsonResponse(context)
     
 class ConstnStockViewList(PageListView):
-    model = ConStock
+    model = Stock
     template_name = "constn/constn_stock.html"
     title_name = "工地庫存"
 
@@ -87,7 +87,7 @@ class ConstnStockViewList(PageListView):
             state_int = int(state)
             constn = constn.filter(state=state_int)
 
-        stock = ConStock.objects.select_related("material")
+        stock = Stock.objects.select_related("material")
         result = stock.filter(siteinfo__in=constn.all())
         return result.all()
 
@@ -98,7 +98,7 @@ class ConstnStockViewList(PageListView):
 def split_mat_constn(request):
     if request.method == "GET":
         id = request.GET.get('id')
-        constn_stock = ConStock.objects.get(id=id)
+        constn_stock = Stock.objects.get(id=id)
 
         context = {"stock":constn_stock}
         

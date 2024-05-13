@@ -110,9 +110,9 @@
     <td class="value">{% if item.m_408 != 0 %}{{ item.m_408 }}{% endif%}</td>
     <td class="value">{% if item.m_414 != 0 %}{{ item.m_414 }}{% endif%}</td>
     <td class="value">{% if item.m_4141 != 0 %}{{ item.m_4141 }}{% endif%}</td>
-    <td class="value">{% if item.m_11 != 0 %}{{ item.m_11 |floatformat:"0"}}{% endif%}</td>
+    <td class="value">{% if item.m_92 != 0 %}{{ item.m_92 }}{% endif%}</td>
+    <td class="value">{% if item.m_12 != 0 %}{{ item.m_12 |floatformat:"0"}}{% endif%}</td>
     <td class="value">{% if item.m_13 != 0 %}{{ item.m_13 |floatformat:"0"}}{% endif%}</td>
-    <td class="value">{% if item.m_14 != 0 %}{{ item.m_14 |floatformat:"0"}}{% endif%}</td>
     <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a></td>
   </tr>
   {% endfor %}
@@ -127,9 +127,9 @@
     <th>{{ kh_report.m_408 }}</th>
     <th>{{ kh_report.m_414 }}</th>
     <th>{{ kh_report.m_4141 }}</th>
-    <th>{{ kh_report.m_11 |floatformat:"0"}}</th>
+    <th>{{ kh_report.m_92 }}</th>
+    <th>{{ kh_report.m_12 |floatformat:"0"}}</th>
     <th>{{ kh_report.m_13 |floatformat:"0"}}</th>
-    <th>{{ kh_report.m_14 |floatformat:"0"}}</th>
     <th></th>
   </tr>
   <tr class="table-warning">
@@ -143,9 +143,9 @@
     <th>{{ lk_report.m_408 }}</th>
     <th>{{ lk_report.m_414 }}</th>
     <th>{{ lk_report.m_4141 }}</th>
-    <th>{{ lk_report.m_11 |floatformat:"0" }}</th>
+    <th>{{ lk_report.m_92 |floatformat:"0" }}</th>
+    <th>{{ lk_report.m_12 |floatformat:"0"}}</th>
     <th>{{ lk_report.m_13 |floatformat:"0"}}</th>
-    <th>{{ lk_report.m_14 |floatformat:"0"}}</th>
     <th></th>
   </tr>
   <tr class="table-warning">
@@ -175,9 +175,9 @@
     <th>{{ befote_total_report.m_408 }}</th>
     <th>{{ befote_total_report.m_414 }}</th>
     <th>{{ befote_total_report.m_4141 }}</th>    
-    <th>{{ befote_total_report.m_11 |floatformat:"0"}}</th>
+    <th>{{ befote_total_report.m_92 }}</th>
+    <th>{{ befote_total_report.m_12 |floatformat:"0"}}</th>
     <th>{{ befote_total_report.m_13 |floatformat:"0"}}</th>
-    <th>{{ befote_total_report.m_14 |floatformat:"0"}}</th>
     <th></th>
   </tr>
   <tr class="table-warning">

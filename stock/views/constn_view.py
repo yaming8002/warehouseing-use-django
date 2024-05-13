@@ -5,7 +5,7 @@ from stock.util.steel_diff_summary import build_constn_diff_view
 from stock.util.steel_pile import build_steel_ng_table, build_steel_pile_table
 from stock.util.steel_component import component_map, build_component_table, mat_tree
 from stock.models.site_model import SiteInfo
-from wcommon.templatetags.strmap import get_level
+from wcom.templatetags.strmap import get_level
 
 # Create your views here.
 

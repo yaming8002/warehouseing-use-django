@@ -4,7 +4,7 @@ from django.http import Http404
 from django.views.generic.list import ListView
 from datetime import datetime, timedelta
 
-from wcommon.utils.uitls import get_year_month
+from wcom.utils.uitls import get_year_month
 
 class PageListView(ListView):
     paginate_by = 20
