@@ -7,8 +7,6 @@ from stock.models.site_model import SiteInfo
 
 # # Create your models here.
 
-
-
 class RailReport(MonthReport):
     for i in range(5, 17):
         locals()[f"in_{i}"] = models.DecimalField(
@@ -28,28 +26,17 @@ class RailReport(MonthReport):
     )
 
     @classmethod
-    def add_report(
-        cls, site: SiteInfo, build_date, is_in: bool, mat: Materials, all_quantity: Decimal
-    ):
-        if mat.mat_code =="999" and mat.specification.id == 25 :
-            year, month = build_date.year, build_date.month
-            report = cls.get_current_by_site(site, year, month)
-            cls.update_column_value(report.id,True,"rail_ng",all_quantity)
+    def count_total(cls , site: SiteInfo,year:int,month:int,is_in:bool=False):
+        now = cls.get_current_by_site(site,year, month)
+        column = "in_" if is_in else "out_"
+        value = Decimal(0)
+        for i in range(5,17):
+            print(f"{column}{i}")
+            value += getattr(now,f"{column}{i}",0)
 
-        if mat.mat_code != "3050"  :
-            return
-        year, month = build_date.year, build_date.month
-        report = cls.get_current_by_site(site, year, month)
-        whse = cls.get_current_by_site(SiteInfo.objects.get(code="0001"), year, month)
-        if is_in:
-            column = f"in_{mat.specification.id}"
-            total_col = "in_total"
-        else:    
-            column = f"out_{mat.specification.id}"
-            total_col = "out_total"
-        
-        cls.update_column_value(report.id,True,column,all_quantity)
-        cls.update_column_value(report.id,True,total_col,all_quantity)
-        cls.update_column_value(whse.id,is_in,f"in_{mat.specification.id}",all_quantity)
-
+        if is_in :
+            now.in_total = value
+        else:
+            now.out_total = value
+        now.save()
 

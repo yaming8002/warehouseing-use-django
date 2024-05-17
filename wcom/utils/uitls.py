@@ -45,3 +45,13 @@ def get_year_month(year_month=None):
     year_month =year_month if year_month else (datetime.now()).strftime('%Y-%m') 
     split_year_month = [int(x) for x in year_month.split('-')]
     return split_year_month[0],split_year_month[1]
+
+
+def get_before_year_month(year=None,month=None):
+    if year is None :
+        year , month = get_year_month() 
+    month -= 1
+    if month == 0:
+        year -= 1
+        month =12
+    return year,month

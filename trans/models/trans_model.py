@@ -128,6 +128,7 @@ class TransLogDetail(models.Model):
         mat_code = excel_value_to_str(item[7])
         level = int(item[21]) % 10 if item[21] else None
         remark = str(item[20])
+
         mat = Materials.get_item_by_code(mat_code, remark, unit)
 
         all_unit = unit * quantity if unit else Decimal(0)
@@ -163,16 +164,16 @@ class TransLogDetail(models.Model):
             obj.save(update_fields=['quantity', 'all_quantity', 'all_unit', 'remark'])
 
 
-        is_stock_add = tran.transaction_type == "IN"
-        Stock.move_material(tran.constn_site ,mat, quantity, all_unit, is_stock_add)
+        # is_stock_add = tran.transaction_type == "IN"
+        # Stock.move_material(tran.constn_site ,mat, quantity, all_unit, is_stock_add)
 
-        if DoneSteelReport.add_new_mat( tran.constn_site, tran.turn_site, tran.build_date, is_stock_add, mat, quantity, all_unit ,remark ):
-            """if this case not new material"""
-            Stock.move_material( tran.constn_site, mat, quantity, all_unit, not is_stock_add )
-            SteelReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity, all_unit )
+        # if DoneSteelReport.add_new_mat( tran.constn_site, tran.turn_site, tran.build_date, is_stock_add, mat, quantity, all_unit ,remark ):
+        #     """if this case not new material"""
+        #     Stock.move_material( tran.constn_site, mat, quantity, all_unit, not is_stock_add )
+        #     SteelReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity, all_unit )
             
-        RailReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity )
-        BoardReport.add_report(tran.constn_site, remark, is_stock_add, mat, quantity)
+        # RailReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity )
+        # BoardReport.add_report(tran.constn_site, remark, is_stock_add, mat, quantity)
 
     @classmethod
     def rollback(cls, tran:TransLog, detial_id=None):

@@ -4,6 +4,7 @@ from decimal import Decimal
 from typing import Dict, List
 
 from django.db.models import Q
+from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -17,29 +18,29 @@ class BoardControlView(MonthListView):
     template_name = "board_report/board_report.html"
 
     def get_queryset(self):
+        year,month = self.get_year_month()
         mat_code =self.request.GET.get("mat_code")
         if mat_code is None:
             return None
-        query = Q(close=False) & Q(siteinfo_id__gte=4)
+        is_lost = "-" in mat_code
+        mat_code = '22' if '22' in mat_code  else mat_code
+        query = Q(close=False) & Q(siteinfo_id__gt=4) & (Q(year__lt=year) | Q(year=year, month__lte=month))
+        query &= Q(mat_code=mat_code) & Q(is_lost=is_lost)
 
-        if "-" not in mat_code : 
-            query =query& Q(mat_code = mat_code) & Q(is_lost = False)
-        else:
-            mat_code = mat_code.replace("-","")
-            query =query& Q(mat_code = mat_code) & Q(is_lost = True)
-
-        return BoardReport.objects.filter(query).order_by("is_done").all() 
+        return BoardReport.get_current_by_query(query)
 
     def get_whse_martials(self, context):
+        year,month = self.get_year_month()
         mat_code =self.request.GET.get("mat_code")
-        if mat_code is None:
-            return None
-        mat_code = mat_code if mat_code else '22'
-        obj_board= BoardReport.objects.select_related("siteinfo").filter( Q(mat_code = mat_code))
         context['mat_code'] = mat_code
-        context['lk_report'] = obj_board.get(siteinfo__code="0001") if obj_board.filter(siteinfo__code="0001").exists() else None
-        context['kh_report'] = obj_board.get(siteinfo__code="0003") if obj_board.filter(siteinfo__code="0003").exists() else None
-        # context['lk_report'] = BoardReport.objects.get(siteinfo__code="0001")
+        if mat_code is None or mat_code=="-22":
+            return None
+        # obj_board= BoardReport.objects.select_related("siteinfo").filter( Q(mat_code = mat_code))
+        
+        context['lk_report'] = BoardReport.get_site_matial(SiteInfo.get_site_by_code('0001'),mat_code,year,month)
+        if '22' in mat_code :
+            context['warning_lk_report'] = BoardReport.get_site_matial(SiteInfo.get_site_by_code('0001'),mat_code,year,month,True)
+        context['kh_report'] = BoardReport.get_site_matial(SiteInfo.get_site_by_code('0003'),mat_code,year,month)
 
 
     def get_context_data(self, **kwargs):

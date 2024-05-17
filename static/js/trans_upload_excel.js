@@ -153,8 +153,14 @@ async function handleFileProcessing(file) {
 async function processAndUploadData(rows, is_rent,csrftoken) {
     const batchSize = 50;
     let batchData = [];
-
+    let count_date = new Date();
     for (let i = 0; i < rows.length; i++) {
+        if (i < 2){
+            count_date = rows[i][1];
+        } else if ( count_date >rows[i][1] )  {
+            count_date = rows[i][1] ;
+        }
+
         if (end_date < rows[i][1]) {
             batchData.push(rows[i]);
         }
@@ -200,9 +206,11 @@ async function processAndUploadData(rows, is_rent,csrftoken) {
 
     // Update the end date if applicable
     if (is_rent) {
+        end_date = excelDateToJSDate(count_date) ;
         try {
             await $.ajax({
                 url: "/update_end_date/",
+                data:{"count_date":formatDate(end_date)},
                 method: 'GET'
             });
             alert("上傳完成");

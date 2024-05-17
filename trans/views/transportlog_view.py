@@ -1,11 +1,11 @@
 import json
 import logging
-
 # # Create your models here.
 import logging.config
-
-from datetime import datetime, timedelta
+import sys
 import traceback
+from datetime import datetime, timedelta
+
 from django.conf import settings
 from django.db.models import Q
 from django.http import JsonResponse
@@ -14,9 +14,9 @@ from django.views import View
 
 from stock.models.material_model import MatCat, Materials
 from stock.models.site_model import SiteInfo
-
 # from trans.forms import TransLogDetailForm
 from trans.models import TransLog, TransLogDetail
+from trans.service.update_report import (update_board_by_month, update_rail_by_month, update_steel_by_month)
 from wcom.models.menu import SysInfo
 from wcom.utils.excel_tool import ImportData2Generic
 from wcom.utils.pagelist import PageListView
@@ -317,6 +317,7 @@ class TransTurn(PageListView):
 
 
 def update_end_date(request):
+    count_date = request.GET.get('count_date')
     log_date_dict = (
         TransLog.objects.values("build_date").order_by("-build_date").first()
     )
@@ -334,7 +335,11 @@ def update_end_date(request):
         f"{five_days_before.year}/{five_days_before.month}/{five_days_before.day}"
     )
     end_day.save()
-
+    datetime.strptime
+    count_date = datetime.strptime( request.GET.get('count_date'),"%Y-%m-%d")
+    update_rail_by_month(count_date)
+    update_steel_by_month(count_date)
+    update_board_by_month(count_date)
     response_data = {
         "success": True,
         "msg": "上傳成功",
