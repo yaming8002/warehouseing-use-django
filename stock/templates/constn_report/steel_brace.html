@@ -1,11 +1,10 @@
 {% extends 'base/base_table.html' %}{{ '' }}
-{% block title %}
-    {{ title }} {{ '' }}
-{% endblock %}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
 {% block javascript %}
-<script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
-<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
-<script>
+  <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+  <script type="text/javascript"
+          src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+  <script>
   $(document).ready(function () {
     // Adjusting the style of the caption in the table with id 'base_table'
     $("#base_table caption").each(function () {
@@ -18,6 +17,23 @@
         "clip": "auto",
         "caption-side": "top"
       });
+      $('#search').on('submit', function() {
+        var code = $('#code').val().trim();
+        var owner = $('#owner').val().trim();
+        var name = $('#name').val().trim();
+
+        if (code.length > 0) {
+            return true;
+        }
+
+        if (owner.length > 0 && name.length > 0) {
+            return true;
+        }
+
+        alert('請填寫工地編號，或同時填寫業主和姓名！');
+        return false;
+    });
+
     });
 
     // Setting up the click event for the button with id 'exceloutput'
@@ -32,47 +48,60 @@
       });
     });
   });
-</script>
+
+
+  </script>
 {% endblock %}
 {% block form %}
-{% load strmap %}
-<!-- Corrected form tag and added trailing slash to action attribute -->
-<form id="search" action="/constn/brace/" method="GET">
-  {% csrf_token %}
-  <p>
-    <label for="code">工地編號</label>
-    <input type="text" id="code" name="code" value="{{ request.GET.code }}" />
-    <label for="owner">業主</label>
-    <input type="text" id="owner" name="owner" value="{{ request.GET.owner }}" />
-    <label for="name">名稱</label>
-    <input type="text" id="name" name="name" value="{{ request.GET.name }}" />
-  </p>
-  <p>
-    <label for="level">層數</label>
-    <select id="level" name="level">
-      {% get_level as levels %}
-      {% for level in levels %}<option value="{{ level.0 }}"  {% if table_level == level.0 %} selected {% endif %} >{{ level.1 }}</option>{% endfor %}
-    </select>
-  </p>
-  <input type="submit" value="查詢" />
-  <input type="button" id="exceloutput" value="匯出EXCEL" />
-</form>
+  {% load strmap %}
+  <!-- Corrected form tag and added trailing slash to action attribute -->
+  <form id="search"
+        action="/constn/brace/"
+        method="POST">
+    {% csrf_token %}
+    <p>
+      <label for="code">工地編號</label>
+      <input type="text" id="code" name="code" value="{{ request.POST.code }}" />
+      <label for="owner">業主</label>
+      <input type="text" id="owner" name="owner" value="{{ request.POST.owner }}" />
+      <label for="name">名稱</label>
+      <input type="text" id="name" name="name" value="{{ request.POST.name }}" />
+    </p>
+    <p>
+      <label for="level">層數</label>
+      <select id="level" name="level">
+        {% get_level as levels %}
+        {% for level in levels %}
+          <option value="{{ level.0 }}"
+                  {% if table_level == level.0 %}selected{% endif %}>{{ level.1 }}</option>
+        {% endfor %}
+      </select>
+    </p>
+    <input type="submit" value="查詢" />
+    <input type="button" id="exceloutput" value="匯出EXCEL" />
+  </form>
 {% endblock %}
 {% block table %}
-<caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}-支撐</caption>
-{% for key, tran_map in steel_pile_table.items %}
-{% if tran_map.max_length > 2 %}
-<tbody>
-  <tr>
-    <th class="s2" dir="ltr">規格: </th>
-    {% get_level as levels %}
-    {% for level in levels %}
-      {% if level.0 <= table_level %}
-      <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">{{level.1}}出料</th>
-      <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">{{level.1}}入料</th>
-      {% endif %}
-    {% endfor %}
-<!--
+  <caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}-支撐</caption>
+  {% for key, tran_map in steel_pile_table.items %}
+    {% if tran_map.max_length > 2 %}
+      <tbody>
+        <tr>
+          <th class="s2" dir="ltr">規格:</th>
+          {% get_level as levels %}
+          {% for level in levels %}
+            {% if level.0 <= table_level %}
+              <th class="s3 table-danger"
+                  dir="ltr"
+                  colspan="5"
+                  style="border-left: 1px solid black">{{ level.1 }}出料</th>
+              <th class="s2 table-success"
+                  dir="ltr"
+                  colspan="5"
+                  style="border-left: 1px solid black">{{ level.1 }}入料</th>
+            {% endif %}
+          {% endfor %}
+          <!--
     <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第一層出料</th>
     <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第一層入料</th>
     <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第二層出料</th>
@@ -87,86 +116,98 @@
     <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第六層入料</th>
     <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第七層出料</th>
     <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第七層入料</th>
-    -->
-
-    <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
-      出支
-      <br>
-      合計
-    </th>
-    <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
-      出M
-      <br>
-      合計
-    </th>
-    <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
-      入支
-      <br>
-      合計
-    </th>
-    <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
-      入M
-      <br>
-      合計
-    </th>
-    <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">支差異</th>
-    <th class="s2" dir="ltr" rowspan="2" style="border-left: 1px solid black">M差異</th>
-  </tr>
-  <tr style="height: 20px">
-    <th class="s5" dir="ltr" rowspan="{{ tran_map.max_length }}" style="vertical-align: middle">{{ key }}</th>
-    {% for _ in column_count %}
-    <th class="s4 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" dir="ltr"
-      style=" border-left: 1px solid black;">日期</th>
-    <th class="s4 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" dir="ltr">支</th>
-    <th class="s4 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" dir="ltr">合計M
-    </th>
-    <th class="s4 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" dir="ltr">單號
-    </th>
-    <th class="s3 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}" dir="ltr">備註
-    </th>
-    {% endfor %}
-  </tr>
-  {% for row in tran_map.table %}
-  <tr style="height: 20px">
-    {% for item in row %}
-    {% if item %}
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"><!--{{ item }}-->{{ item.build_date | date:"Y/m/d" }}</td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.total_quantity |floatformat:"2" }}</td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.total_unit|floatformat:"2" }}</td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.code }}
-    </td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.remake }}
-    </td>
-    {% else %}
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
+-->
+          <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
+            出支
+            <br>
+            合計
+          </th>
+          <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
+            出M
+            <br>
+            合計
+          </th>
+          <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
+            入支
+            <br>
+            合計
+          </th>
+          <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
+            入M
+            <br>
+            合計
+          </th>
+          <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">支差異</th>
+          <th class="s2" dir="ltr" rowspan="2" style="border-left: 1px solid black">M差異</th>
+        </tr>
+        <tr style="height: 20px">
+          <th class="s5"
+              dir="ltr"
+              rowspan="{{ tran_map.max_length }}"
+              style="vertical-align: middle">{{ key }}</th>
+          {% for _ in column_count %}
+            <th class="s4 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"
+                dir="ltr"
+                style="border-left: 1px solid black">日期</th>
+            <th class="s4 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"
+                dir="ltr">支</th>
+            <th class="s4 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"
+                dir="ltr">合計M</th>
+            <th class="s4 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"
+                dir="ltr">單號</th>
+            <th class="s3 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"
+                dir="ltr">備註</th>
+          {% endfor %}
+        </tr>
+        {% for row in tran_map.table %}
+          <tr style="height: 20px">
+            {% for item in row %}
+              {% if item %}
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
+                  <!--{{ item }}-->{{ item.build_date | date:"Y/m/d" }}
+                </td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
+                  {{ item.total_quantity |floatformat:"0" }}
+                </td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
+                  {{ item.total_unit|floatformat:"2" }}
+                </td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.code }}</td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.remake }}</td>
+              {% else %}
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
+              {% endif %}
+            {% endfor %}
+            {% if forloop.first %}
+              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.count_out|floatformat:"0" }}</th>
+              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.unit_out|floatformat:"2" }}</th>
+              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.count_in|floatformat:"0" }}</th>
+              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.unit_in|floatformat:"2" }}</th>
+              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_count |floatformat:"0" }}</th>
+              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_unit |floatformat:"2" }}</th>
+            {% endif %}
+          </tr>
+        {% endfor %}
+        <tr style="height: 20px" class="ttttt">
+          {% for row in tran_map.level_summary %}
+            <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"
+                style="border-left: 1px solid black"
+                class="ttttt">總計:</td>
+            <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
+              {{ row.count |floatformat:"0" }}
+            </td>
+            <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
+              {{ row.unit|floatformat:"2" }}
+            </td>
+            <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
+            <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
+          {% endfor %}
+        </tr>
+      </tbody>
     {% endif %}
-    {% endfor %}
-    {% if forloop.first %}
-    <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.count_out|floatformat:"2" }}</th>
-    <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.unit_out|floatformat:"2" }}</th>
-    <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.count_in|floatformat:"2" }}</th>
-    <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.unit_in|floatformat:"2" }}</th>
-    <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_count |floatformat:"2" }}</th>
-    <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_unit |floatformat:"2" }}</th>
-    {% endif %}
-  </tr>
   {% endfor %}
-  <tr style="height: 20px" class="ttttt">
-    {% for row in tran_map.level_summary %}
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"
-      style=" border-left: 1px solid black;" class="ttttt">總計:</td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
-      {{ row.count |floatformat:"2" }}</td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ row.unit|floatformat:"2" }}</td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
-    <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
-    {% endfor %}
-  </tr>
-</tbody>
-{% endif %}
-{% endfor %}
 {% endblock %}

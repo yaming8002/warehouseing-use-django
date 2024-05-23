@@ -159,9 +159,9 @@
     <th>{{ total_report.m_408 }}</th>
     <th>{{ total_report.m_414 }}</th>
     <th>{{ total_report.m_4141 }}</th>
-    <th>{{ total_report.m_11 |floatformat:"0"}}</th>
+    <th>{{ total_report.m_92 |floatformat:"0"}}</th>
+    <th>{{ total_report.m_12 |floatformat:"0"}}</th>
     <th>{{ total_report.m_13 |floatformat:"0"}}</th>
-    <th>{{ total_report.m_14 |floatformat:"0"}}</th>
     <th></th>
   </tr>
   <tr class="table-warning">
@@ -186,7 +186,7 @@
       {% if forloop.counter > 9 %}
       <th>{{d |floatformat:"0"}}</th>
       {% else %}
-      <th>{{d}}</th>
+      <th>{{d |floatformat:"2"}}</th>
       {% endif %}
     {% endfor %}
     <th></th>

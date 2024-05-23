@@ -200,7 +200,9 @@
         <!--<td>{{ item.transportlog.member }}</td>-->
         <td>{{ item.translog.member }}</td>
         <td>
-          <a href="#" onclick="removeRow({{ item.id }})">作廢</a>
+          {% if not item.is_rollback %}
+            <a href="#" onclick="removeRow({{ item.id }})">作廢</a>
+          {% endif %}
         </td>
       </tr>
     {% endfor %}

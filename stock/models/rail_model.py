@@ -31,7 +31,6 @@ class RailReport(MonthReport):
         column = "in_" if is_in else "out_"
         value = Decimal(0)
         for i in range(5,17):
-            print(f"{column}{i}")
             value += getattr(now,f"{column}{i}",0)
 
         if is_in :

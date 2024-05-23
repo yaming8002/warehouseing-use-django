@@ -153,13 +153,9 @@ async function handleFileProcessing(file) {
 async function processAndUploadData(rows, is_rent,csrftoken) {
     const batchSize = 50;
     let batchData = [];
-    let count_date = new Date();
+    let count_date = rows[2][1]
+
     for (let i = 0; i < rows.length; i++) {
-        if (i < 2){
-            count_date = rows[i][1];
-        } else if ( count_date >rows[i][1] )  {
-            count_date = rows[i][1] ;
-        }
 
         if (end_date < rows[i][1]) {
             batchData.push(rows[i]);
@@ -181,8 +177,7 @@ async function processAndUploadData(rows, is_rent,csrftoken) {
                             const tr = $('<tr></tr>').append(`<td>${item.e}</td>`);
                             item.item.slice(1).forEach((col, index) => {
                                 if (index + 1 === 1 || index + 1 === 27) {
-                                    let jsDate = excelDateToJSDate(col); // Convert to JS Date
-                                    let formattedDate = formatDate(jsDate); // Format to "Y-m-d"
+                                    let formattedDate = formatDate(col); // Format to "Y-m-d"
                                     tr.append(`<td>${formattedDate}</td>`); // Append formatted date
                                 } else {
                                     tr.append(`<td>${col || ''}</td>`);
@@ -206,11 +201,11 @@ async function processAndUploadData(rows, is_rent,csrftoken) {
 
     // Update the end date if applicable
     if (is_rent) {
-        end_date = excelDateToJSDate(count_date) ;
+        console.log(count_date)
         try {
             await $.ajax({
                 url: "/update_end_date/",
-                data:{"count_date":formatDate(end_date)},
+                data:{"count_date":formatDate(count_date)},
                 method: 'GET'
             });
             alert("上傳完成");
@@ -221,15 +216,16 @@ async function processAndUploadData(rows, is_rent,csrftoken) {
     }
 }
 
-function excelDateToJSDate(serial) {
-    const excelEpoch = new Date(Date.UTC(1899, 11, 31)); // setting Excel epoch
-    const utc_days = serial - 2; // Adjusting for Excel's leap year bug
-    return new Date(excelEpoch.getTime() + utc_days * 86400000); // 86400000 ms per day
-}
+
+function excelDateToJSDate(excelDate) {
+    const date = new Date(1899, 11, 30); // 月份从 0 开始，11 代表 12 月
+    date.setDate(date.getDate() + excelDate - 1); // 减去1天校正
+    return date;
+  }
 
 function formatDate(date) {
-    let d = new Date(date),
-        month = '' + (d.getUTCMonth() + 1), // getUTCMonth returns 0-11
+    let d = excelDateToJSDate(date)
+    let month = '' + (d.getUTCMonth() + 1), // getUTCMonth returns 0-11
         day = '' + d.getUTCDate(),
         year = d.getUTCFullYear();
 

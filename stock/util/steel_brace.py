@@ -55,7 +55,7 @@ def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
                 .annotate(
                     total_quantity=Sum("quantity"),
                     total_unit=Sum("all_unit"),
-                )
+                ).order_by("translog__build_date")
             )
 
             site_in = (seat * 2) + 1

@@ -7,7 +7,8 @@ from stock.models.material_model import Materials
 from trans.models import TransLog, TransLogDetail
 
 support_list = {
-    "300-0": "中\nH300",
+    "3050-0": "鋼軌樁",
+    "301-0": "中\nH300",
     "301-1": "中\nH300構台樑",
     "351-0": "中\nH350",
     "351-1": "中\nH350構台樑",

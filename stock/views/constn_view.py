@@ -14,10 +14,10 @@ def steel_brace_view(request):
     # 鋼樁 
     context = {}
     table_level = 7
-    if request.method == "GET":
-        owner = request.GET.get("owner")
-        code = request.GET.get("code")
-        name = request.GET.get("name")
+    if request.method == "POST":
+        owner = request.POST.get("owner")
+        code = request.POST.get("code")
+        name = request.POST.get("name")
         constn = SiteInfo.objects.filter(genre=1)
         show = False
         if owner:
@@ -30,7 +30,7 @@ def steel_brace_view(request):
             constn = constn.filter(name=name)
             show = True
 
-        get_level_val = request.GET.get("level")
+        get_level_val = request.POST.get("level")
         table_level = int(get_level_val) if get_level_val else table_level
 
         if show and constn.exists():
@@ -48,10 +48,10 @@ def steel_brace_view(request):
 def steel_pile_view(request):
     # 将查询结果传递给模板
     context = {}
-    if request.method == "GET":
-        owner = request.GET.get("owner")
-        code = request.GET.get("code")
-        name = request.GET.get("name")
+    if request.method == "POST":
+        owner = request.POST.get("owner")
+        code = request.POST.get("code")
+        name = request.POST.get("name")
         constn = SiteInfo.objects.filter(genre=1)
         show = False
         if owner:
@@ -87,7 +87,7 @@ def component_view(request):
         constn_obj = SiteInfo.get_obj_by_value(
             genre=1, owner=owner, code=code, name=name
         )
-        print(constn_obj.query)
+        # print(constn_obj.query)
         get_level_val = request.POST.get("level")
         table_level = int(get_level_val) if get_level_val else table_level
 
@@ -104,7 +104,7 @@ def component_view(request):
     context["mat_tree"] = mat_tree
     context["selected_items"] = selected_items
     context["table_level"] = table_level
-    context["column_count"] = range(table_level * 2)
+    context["column_count"] = range((table_level+1) * 2)
     return render(request, "constn_report/component.html", context)
 
 

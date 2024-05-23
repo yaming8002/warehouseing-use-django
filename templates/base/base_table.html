@@ -57,6 +57,7 @@
           $('.tableStyle').css('max-height', desiredHeight + 'px'); // 设置最大高度
           $('#base_table').css('max-height', desiredHeight + 'px'); // 设置最大高度
       }
+
       });
     </script>
     {% block javascript %}<script></script>{% endblock %}
@@ -158,6 +159,10 @@
     text-overflow: ellipsis; /* 超出部分显示省略号 */
     text-align: left !important;
  }
+
+ .hidden {
+  display: none;
+}
 
   {% block styles %}
 

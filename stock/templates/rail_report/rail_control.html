@@ -66,7 +66,7 @@
     </th>
     <th class='table-danger' colspan='13'>出料</th>
     <th class='table-success' colspan='13'>入料</th>
-    <th rowspan='2'>廢料</th>
+    <th rowspan='2'>廢料<br>(公斤)</th>
     <th rowspan='2'>編輯</th>
   </tr>
   <tr class="sticky-header">
@@ -112,180 +112,180 @@
       </td>
       <td class='table-danger'>
         {% if item.out_5 != 0 %}{{ item.out_5 |floatformat:"0" }}{% endif %}
-        </td>
-        <td class='table-danger'>
-          {% if item.out_6 != 0 %}{{ item.out_6 |floatformat:"0" }}{% endif %}
-          </td>
-          <td class='table-danger'>
-            {% if item.out_7 != 0 %}{{ item.out_7 |floatformat:"0" }}{% endif %}
-            </td>
-            <td class='table-danger'>
-              {% if item.out_8 != 0 %}{{ item.out_8 |floatformat:"0" }}{% endif %}
-              </td>
-              <td class='table-danger'>
-                {% if item.out_9 != 0 %}{{ item.out_9 |floatformat:"0" }}{% endif %}
-                </td>
-                <td class='table-danger'>
-                  {% if item.out_10 != 0 %}{{ item.out_10 |floatformat:"0" }}{% endif %}
-                  </td>
-                  <td class='table-danger'>
-                    {% if item.out_11 != 0 %}{{ item.out_11 |floatformat:"0" }}{% endif %}
-                    </td>
-                    <td class='table-danger'>
-                      {% if item.out_12 != 0 %}{{ item.out_12 |floatformat:"0" }}{% endif %}
-                      </td>
-                      <td class='table-danger'>
-                        {% if item.out_13 != 0 %}{{ item.out_13 |floatformat:"0" }}{% endif %}
-                        </td>
-                        <td class='table-danger'>
-                          {% if item.out_14 != 0 %}{{ item.out_14 |floatformat:"0" }}{% endif %}
-                          </td>
-                          <td class='table-danger'>
-                            {% if item.out_15 != 0 %}{{ item.out_15 |floatformat:"0" }}{% endif %}
-                            </td>
-                            <td class='table-danger'>
-                              {% if item.out_16 != 0 %}{{ item.out_16 |floatformat:"0" }}{% endif %}
-                              </td>
-                              <td class='table-danger'>{{ item.out_total  |floatformat:"0" }}</td>
-                              <td class='table-success'>
-                                {% if item.in_5 != 0 %}{{ item.in_5  |floatformat:"0" }}{% endif %}
-                                </td>
-                                <td class='table-success'>
-                                  {% if item.in_6 != 0 %}{{ item.in_6  |floatformat:"0" }}{% endif %}
-                                  </td>
-                                  <td class='table-success'>
-                                    {% if item.in_7 != 0 %}{{ item.in_7  |floatformat:"0" }}{% endif %}
-                                    </td>
-                                    <td class='table-success'>
-                                      {% if item.in_8 != 0 %}{{ item.in_8  |floatformat:"0" }}{% endif %}
-                                      </td>
-                                      <td class='table-success'>
-                                        {% if item.in_9 != 0 %}{{ item.in_9  |floatformat:"0" }}{% endif %}
-                                        </td>
-                                        <td class='table-success'>
-                                          {% if item.in_10 != 0 %}{{ item.in_10  |floatformat:"0" }}{% endif %}
-                                          </td>
-                                          <td class='table-success'>
-                                            {% if item.in_11 != 0 %}{{ item.in_11  |floatformat:"0" }}{% endif %}
-                                            </td>
-                                            <td class='table-success'>
-                                              {% if item.in_12 != 0 %}{{ item.in_12  |floatformat:"0" }}{% endif %}
-                                              </td>
-                                              <td class='table-success'>
-                                                {% if item.in_13 != 0 %}{{ item.in_13  |floatformat:"0" }}{% endif %}
-                                                </td>
-                                                <td class='table-success'>
-                                                  {% if item.in_14 != 0 %}{{ item.in_14  |floatformat:"0" }}{% endif %}
-                                                  </td>
-                                                  <td class='table-success'>
-                                                    {% if item.in_15 != 0 %}{{ item.in_15  |floatformat:"0" }}{% endif %}
-                                                    </td>
-                                                    <td class='table-success'>
-                                                      {% if item.in_16 != 0 %}{{ item.in_16  |floatformat:"0" }}{% endif %}
-                                                      </td>
-                                                      <td class='table-success'>{{ item.in_total |floatformat:"0" }}</td>
-                                                      <td>
-                                                        {% if item.rail_ng != 0 %}{{ item.rail_ng |floatformat:"0" }}{% endif %}
-                                                        </td>
-                                                        <td>
-                                                          <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a>
-                                                        </td>
-                                                      </tr>
-                                                    {% endfor %}
-                                                    <tr>
-                                                      <th colspan="5">工地出入總計</th>
-                                                      <th class='table-danger'>{{ summary.out_5 |floatformat:"0" }}</th>
-                                                      <th class='table-danger'>{{ summary.out_6 |floatformat:"0" }}</th>
-                                                      <th class='table-danger'>{{ summary.out_7 |floatformat:"0" }}</th>
-                                                      <th class='table-danger'>{{ summary.out_8 |floatformat:"0" }}</th>
-                                                      <th class='table-danger'>{{ summary.out_9 |floatformat:"0" }}</th>
-                                                      <th class='table-danger'>{{ summary.out_10 |floatformat:"0" }}</th>
-                                                      <th class='table-danger'>{{ summary.out_11 |floatformat:"0" }}</th>
-                                                      <th class='table-danger'>{{ summary.out_12 |floatformat:"0" }}</th>
-                                                      <th class='table-danger'>{{ summary.out_13 |floatformat:"0" }}</th>
-                                                      <th class='table-danger'>{{ summary.out_14 |floatformat:"0" }}</th>
-                                                      <th class='table-danger'>{{ summary.out_15 |floatformat:"0" }}</th>
-                                                      <th class='table-danger'>{{ summary.out_16 |floatformat:"0" }}</th>
-                                                      <th class='table-danger'>{{ summary.out_total  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_5  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_6  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_7  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_8  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_9  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_10  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_11  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_12  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_13  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_14  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_15  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_16  |floatformat:"0" }}</th>
-                                                      <th class='table-success'>{{ summary.in_total |floatformat:"0" }}</th>
-                                                      <th>{{ summary.rail_ng |floatformat:"0" }}</th>
-                                                      <th></th>
-                                                    </tr>
-                                                    <tr class="separator">
-                                                      <td colspan="18" class="separator"></td>
-                                                    </tr>
-                                                    <tr>
-                                                      <th colspan="5" rowspan=2>林口倉庫數量</th>
-                                                      <th>5M</th>
-                                                      <th>6M</th>
-                                                      <th>7M</th>
-                                                      <th>8M</th>
-                                                      <th>9M</th>
-                                                      <th>10M</th>
-                                                      <th>11M</th>
-                                                      <th>12M</th>
-                                                      <th>13M</th>
-                                                      <th>14M</th>
-                                                      <th>15M</th>
-                                                      <th>16M</th>
-                                                      <th>總支數</th>
-                                                    </tr>
-                                                    <tr>
-                                                      <td>{{ lk_report.in_5  |floatformat:"0" }}</td>
-                                                      <td>{{ lk_report.in_6  |floatformat:"0" }}</td>
-                                                      <td>{{ lk_report.in_7  |floatformat:"0" }}</td>
-                                                      <td>{{ lk_report.in_8  |floatformat:"0" }}</td>
-                                                      <td>{{ lk_report.in_9  |floatformat:"0" }}</td>
-                                                      <td>{{ lk_report.in_10 |floatformat:"0" }}</td>
-                                                      <td>{{ lk_report.in_11 |floatformat:"0" }}</td>
-                                                      <td>{{ lk_report.in_12 |floatformat:"0" }}</td>
-                                                      <td>{{ lk_report.in_13 |floatformat:"0" }}</td>
-                                                      <td>{{ lk_report.in_14 |floatformat:"0" }}</td>
-                                                      <td>{{ lk_report.in_15 |floatformat:"0" }}</td>
-                                                      <td>{{ lk_report.in_16 |floatformat:"0" }}</td>
-                                                      <td>{{ lk_report.in_total|floatformat:"0" }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                      <th colspan="5" rowspan=2>國廣總數量</th>
-                                                      <th>5M</th>
-                                                      <th>6M</th>
-                                                      <th>7M</th>
-                                                      <th>8M</th>
-                                                      <th>9M</th>
-                                                      <th>10M</th>
-                                                      <th>11M</th>
-                                                      <th>12M</th>
-                                                      <th>13M</th>
-                                                      <th>14M</th>
-                                                      <th>15M</th>
-                                                      <th>16M</th>
-                                                      <th>總支數</th>
-                                                    </tr>
-                                                    <tr>
-                                                      <td>{{ total_report.in_5  |floatformat:"0" }}</td>
-                                                      <td>{{ total_report.in_6  |floatformat:"0" }}</td>
-                                                      <td>{{ total_report.in_7  |floatformat:"0" }}</td>
-                                                      <td>{{ total_report.in_8  |floatformat:"0" }}</td>
-                                                      <td>{{ total_report.in_9  |floatformat:"0" }}</td>
-                                                      <td>{{ total_report.in_10 |floatformat:"0" }}</td>
-                                                      <td>{{ total_report.in_11 |floatformat:"0" }}</td>
-                                                      <td>{{ total_report.in_12 |floatformat:"0" }}</td>
-                                                      <td>{{ total_report.in_13 |floatformat:"0" }}</td>
-                                                      <td>{{ total_report.in_14 |floatformat:"0" }}</td>
-                                                      <td>{{ total_report.in_15 |floatformat:"0" }}</td>
-                                                      <td>{{ total_report.in_16 |floatformat:"0" }}</td>
-                                                      <td>{{ total_report.in_total |floatformat:"0" }}</td>
-                                                    </tr>
-                                                  {% endblock %}
+      </td>
+      <td class='table-danger'>
+        {% if item.out_6 != 0 %}{{ item.out_6 |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-danger'>
+        {% if item.out_7 != 0 %}{{ item.out_7 |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-danger'>
+        {% if item.out_8 != 0 %}{{ item.out_8 |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-danger'>
+        {% if item.out_9 != 0 %}{{ item.out_9 |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-danger'>
+        {% if item.out_10 != 0 %}{{ item.out_10 |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-danger'>
+        {% if item.out_11 != 0 %}{{ item.out_11 |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-danger'>
+        {% if item.out_12 != 0 %}{{ item.out_12 |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-danger'>
+        {% if item.out_13 != 0 %}{{ item.out_13 |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-danger'>
+        {% if item.out_14 != 0 %}{{ item.out_14 |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-danger'>
+        {% if item.out_15 != 0 %}{{ item.out_15 |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-danger'>
+        {% if item.out_16 != 0 %}{{ item.out_16 |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-danger'>{{ item.out_total  |floatformat:"0" }}</td>
+      <td class='table-success'>
+        {% if item.in_5 != 0 %}{{ item.in_5  |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-success'>
+        {% if item.in_6 != 0 %}{{ item.in_6  |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-success'>
+        {% if item.in_7 != 0 %}{{ item.in_7  |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-success'>
+        {% if item.in_8 != 0 %}{{ item.in_8  |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-success'>
+        {% if item.in_9 != 0 %}{{ item.in_9  |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-success'>
+        {% if item.in_10 != 0 %}{{ item.in_10  |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-success'>
+        {% if item.in_11 != 0 %}{{ item.in_11  |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-success'>
+        {% if item.in_12 != 0 %}{{ item.in_12  |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-success'>
+        {% if item.in_13 != 0 %}{{ item.in_13  |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-success'>
+        {% if item.in_14 != 0 %}{{ item.in_14  |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-success'>
+        {% if item.in_15 != 0 %}{{ item.in_15  |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-success'>
+        {% if item.in_16 != 0 %}{{ item.in_16  |floatformat:"0" }}{% endif %}
+      </td>
+      <td class='table-success'>{{ item.in_total |floatformat:"0" }}</td>
+      <td>
+        {% if item.rail_ng != 0 %}{{ item.rail_ng |floatformat:"0" }}{% endif %}
+      </td>
+      <td>
+        <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a>
+      </td>
+    </tr>
+  {% endfor %}
+  <tr>
+    <th colspan="5">工地出入總計</th>
+    <th class='table-danger'>{{ summary.out_5 |floatformat:"0" }}</th>
+    <th class='table-danger'>{{ summary.out_6 |floatformat:"0" }}</th>
+    <th class='table-danger'>{{ summary.out_7 |floatformat:"0" }}</th>
+    <th class='table-danger'>{{ summary.out_8 |floatformat:"0" }}</th>
+    <th class='table-danger'>{{ summary.out_9 |floatformat:"0" }}</th>
+    <th class='table-danger'>{{ summary.out_10 |floatformat:"0" }}</th>
+    <th class='table-danger'>{{ summary.out_11 |floatformat:"0" }}</th>
+    <th class='table-danger'>{{ summary.out_12 |floatformat:"0" }}</th>
+    <th class='table-danger'>{{ summary.out_13 |floatformat:"0" }}</th>
+    <th class='table-danger'>{{ summary.out_14 |floatformat:"0" }}</th>
+    <th class='table-danger'>{{ summary.out_15 |floatformat:"0" }}</th>
+    <th class='table-danger'>{{ summary.out_16 |floatformat:"0" }}</th>
+    <th class='table-danger'>{{ summary.out_total  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_5  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_6  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_7  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_8  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_9  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_10  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_11  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_12  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_13  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_14  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_15  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_16  |floatformat:"0" }}</th>
+    <th class='table-success'>{{ summary.in_total |floatformat:"0" }}</th>
+    <th>{{ summary.rail_ng |floatformat:"0" }}</th>
+    <th></th>
+  </tr>
+  <tr class="separator">
+    <td colspan="18" class="separator"></td>
+  </tr>
+  <tr>
+    <th colspan="5" rowspan=2>林口倉庫數量</th>
+    <th>5M</th>
+    <th>6M</th>
+    <th>7M</th>
+    <th>8M</th>
+    <th>9M</th>
+    <th>10M</th>
+    <th>11M</th>
+    <th>12M</th>
+    <th>13M</th>
+    <th>14M</th>
+    <th>15M</th>
+    <th>16M</th>
+    <th>總支數</th>
+  </tr>
+  <tr>
+    <td>{{ lk_report.in_5  |floatformat:"0" }}</td>
+    <td>{{ lk_report.in_6  |floatformat:"0" }}</td>
+    <td>{{ lk_report.in_7  |floatformat:"0" }}</td>
+    <td>{{ lk_report.in_8  |floatformat:"0" }}</td>
+    <td>{{ lk_report.in_9  |floatformat:"0" }}</td>
+    <td>{{ lk_report.in_10 |floatformat:"0" }}</td>
+    <td>{{ lk_report.in_11 |floatformat:"0" }}</td>
+    <td>{{ lk_report.in_12 |floatformat:"0" }}</td>
+    <td>{{ lk_report.in_13 |floatformat:"0" }}</td>
+    <td>{{ lk_report.in_14 |floatformat:"0" }}</td>
+    <td>{{ lk_report.in_15 |floatformat:"0" }}</td>
+    <td>{{ lk_report.in_16 |floatformat:"0" }}</td>
+    <td>{{ lk_report.in_total|floatformat:"0" }}</td>
+  </tr>
+  <tr>
+    <th colspan="5" rowspan=2>國廣總數量</th>
+    <th>5M</th>
+    <th>6M</th>
+    <th>7M</th>
+    <th>8M</th>
+    <th>9M</th>
+    <th>10M</th>
+    <th>11M</th>
+    <th>12M</th>
+    <th>13M</th>
+    <th>14M</th>
+    <th>15M</th>
+    <th>16M</th>
+    <th>總支數</th>
+  </tr>
+  <tr>
+    <td>{{ total_report.in_5  |floatformat:"0" }}</td>
+    <td>{{ total_report.in_6  |floatformat:"0" }}</td>
+    <td>{{ total_report.in_7  |floatformat:"0" }}</td>
+    <td>{{ total_report.in_8  |floatformat:"0" }}</td>
+    <td>{{ total_report.in_9  |floatformat:"0" }}</td>
+    <td>{{ total_report.in_10 |floatformat:"0" }}</td>
+    <td>{{ total_report.in_11 |floatformat:"0" }}</td>
+    <td>{{ total_report.in_12 |floatformat:"0" }}</td>
+    <td>{{ total_report.in_13 |floatformat:"0" }}</td>
+    <td>{{ total_report.in_14 |floatformat:"0" }}</td>
+    <td>{{ total_report.in_15 |floatformat:"0" }}</td>
+    <td>{{ total_report.in_16 |floatformat:"0" }}</td>
+    <td>{{ total_report.in_total |floatformat:"0" }}</td>
+  </tr>
+{% endblock %}

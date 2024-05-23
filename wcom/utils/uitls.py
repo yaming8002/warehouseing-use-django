@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import re
 
 def excel_value_to_str(code,desired_length=None):
     if code is None :
@@ -55,3 +56,11 @@ def get_before_year_month(year=None,month=None):
         year -= 1
         month =12
     return year,month
+
+
+def is_whse_code(s):
+    pattern = r'^[A-Z][0-9]{6}$'
+    if re.match(pattern, s):
+        return True
+    else:
+        return False

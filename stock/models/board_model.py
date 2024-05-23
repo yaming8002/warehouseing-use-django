@@ -102,7 +102,7 @@ class BoardReport(MonthReport):
             .order_by("-year", "-month")
             .values("id", "siteinfo__id")
         )
-        print(query_set.query)
+        # print(query_set.query)
         ids = [item["id"] for item in query_set]
         
         return (
@@ -115,38 +115,33 @@ class BoardReport(MonthReport):
 
     @classmethod
     def update_column_value_by_before(cls, site: SiteInfo, year: int, month: int, is_add: bool, column: str, value: Decimal):
-        # Get the previous year and month
-        b_year, b_month = get_before_year_month(year, month)
         find_code = '22' if column =='2205' else column
-        before = cls.get_site_matial(site,find_code, b_year, b_month)
-        now = cls.get_site_matial(site,find_code, year, month)
-        # Retrieve the records for the previous and current periods
-        if now is None:
-            now = cls(
-                siteinfo=site,
-                year=year,
-                month=month,
-            )
-        # Set material codes based on conditions
-        if column in ['22', '2205']:
-            now.mat_code = '22'
-            now.mat_code2 = '2205'
-        else:
-            now.mat_code = column
-            now.mat_code2 = None
-
-        # Choose the right quantity field based on column and adjust its value
         target_field = 'quantity2' if column == '2205' else 'quantity'
-        previous_quantity = getattr(before, target_field,0) 
+
+        now = cls.get_site_matial(site,find_code, year, month)
+        update_value = Decimal(0)
+        b_year,b_month=get_before_year_month(year, month)
+        query = Q(siteinfo=site)&Q(year=b_year)&Q(month=b_month )&Q(mat_code=find_code)
+        if site.id < 4 :
+            query &=Q(is_done=False)
+
+        if cls.objects.filter(query).exists():
+            before = cls.objects.get(query)
+            update_value =Decimal( getattr(before,target_field,0) )
+ 
+        if now is None:
+            now = cls.objects.create(
+                siteinfo=site,year=year,month=month ,mat_code=find_code
+            )
+        if column in ['22', '2205']:
+             now.mat_code2 = '2205'
+
         change = value if is_add else -value
-        print(f"{now.quantity} + {change} = {Decimal(previous_quantity) + change}")
-
-        new_quantity = Decimal(previous_quantity) + change
-
-        # Set the updated quantity
-        setattr(now, target_field, new_quantity)
-        print(f"{now.quantity} += {change}")
-        # Save the updated record
+        if site.code=='1495':
+            print( update_value)
+            print( value)
+            print( update_value + change)
+        setattr(now, target_field, update_value + change)
         now.save()
 
     @classmethod
@@ -164,7 +159,7 @@ class BoardReport(MonthReport):
             return
 
         report = cls.get_board_report(site, mat)
-        whse = cls.get_board_report(SiteInfo.objects.get(code="0001"), mat)
+        whse = cls.get_board_report(SiteInfo.get_site_by_code("0001"), mat)
         code_str = "quantity2" if mat.mat_code == "2205" else "quantity"
 
         cls.update_column_value(report.id, not is_in, code_str, all_quantity)

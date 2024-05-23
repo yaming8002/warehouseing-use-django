@@ -44,15 +44,14 @@ class StockView(PageListView):
             mat_obj = mat_obj.filter(name__istartswith=name)
         if category_id:
             mat_obj = mat_obj.filter(category=category_id)
-
-        result = stock_obj.filter(material__in=mat_obj,siteinfo__in=site_obj) # inner join
+        stock_obj.filter(material__in=mat_obj,siteinfo__in=site_obj,quantity__lt=0).update(quantity=0)
+        result = stock_obj.filter(material__in=mat_obj,siteinfo__in=site_obj,quantity__gt=0) # inner join
         return result.all()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["categorys"] = MatCat.objects.all()
         context["siteInfos"] = SiteInfo.objects.filter(genre=0).all()
-
         return context
     
 def getMatrtialData(request):

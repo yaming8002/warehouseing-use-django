@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Any, Dict, List
 from django.db import models
 from django.db.models.functions import Coalesce
-from django.db.models import Case, F, Sum, Value, When
+from django.db.models import Q, F, Sum, Value, When
 from django.shortcuts import render
 
 from stock.models.material_model import Materials
@@ -200,7 +200,7 @@ def build_component_table(constn, level, map_list) -> Dict[str, Dict[str, any]]:
     transdefaullog = TransLogDetail.objects.filter(translog__in=translog)
 
     steel_map = dict()
-
+    level +=1
     for mat_code, name in map_list.items():
         steel_map[name] = {}
         tr_list: List[List[Any]] = [[] for _ in range(level * 2)]
@@ -212,9 +212,16 @@ def build_component_table(constn, level, map_list) -> Dict[str, Dict[str, any]]:
             "unit_out": Decimal(0),
         }
 
+
         for seat in range(level):
+            query= Q(material__mat_code=mat_code)
+            if seat==0:
+                query &= (Q(level = seat) | Q(level__isnull=True) )
+            else:
+                query &= Q(level = seat) 
+
             total_quantity_and_unit = (
-                transdefaullog.filter(material__mat_code=mat_code, level=(seat + 1))
+                transdefaullog.filter(query)
                 .values(**values_dict)
                 .annotate(
                     total_quantity=Sum("quantity"),
@@ -232,16 +239,16 @@ def build_component_table(constn, level, map_list) -> Dict[str, Dict[str, any]]:
                 else:
                     tr_list[site_out].append(item)
                     summary["count_out"] += Decimal(item["total_quantity"])
+
             max_length = max(max_length, len(tr_list[site_in]), len(tr_list[site_out]))
 
         summary["diff_count"] = summary["count_in"] - summary["count_out"]
-        summary["max_length"] = max_length + 1
+        summary["max_length"] = max_length +1
         steel_map[name]["summary"] = summary
-        steel_map[name]["max_length"] = max_length + 2
+        steel_map[name]["max_length"] = max_length + 1
         steel_map[name]["table"] = transpose_list_of_lists(tr_list)
         steel_map[name]["level_summary"] = level_summary_of_lists(tr_list)
-        # print(steel_map[name]["table"] )
-        # print(f"name:{name},max:{max_length}")
+     
     return steel_map
 
 

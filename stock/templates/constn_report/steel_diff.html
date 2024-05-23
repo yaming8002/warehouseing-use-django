@@ -20,14 +20,34 @@
           fileName: fileName // Using the captured file name
         });
       });
+      $('#search').on('submit', function() {
+        var code = $('#code').val().trim();
+        var owner = $('#owner').val().trim();
+        var name = $('#name').val().trim();
+
+        if (code.length > 0) {
+            return true;
+        }
+
+        if (owner.length > 0 && name.length > 0) {
+            return true;
+        }
+
+        alert('請填寫工地編號，或同時填寫業主和姓名！');
+        return false;
     });
+
+    });
+
   </script>
 {% endblock %}
 {% block styles %}{% endblock %}
 {% block form %}
   {% load strmap %}
   <!-- Corrected form tag and added trailing slash to action attribute -->
-  <form id="search" action="/constn/constn_diff/" method="POST">
+  <form id="search"
+        action="/constn/constn_diff/"
+        method="POST">
     {% csrf_token %}
     <p>
       <label for="code">工地編號</label>
@@ -42,7 +62,9 @@
   </form>
 {% endblock %}
 {% block table %}
-  <caption><h3>[{{ constn.code }}]{{ constn.owner }}--{{ constn.name }}-差異表</h3></caption>
+  <caption>
+    <h3>[{{ constn.code }}]{{ constn.owner }}--{{ constn.name }}-差異表</h3>
+  </caption>
   <!--{{steel_pile_table }}-->
   <tbody>
     <tr>

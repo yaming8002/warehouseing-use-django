@@ -148,9 +148,9 @@
     <th>{{ befote_total_report.m_408 }}</th>
     <th>{{ befote_total_report.m_414 }}</th>
     <th>{{ befote_total_report.m_4141 }}</th>
-    <th>{{ befote_total_report.m_11 |floatformat:"0" }}</th>
+    <th>{{ befote_total_report.m_92 |floatformat:"0" }}</th>
+    <th>{{ befote_total_report.m_12 |floatformat:"0" }}</th>
     <th>{{ befote_total_report.m_13 |floatformat:"0" }}</th>
-    <th>{{ befote_total_report.m_14 |floatformat:"0" }}</th>
     
   </tr>
   {% load strmap %}
@@ -176,8 +176,8 @@
       <td>{% if item.m_408 != 0 %}{{ item.m_408 }}{% endif%}</td>
       <td>{% if item.m_414 != 0 %}{{ item.m_414 }}{% endif%}</td>
       <td>{% if item.m_4141 != 0 %}{{ item.m_4141 }}{% endif%}</td>
-      <td>{% if item.m_11 != 0 %}{{ item.m_11 |floatformat:"0" }}{% endif%}</td>
-      <td>{% if item.m_13 != 0 %}{{ item.m_13 |floatformat:"0" }}{% endif%}</td>
+      <td>{% if item.m_92 != 0 %}{{ item.m_92 |floatformat:"0" }}{% endif%}</td>
+      <td>{% if item.m_12 != 0 %}{{ item.m_12 |floatformat:"0" }}{% endif%}</td>
       <td>{% if item.m_13 != 0 %}{{ item.m_13 |floatformat:"0" }}{% endif%}</td>
       <td colspan='6' style="text-align:left" >{% if item.remark %}{{ item.remark }}<br>{% endif %}
         {% if item.turn_site_id %}目的地:[{{item.turn_site.code}}]{{item.turn_site.owner}}{% endif %}
@@ -196,9 +196,9 @@
     <th>{{ total_report.m_408 }}</th>
     <th>{{ total_report.m_414 }}</th>
     <th>{{ total_report.m_4141 }}</th>
-    <th>{{ total_report.m_11 |floatformat:"0" }}</th>
+    <th>{{ total_report.m_92 |floatformat:"0" }}</th>
+    <th>{{ total_report.m_12 |floatformat:"0" }}</th>
     <th>{{ total_report.m_13 |floatformat:"0" }}</th>
-    <th>{{ total_report.m_14 |floatformat:"0" }}</th>
     <th colspan='6'></th>
     <th ></th>
   </tr>

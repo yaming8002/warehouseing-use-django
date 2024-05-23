@@ -8,8 +8,8 @@ from django.http import JsonResponse
 from django.shortcuts import render
 
 from stock.models import SteelReport
+from stock.models.done_steel_model import DoneSteelReport
 from stock.models.site_model import SiteInfo
-from stock.models.steel_model import DoneSteelReport
 from stock.models.steel_pillar import SteelPillar
 from wcom.utils import MonthListView
 
@@ -131,7 +131,7 @@ def get_steel_edit_done(request):
 def steel_done_withdraw(request):
     if request.method == 'GET':
         report_id = request.GET.get('id') 
-        print(report_id)
+        # print(report_id)
         report = DoneSteelReport.objects.select_related('siteinfo').get(id=report_id)
         site= report.siteinfo
         site.rail_done = False

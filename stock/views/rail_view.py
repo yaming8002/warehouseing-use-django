@@ -87,7 +87,7 @@ def get_rail_edit_done(request):
         RailReport.objects.filter(q).delete()
 
         if report.is_done:
-            rail_update__total(report,False)
+            rail_update__total(report,False,year,month)
         context = {'msg':"成功"}
         return JsonResponse(context)
 
@@ -111,30 +111,28 @@ def rail_done_withdraw(request):
     if request.method == 'GET':
         # site_id = request.GET.get('site_id') 
         id = request.GET.get('id') 
-        print(id)
         report = RailReport.objects.get(id=id)
         report.is_done = False
         report.siteinfo.is_rail_done = False
         report.siteinfo.save()
-        rail_update__total(report,True)
+        rail_update__total(report,True,report.year,report.month )
         report.save()
         context={'msg':"成功退回"}
         return JsonResponse(context)
 
 
-def rail_update__total(report:RailReport,is_withdraw: bool):
+def rail_update__total(report:RailReport,is_withdraw: bool , year,month):
     if report.siteinfo.id < 3:
         return
     
-    year,month = get_year_month()
-    total = RailReport.get_current_by_site(SiteInfo.get_site_by_code('0000'),year=year,month=month)
-
-    for i in range(5, 17):
-        update_value = getattr(report, f'out_{i}') - getattr(report, f'in_{i}')
-        update_value *= 1 if is_withdraw else -1
-        update_value = Decimal(f'{update_value:.2f}')
-        setattr(total, f'in_{i}', getattr(total, f'in_{i}') + update_value)
-    total_total =getattr(report, "out_total") - getattr(report, "in_total") 
-    total_total = 1 if is_withdraw else -1
-    total.in_total += total_total if is_withdraw else -total_total
-    total.save() 
+    total_list = RailReport.objects.filter(siteinfo =SiteInfo.get_site_by_code('0000'),year__gte=year,month__gte=month).all()
+    for total in total_list :
+        for i in range(5, 17):
+            update_value =   getattr(report, f'out_{i}') - getattr(report, f'in_{i}')
+            update_value = Decimal(f'{update_value:.2f}')
+            update_value = update_value if is_withdraw  else -1*update_value
+            setattr(total, f'in_{i}', getattr(total, f'in_{i}') + update_value)
+        report_total =  report.out_total -report.in_total
+        report_total = report_total if is_withdraw  else -1*report_total
+        total.in_total += report_total
+        total.save() 

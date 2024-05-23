@@ -18,6 +18,16 @@
         "caption-side": "top"
       });
 
+      $("#control_list").click(function() {
+        var checklist = $('#check_list');
+        if (checklist.css('display') === 'none' || !checklist.css('display')) {
+            checklist.show();
+            $(this).val('收起');
+        } else {
+            checklist.hide();
+            $(this).val('展开');
+        }
+    });
 
     });
 
@@ -52,16 +62,27 @@
         fileName: fileName // Using the captured file name
       });
     });
+
+    $('#search').on('submit', function() {
+      var code = $('#code').val().trim();
+      var owner = $('#owner').val().trim();
+      var name = $('#name').val().trim();
+
+      if (code.length > 0) {
+          return true;
+      }
+
+      if (owner.length > 0 && name.length > 0) {
+          return true;
+      }
+
+      alert('請填寫工地編號，或同時填寫業主和姓名！');
+      return false;
   });
 
-  function showchecklist() {
-    if ($("#check_list").is(':visible')) {
-      $("#check_list").hide()
-    } else {
-      $("#check_list").show()
-    }
+  });
 
-  }
+
   </script>
 {% endblock %}
 {% block form %}
@@ -81,49 +102,54 @@
       <label for="level">層數</label>
       <select id="level" name="level">
         {% get_level as levels %}
-        {% for level in levels %}<option value="{{ level.0 }}"  {% if table_level == level.0 %} selected {% endif %} >{{ level.1 }}</option>{% endfor %}
+        {% for level in levels %}
+          <option value="{{ level.0 }}"
+                  {% if table_level == level.0 %}selected{% endif %}>{{ level.1 }}</option>
+        {% endfor %}
       </select>
-    </p>
-    <p>
+
       <input type="checkbox"
              class="form-check-input"
              id="check_all"
              name="is_all"
              {% if request.POST.is_all or request.method == 'GET' %}checked{% endif %}>
-      <label for="check_all">全選</label>
-      <div id="check_list">
-        <table style="border: none;">
+      <label for="check_all">所有配件</label>
+      <input type="button" id="control_list" value="展开">
+    </p>
+    <p>
+      <div id="check_list" style="display:none;">
+        <table>
           {% for mat in mat_tree %}
-          <tr>
-          <td>
-              <input type="checkbox"
-              class="form-check-input box_items "
-              id="group_{{ mat.topic }}"
-              value="{{ mat.topic }}"
-              name="{{ mat.topic }}"
-              {% if mat.topic in request.POST or request.method == 'GET' %}checked{% endif %}>
-          <label class="form-check-label" for="{{ item.key }}">{{ mat.name }}</label>
-          </td>
-          </tr>
-          <tr>
-            <td></td>
-            {% for item in mat.mat_list %}
+            <tr>
               <td>
                 <input type="checkbox"
-                       class="form-check-input box_items class_{{ mat.topic }} "
-                       id="{{ item.key }}"
-                       name="selected_items"
-                       value="{{ item.key }}"
-                       {% if item.key in selected_items or request.method == 'GET' %}checked{% endif %}>
-                <label class="form-check-label" for="{{ item.key }}">{{ item.value }}</label>
+                       class="form-check-input box_items "
+                       id="group_{{ mat.topic }}"
+                       value="{{ mat.topic }}"
+                       name="{{ mat.topic }}"
+                       {% if mat.topic in request.POST or request.method == 'GET' %}checked{% endif %}>
+                <label class="form-check-label" for="{{ item.key }}">{{ mat.name }}</label>
               </td>
-              {% if forloop.counter|divisibleby:8 and not forloop.last %}
-              </tr>
-              <tr>
-                <td></td>
-              {% endif %}
-            {% endfor %}
-          </tr>
+            </tr>
+            <tr>
+              <td></td>
+              {% for item in mat.mat_list %}
+                <td>
+                  <input type="checkbox"
+                         class="form-check-input box_items class_{{ mat.topic }} "
+                         id="{{ item.key }}"
+                         name="selected_items"
+                         value="{{ item.key }}"
+                         {% if item.key in selected_items or request.method == 'GET' %}checked{% endif %}>
+                  <label class="form-check-label" for="{{ item.key }}">{{ item.value }}</label>
+                </td>
+                {% if forloop.counter|divisibleby:8 and not forloop.last %}
+                </tr>
+                <tr>
+                  <td></td>
+                {% endif %}
+              {% endfor %}
+            </tr>
           {% endfor %}
         </table>
       </div>
@@ -134,14 +160,14 @@
 {% endblock %}
 {% block table %}
   <caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}-配件</caption>
- 
   {% for key, tran_map in steel_pile_table.items %}
-    {% if tran_map.max_length > 2 %}
+    {% if tran_map.max_length > 1 %}
       <tr>
         <th class="s2" dir="ltr">規格:</th>
-        {% get_level as levels %}
+        {% get_level_all as levels %}
         {% for level in levels %}
           {% if level.0 <= table_level %}
+            <!--{{level}}-->
             <th class="s3 table-danger"
                 dir="ltr"
                 colspan="5"
@@ -152,10 +178,7 @@
                 style="border-left: 1px solid black">{{ level.1 }}入料</th>
           {% endif %}
         {% endfor %}
-        <th class="s4"
-            dir="ltr"
-            colspan="3"
-            style="border-left: 1px solid black">合計</th>
+        <th class="s4" dir="ltr" colspan="3" style="border-left: 1px solid black">合計</th>
       </tr>
       {% load custom_filters %}
       <tbody>
@@ -194,9 +217,9 @@
                   </td>
                   <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.code }}</td>
                   {% if tr_count == 1 %}
-                  <td rowspan="{{ tran_map.summary.max_length }}"  class="table-secondary">
-                    {{ tran_map.level_summary|list_index_value:forloop.counter }}
-                  </td>
+                    <td rowspan="{{ tran_map.summary.max_length }}"  class="table-secondary">
+                      {{ tran_map.level_summary|list_index_value:forloop.counter }}
+                    </td>
                   {% endif %}
                   <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.remake }}</td>
                 {% else %}
@@ -204,9 +227,9 @@
                   <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
                   <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
                   {% if tr_count == 1 %}
-                  <td rowspan="{{ tran_map.summary.max_length }}"  class="table-secondary">
-                    {{ tran_map.level_summary|list_index_value:forloop.counter }}
-                  </td>
+                    <td rowspan="{{ tran_map.summary.max_length }}"  class="table-secondary">
+                      {{ tran_map.level_summary|list_index_value:forloop.counter }}
+                    </td>
                   {% endif %}
                   <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
                 {% endif %}
@@ -216,9 +239,9 @@
                 <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.count_in|floatformat:"2" }}</th>
                 <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_count |floatformat:"2" }}</th>
               {% endif %}
-              {% endwith %}
-            </tr>
-          {% endfor %}
+            {% endwith %}
+          </tr>
+        {% endfor %}
       </tbody>
     {% endif %}
   {% endfor %}

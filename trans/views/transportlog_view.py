@@ -16,7 +16,7 @@ from stock.models.material_model import MatCat, Materials
 from stock.models.site_model import SiteInfo
 # from trans.forms import TransLogDetailForm
 from trans.models import TransLog, TransLogDetail
-from trans.service.update_report import (update_board_by_month, update_rail_by_month, update_steel_by_month)
+from trans.service.update_report import (update_board_by_month, update_done_steel_by_month, update_rail_by_month, update_steel_by_month)
 from wcom.models.menu import SysInfo
 from wcom.utils.excel_tool import ImportData2Generic
 from wcom.utils.pagelist import PageListView
@@ -55,11 +55,11 @@ class TrandportView(PageListView):
         if begin and end:
             log = log.filter(build_date__range=[begin, end])
         if code:
-            log = log.filter(code__istartswith=code)
+            log = log.filter(code__iendswith=code)
         if tran_type:
             log = log.filter(transaction_type=tran_type)
         if constn_id:
-            log = log.filter(constn_site__id=constn_id)
+            log = log.filter(constn_site__code=constn_id)
         if constn_name:
             log = log.filter(constn_site__name__istartswith=constn_name)
         if car_firm:
@@ -190,6 +190,7 @@ class ImportTransportView(ImportData2Generic):
                 tran = TransLog.create(code=trancode, item=item)
 
                 if mat_code and mat_code != "":
+                    # print(item)
                     TransLogDetail.create(tran, item, is_rent=False)
 
             except Exception as e:
@@ -340,6 +341,7 @@ def update_end_date(request):
     update_rail_by_month(count_date)
     update_steel_by_month(count_date)
     update_board_by_month(count_date)
+    update_done_steel_by_month(count_date)
     response_data = {
         "success": True,
         "msg": "上傳成功",
@@ -372,7 +374,7 @@ def trans_detial_rollback_view(request):
     end_day.value = (
         f"{five_days_before.year}/{five_days_before.month}/{five_days_before.day}"
     )
-    print(end_day.value)
+
     end_day.save()
     response_data = {
         "success": True,

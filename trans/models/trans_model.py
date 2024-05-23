@@ -4,17 +4,18 @@ from django.db import models
 from datetime import datetime
 from django.db.models import Q
 from stock.models.board_model import BoardReport
+from stock.models.done_steel_model import DoneSteelReport
 from stock.models.material_model import Materials
 from stock.models.rail_model import RailReport
 from stock.models.site_model import SiteInfo
-from stock.models.steel_model import DoneSteelReport, SteelReport
+from stock.models.steel_model import SteelReport
 from stock.models.stock_model import Stock
 from trans.models.car_model import CarInfo
 from wcom.utils.uitls import excel_num_to_date, excel_value_to_str, get_month_range
 
 
 class TransLog(models.Model):
-    code = models.CharField(max_length=20)
+    code = models.CharField(max_length=100)
     constn_site = models.ForeignKey(
         SiteInfo,
         related_name="transport_site",
@@ -44,9 +45,9 @@ class TransLog(models.Model):
         consite = excel_value_to_str(item[2], 4)
         turn_site = excel_value_to_str(item[3], 4)
 
-        consite = SiteInfo.objects.get(code=consite)
+        consite = SiteInfo.get_site_by_code(consite)
         if turn_site is not None:
-            turn_site = SiteInfo.objects.get(code=turn_site)
+            turn_site = SiteInfo.get_site_by_code(turn_site)
 
         transaction_type = "IN" if item[15] is not None and item[15] > 0 else "OUT"
 
@@ -164,9 +165,9 @@ class TransLogDetail(models.Model):
             obj.save(update_fields=['quantity', 'all_quantity', 'all_unit', 'remark'])
 
 
-        # is_stock_add = tran.transaction_type == "IN"
-        # Stock.move_material(tran.constn_site ,mat, quantity, all_unit, is_stock_add)
-
+        is_stock_add = tran.transaction_type == "IN"
+        Stock.move_material(tran.constn_site ,mat, quantity, all_unit, not is_stock_add)
+        Stock.move_material(SiteInfo.get_site_by_code('0001') ,mat, quantity, all_unit, is_stock_add)
         # if DoneSteelReport.add_new_mat( tran.constn_site, tran.turn_site, tran.build_date, is_stock_add, mat, quantity, all_unit ,remark ):
         #     """if this case not new material"""
         #     Stock.move_material( tran.constn_site, mat, quantity, all_unit, not is_stock_add )

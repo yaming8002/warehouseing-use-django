@@ -19,23 +19,43 @@
           fileName: fileName // Using the captured file name
         });
       });
+      $('#search').on('submit', function() {
+        var code = $('#code').val().trim();
+        var owner = $('#owner').val().trim();
+        var name = $('#name').val().trim();
+
+        if (code.length > 0) {
+            return true;
+        }
+
+        if (owner.length > 0 && name.length > 0) {
+            return true;
+        }
+
+        alert('請填寫工地編號，或同時填寫業主和姓名！');
+        return false;
     });
+
+    });
+
+
   </script>
 {% endblock %}
 {% block form %}
   {% load strmap %}
   <!-- Corrected form tag and added trailing slash to action attribute -->
-  <form id="search" action="/constn/pile/" method="GET">
+  <form id="search"
+        action="/constn/pile/"
+        method="POST" >
     {% csrf_token %}
     <p>
       <label for="code">工地編號</label>
-      <input type="text" id="code" name="code" value ="{{ request.GET.code }}" />
+      <input type="text" id="code" name="code" value ="{{ request.POST.code }}" />
       <label for="owner">業主</label>
-      <input type="text" id="owner" name="owner" value="{{ request.GET.owner }}" />
+      <input type="text" id="owner" name="owner" value="{{ request.POST.owner }}" />
       <label for="name">名稱</label>
-      <input type="text" id="name" name="name" value="{{ request.GET.name }}" />
+      <input type="text" id="name" name="name" value="{{ request.POST.name }}" />
     </p>
-
     <input type="submit" value="查詢" />
     <input type="button" id="exceloutput" value="匯出EXCEL" />
   </form>
@@ -46,91 +66,26 @@
   <tbody>
     <tr>
       <th rowspan="2">規格:</th>
-      <th colspan="5" class="table-danger" >出料</th>
-      <th colspan="5" class="table-success" >入料</th>
-      <th rowspan="2" >支差異</th>
-      <th rowspan="2" >M差異</th>
+      <th colspan="5" class="table-danger">出料</th>
+      <th colspan="5" class="table-success">入料</th>
+      <th rowspan="2">支差異</th>
+      <th rowspan="2">M差異</th>
     </tr>
     <tr style="height: 20px">
-        <th class="table-danger" >日期</th>
-        <th class="table-danger">支</th>
-        <th class="table-danger">合計M</th>
-        <th class="table-danger">單號</th>
-        <th class="table-danger">備註</th>
-        <th class="table-success">日期</th>
-        <th class="table-success">支</th>
-        <th class="table-success">合計M</th>
-        <th class="table-success">單號</th>
-        <th class="table-success">備註</th>
+      <th class="table-danger">日期</th>
+      <th class="table-danger">支</th>
+      <th class="table-danger">合計M</th>
+      <th class="table-danger">單號</th>
+      <th class="table-danger">備註</th>
+      <th class="table-success">日期</th>
+      <th class="table-success">支</th>
+      <th class="table-success">合計M</th>
+      <th class="table-success">單號</th>
+      <th class="table-success">備註</th>
     </tr>
     {% for key, tran_map in steel_pile_table.items %}
-     {% if tran_map.max_length > 2 %}
-      <tr style=" border-top: 2px solid #000;" >
-        <th class="s5"
-            dir="ltr"
-            rowspan="{{ tran_map.max_length }}"
-            style="vertical-align: middle">{{ key }} </th>
-      </tr>
-      {% for row in tran_map.table %}
-        <tr style="height: 20px">
-          {% for item in row %}
-            {% if item %}
-              <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.build_date | date:"Y/m/d" }}</td>
-              <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.total_quantity |floatformat:"2" }}</td>
-              <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.total_unit |floatformat:"2" }}</td>
-              <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.code }}</td>
-              <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.remake }}</td>
-            {% else %}
-              <td  {% if forloop.counter == 2  %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-              <td  {% if forloop.counter == 2  %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-              <td  {% if forloop.counter == 2  %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-              <td  {% if forloop.counter == 2  %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-              <td  {% if forloop.counter == 2  %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-            {% endif %}
-          {% endfor %}
-          {% if forloop.first %}
-            <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_count |floatformat:"2" }}</th>
-            <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_unit |floatformat:"2" }}</th>
-          {% endif %}
-        </tr>
-      {% endfor %}
-      <tr style="height: 20px">
-        {% for row in tran_map.level_summary %}
-          <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}' > 總計:</th>
-          <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'>{{ row.count |floatformat:"2" }}</th>
-          <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'>{{ row.unit |floatformat:"2" }}</th>
-          <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'></th>
-          <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'></th>
-        {% endfor %}
-        {% if not tran_map.table %}
-          <th rowspan="{{ tran_map.summary.max_length }}">0</th>
-          <th rowspan="{{ tran_map.summary.max_length }}">0</th>
-        {% endif %}
-      </tr>
-      {% endif %}
-      {% endfor %}
-      <tr ><td class="separator"></td></tr>
-      <tr class='table-warning'><td colspan="13">NG 廢鐵</td></tr>
-      <tr>
-        <th rowspan="2">規格:</th>
-        <th colspan="5" class="table-danger" >出料</th>
-        <th colspan="7" class="table-success" >入料</th>
-      </tr>
-      <tr style="height: 20px">
-          <th class="table-danger" >日期</th>
-          <th class="table-danger">支</th>
-          <th class="table-danger">合計M</th>
-          <th class="table-danger">單號</th>
-          <th class="table-danger">備註</th>
-          <th class="table-success">日期</th>
-          <th class="table-success">支</th>
-          <th class="table-success">合計M</th>
-          <th class="table-success">單號</th>
-          <th colspan="3" class="table-success">備註</th>
-      </tr>
-      {% for key, tran_map in steel_ng_table.items %}
       {% if tran_map.max_length > 2 %}
-        <tr style=" border-top: 2px solid #000;" >
+        <tr style=" border-top: 2px solid #000;">
           <th class="s5"
               dir="ltr"
               rowspan="{{ tran_map.max_length }}"
@@ -140,33 +95,124 @@
           <tr style="height: 20px">
             {% for item in row %}
               {% if item %}
-                <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.build_date | date:"Y/m/d" }}</td>
-                <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.total_quantity |floatformat:"2" }}</td>
-                <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.total_unit |floatformat:"2" }}</td>
-                <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} >{{ item.code }}</td>
-                <td  {% if forloop.counter == 2 %} class='table-success' colspan="3"{% else %} class='table-danger'{% endif %} >{{ item.remake }}</td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
+                  {{ item.build_date | date:"Y/m/d" }}
+                </td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
+                  {{ item.total_quantity |floatformat:"0" }}
+                </td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
+                  {{ item.total_unit |floatformat:"2" }}
+                </td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>{{ item.code }}</td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
+                  {{ item.remake }}
+                </td>
               {% else %}
-                <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-                <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-                <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-                <td  {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} ></td>
-                <td  {% if forloop.counter == 2 %} class='table-success' colspan="3"{% else %} class='table-danger'{% endif %} ></td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
               {% endif %}
             {% endfor %}
-
+            {% if forloop.first %}
+              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_count |floatformat:"0" }}</th>
+              <th rowspan="{{ tran_map.summary.max_length }}">{{ tran_map.summary.diff_unit |floatformat:"2" }}</th>
+            {% endif %}
           </tr>
         {% endfor %}
         <tr style="height: 20px">
           {% for row in tran_map.level_summary %}
-            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %} > 總計:</th>
-            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>{{ row.count |floatformat:"2" }}</th>
-            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>{{ row.unit |floatformat:"2" }}</th>
+            <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'>總計:</th>
+            <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'>
+              {{ row.count |floatformat:"0" }}
+            </th>
+            <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'>
+              {{ row.unit |floatformat:"2" }}
+            </th>
+            <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'></th>
+            <th class='{% if forloop.counter == 2 %} table-success {% else %} table-danger{% endif %}'></th>
+          {% endfor %}
+          {% if not tran_map.table %}
+            <th rowspan="{{ tran_map.summary.max_length }}">0</th>
+            <th rowspan="{{ tran_map.summary.max_length }}">0</th>
+          {% endif %}
+        </tr>
+      {% endif %}
+    {% endfor %}
+    <tr>
+      <td class="separator"></td>
+    </tr>
+    <tr class='table-warning'>
+      <td colspan="13">NG 廢鐵</td>
+    </tr>
+    <tr>
+      <th rowspan="2">規格:</th>
+      <th colspan="5" class="table-danger">出料</th>
+      <th colspan="7" class="table-success">入料</th>
+    </tr>
+    <tr style="height: 20px">
+      <th class="table-danger">日期</th>
+      <th class="table-danger">支</th>
+      <th class="table-danger">合計M</th>
+      <th class="table-danger">單號</th>
+      <th class="table-danger">備註</th>
+      <th class="table-success">日期</th>
+      <th class="table-success">支</th>
+      <th class="table-success">合計M</th>
+      <th class="table-success">單號</th>
+      <th colspan="3" class="table-success">備註</th>
+    </tr>
+    {% for key, tran_map in steel_ng_table.items %}
+      {% if tran_map.max_length > 2 %}
+        <tr style=" border-top: 2px solid #000;">
+          <th class="s5"
+              dir="ltr"
+              rowspan="{{ tran_map.max_length }}"
+              style="vertical-align: middle">{{ key }}</th>
+        </tr>
+        {% for row in tran_map.table %}
+          <tr style="height: 20px">
+            {% for item in row %}
+              {% if item %}
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
+                  {{ item.build_date | date:"Y/m/d" }}
+                </td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
+                  {{ item.total_quantity |floatformat:"0" }}
+                </td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
+                  {{ item.total_unit |floatformat:"2" }}
+                </td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>{{ item.code }}</td>
+                <td {% if forloop.counter == 2 %} class='table-success' colspan="3"{% else %} class='table-danger'{% endif %}>
+                  {{ item.remake }}
+                </td>
+              {% else %}
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
+                <td {% if forloop.counter == 2 %} class='table-success' colspan="3"{% else %} class='table-danger'{% endif %}></td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+        <tr style="height: 20px">
+          {% for row in tran_map.level_summary %}
+            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>總計:</th>
+            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
+              {{ row.count |floatformat:"0" }}
+            </th>
+            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
+              {{ row.unit |floatformat:"2" }}
+            </th>
             <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></th>
             <th {% if forloop.counter == 2 %} class='table-success' colspan="3"{% else %} class='table-danger'{% endif %}></th>
           {% endfor %}
-
         </tr>
-        {% endif %}
+      {% endif %}
     </tbody>
   {% endfor %}
 {% endblock %}
