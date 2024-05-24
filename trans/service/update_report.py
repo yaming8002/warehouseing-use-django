@@ -227,12 +227,12 @@ def update_board_by_month(build_date):
     last_day_of_month = (
         first_day_of_month + relativedelta(months=1) - relativedelta(seconds=1)
     )
-    mat_codes = ['22','2205','95']
+
     query = (
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
         & (
-            Q(material__mat_code__in=mat_codes)
-            | (Q(material__mat_code="92") & Q(remark__icontains="簍空"))
+            Q(material__mat_code__in=['22','2205','95'])
+            | (Q(material__mat_code="92") & Q(remark__iregex=r'(?i)簍空|鏤空'))
         )
         & Q(is_rent=False)
         & Q(is_rollback=False)
@@ -247,13 +247,14 @@ def update_board_by_month(build_date):
             "translog__constn_site__code",  # sitecode
             "translog__constn_site__genre",  # sitecode genre
             "material__mat_code",  # mat_code
+            "remark",  # mat_code
         )
         .annotate(
             quantity=conditional_sum("quantity"),
         )
     )
 
-    print(update_list.query)
+    # print(update_list.query)
     site_whse = SiteInfo.get_site_by_code("0001")
     whse_dct = {}
     for x in update_list:

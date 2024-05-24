@@ -47,7 +47,7 @@ class DoneSteelReport(BaseSteelReport):
         ]
         verbose_name = "變動資訊"
         verbose_name_plural = "變動資訊"
-        ordering = ["done_type", "id"]  # 按照 id 升序排序
+        ordering = ["done_type", "siteinfo","id"]  # 按照 id 升序排序
 
     @classmethod
     def whse_reomve_matials(
@@ -182,19 +182,21 @@ class DoneSteelReport(BaseSteelReport):
 
     @classmethod
     def add_done_item(cls, case_name, request):
-        # print(f"{case_name}")
         site_id = request.POST.get("siteinfo_id")
+        y, m = get_year_month(request.POST.get('yearMonth'))
         type_val = request.POST.get(f"{case_name}.done_type")
         isdone = (
             request.POST.get("isdone") is not None
             and request.POST.get("isdone") == "on"
         )
         site = SiteInfo.objects.get(id=site_id)
-        y, m = get_year_month()
+
         done_report_obj = cls.objects.select_related("siteinfo").filter(
             siteinfo=site,
+            year=y,
+            month=m,
             done_type=type_val,
-        )
+        ).order_by("-year","-month")
 
         if done_report_obj.exists():
             done_report = done_report_obj.first()
@@ -209,8 +211,8 @@ class DoneSteelReport(BaseSteelReport):
             )
 
         for k, _ in done_report.static_column_code.items():
-            value = Decimal(request.POST.get(f"{case_name}.m_{k}"))
-
+            value =request.POST.get(f"{case_name}.m_{k}")
+            value = value if value else Decimal(0)
             setattr(done_report, f"m_{k}", value)
 
         done_report.save()

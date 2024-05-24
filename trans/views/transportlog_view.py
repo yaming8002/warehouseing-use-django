@@ -336,8 +336,8 @@ def update_end_date(request):
         f"{five_days_before.year}/{five_days_before.month}/{five_days_before.day}"
     )
     end_day.save()
-    datetime.strptime
-    count_date = datetime.strptime( request.GET.get('count_date'),"%Y-%m-%d")
+    count_date_str = request.GET.get('count_date')
+    count_date = datetime.strptime( count_date_str,"%Y-%m-%d") if 'NaN-NaN-NaN' != count_date_str  else f"{five_days_before.year}-{five_days_before.month}-{five_days_before.day}"
     update_rail_by_month(count_date)
     update_steel_by_month(count_date)
     update_board_by_month(count_date)

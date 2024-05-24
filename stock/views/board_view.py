@@ -24,10 +24,8 @@ class BoardControlView(MonthListView):
             return None
         is_lost = "-" in mat_code
         mat_code = '22' if '22' in mat_code  else mat_code
-        query = Q(close=False) & Q(siteinfo_id__gt=4) & (Q(year__lt=year) | Q(year=year, month__lte=month))
+        query =  Q(siteinfo_id__gt=4) & (Q(year__lt=year) | Q(year=year, month__lte=month))
         query &= Q(mat_code=mat_code) & Q(is_lost=is_lost)
-        query &= ~(Q(quantity=0) & Q(quantity2=0))
-
         return BoardReport.get_current_by_query(query)
 
     def get_whse_martials(self, context):

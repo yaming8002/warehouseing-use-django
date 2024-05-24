@@ -131,21 +131,21 @@
       <th></th>
     </tr>
   {% endif %}
-  {% if lk_report %}
-    <tr class="table-warning">
-      <th colspan="4">{{ lk_report.siteinfo.name }}</th>
-      <th>{{ lk_report.quantity | floatformat:"0" }}</th>
-      {% if request.GET.mat_code == '22' %}
-        <th>{{ lk_report.quantity2 | floatformat:"0" }}</th>
-        <th>{{ lk_report.quantity|add:lk_report.quantity2 | floatformat:"0" }}</th>
+    {% if lk_report  %}
+      <tr class="table-warning">
+        <th colspan="4">{{ lk_report.siteinfo.name }}</th>
+        <th>{{ lk_report.quantity | floatformat:"0" }}</th>
+        {% if request.GET.mat_code == '22' %}
+          <th>{{ lk_report.quantity2 | floatformat:"0" }}</th>
+          <th>{{ lk_report.quantity|add:lk_report.quantity2 | floatformat:"0" }}</th>
+          <th></th>
+        {% endif %}
         <th></th>
-      {% endif %}
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  {% endif %}
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    {% endif %}
   {% if warning_lk_report and request.GET.mat_code == '22' %}
     <tr class="table-warning">
       <th colspan="4">{{ warning_lk_report.siteinfo.name }} 整片不堪使用</th>

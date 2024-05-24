@@ -87,6 +87,7 @@ class BoardReport(MonthReport):
          return None
         return report
 
+
     @classmethod
     def get_current_by_query(cls, query, is_done=False):
         query_set = (
@@ -109,6 +110,7 @@ class BoardReport(MonthReport):
             cls.objects.select_related("siteinfo")
             .filter(id__in=ids)
             .filter(is_done=is_done)
+            .filter(close=False)
             .order_by("done_type","siteinfo__code","siteinfo__genre")
             .all()
         )
@@ -121,13 +123,13 @@ class BoardReport(MonthReport):
         now = cls.get_site_matial(site,find_code, year, month)
         update_value = Decimal(0)
         b_year,b_month=get_before_year_month(year, month)
-        query = Q(siteinfo=site)&Q(year=b_year)&Q(month=b_month )&Q(mat_code=find_code)
+        query = Q(siteinfo=site)& (Q(year__lt=b_year) | Q(year=b_year, month__lte=b_month))&Q(mat_code=find_code)
         if site.id < 4 :
             query &=Q(is_done=False)
 
         if cls.objects.filter(query).exists():
-            before = cls.objects.get(query)
-            update_value =Decimal( getattr(before,target_field,0) )
+            before = cls.objects.filter(query).order_by("-year","-month").first()
+            update_value =Decimal( getattr(before,target_field) )
  
         if now is None:
             now = cls.objects.create(
@@ -137,11 +139,9 @@ class BoardReport(MonthReport):
              now.mat_code2 = '2205'
 
         change = value if is_add else -value
-        if site.code=='1495':
-            print( update_value)
-            print( value)
-            print( update_value + change)
         setattr(now, target_field, update_value + change)
+        if now.quantity + now.quantity2 == 0:
+            now.close = True
         now.save()
 
     @classmethod
