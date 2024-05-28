@@ -164,6 +164,7 @@
       <th class="table-success">單號</th>
       <th colspan="3" class="table-success">備註</th>
     </tr>
+    {% load custom_filters %}
     {% for key, tran_map in steel_ng_table.items %}
       {% if tran_map.max_length > 2 %}
         <tr style=" border-top: 2px solid #000;">
@@ -180,14 +181,14 @@
                   {{ item.build_date | date:"Y/m/d" }}
                 </td>
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
-                  {{ item.total_quantity |floatformat:"0" }}
+                 -
                 </td>
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
-                  {{ item.total_unit |floatformat:"2" }}
+                  {{ tran_map.mat_code|kg_to_meter:item.total_quantity }}
                 </td>
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>{{ item.code }}</td>
                 <td {% if forloop.counter == 2 %} class='table-success' colspan="3"{% else %} class='table-danger'{% endif %}>
-                  {{ item.remake }}
+                  {{item.total_quantity}}(KG) {% if item.remark %}{{ item.remake }}{% endif %}
                 </td>
               {% else %}
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>

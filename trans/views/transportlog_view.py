@@ -16,7 +16,7 @@ from stock.models.material_model import MatCat, Materials
 from stock.models.site_model import SiteInfo
 # from trans.forms import TransLogDetailForm
 from trans.models import TransLog, TransLogDetail
-from trans.service.update_report import (update_board_by_month, update_done_steel_by_month, update_rail_by_month, update_steel_by_month)
+from trans.service.update_report import (update_board_by_month, update_done_steel_by_month, update_done_steel_by_month_only_F, update_rail_by_month, update_steel_by_month)
 from wcom.models.menu import SysInfo
 from wcom.utils.excel_tool import ImportData2Generic
 from wcom.utils.pagelist import PageListView
@@ -341,6 +341,7 @@ def update_end_date(request):
     update_rail_by_month(count_date)
     update_steel_by_month(count_date)
     update_board_by_month(count_date)
+    update_done_steel_by_month_only_F(count_date)
     update_done_steel_by_month(count_date)
     response_data = {
         "success": True,
