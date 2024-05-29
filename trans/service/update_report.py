@@ -156,6 +156,7 @@ def update_done_steel_by_month(build_date):
         )
         & Q(material__mat_code__in=SteelReport.static_column_code.keys())
         & ~Q(translog__constn_site__genre=1)
+        & ~Q(translog__constn_site__code__startswith='F')
         & Q(is_rollback=False)
     )
 
@@ -220,6 +221,47 @@ def update_done_steel_by_month(build_date):
     for k, v in whse_dct.items():
         SteelReport.update_column_value_by_before(site_whse, year, month, True, k, v)
 
+def update_done_steel_by_month_only_F(build_date):
+    # 針對皓民的代號處理
+    year, month = build_date.year, build_date.month
+    first_day_of_month = datetime(year, month, 1)
+    last_day_of_month = (
+        first_day_of_month + relativedelta(months=1) - relativedelta(seconds=1)
+    )
+
+    query = (
+        Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
+        & Q(material__mat_code__in=SteelReport.static_column_code.keys())
+        & Q(translog__constn_site__code__startswith='F')
+        & Q(is_rollback=False)
+    )
+
+    update_list = (
+        TransLogDetail.objects.select_related("translog", "material")
+        .filter(query)
+        .all()
+    )
+
+    whse_dct = defaultdict(lambda: Decimal(0))
+
+    for detial in update_list:
+        if detial.translog.transaction_type == "OUT" :
+            siteinfo = SiteInfo.get_site_by_code('F002')
+            column = f"m_{detial.material.mat_code}"
+            if  ~hasattr(SteelReport, column):
+                continue
+            value = detial.quantity if detial.material.mat_code in ['92','12','13'] else detial.all_unit
+            SteelReport.update_column_value_by_before(
+                siteinfo, year, month, True, column, value
+            )
+            whse_dct[column] += value
+        else:
+            pass
+
+    site_whse = SiteInfo.get_site_by_code("0001")
+    for k, v in whse_dct.items():
+        SteelReport.update_column_value_by_before(site_whse, year, month, True, k, v)
+
 
 def update_board_by_month(build_date):
     year, month = build_date.year, build_date.month
@@ -227,12 +269,12 @@ def update_board_by_month(build_date):
     last_day_of_month = (
         first_day_of_month + relativedelta(months=1) - relativedelta(seconds=1)
     )
-    mat_codes = ['22','2205','95']
+
     query = (
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
         & (
-            Q(material__mat_code__in=mat_codes)
-            | (Q(material__mat_code="92") & Q(remark__icontains="簍空"))
+            Q(material__mat_code__in=['22','2205','95'])
+            | (Q(material__mat_code="92") & Q(remark__iregex=r'(?i)簍空|鏤空'))
         )
         & Q(is_rent=False)
         & Q(is_rollback=False)
@@ -247,13 +289,14 @@ def update_board_by_month(build_date):
             "translog__constn_site__code",  # sitecode
             "translog__constn_site__genre",  # sitecode genre
             "material__mat_code",  # mat_code
+            "remark",  # mat_code
         )
         .annotate(
             quantity=conditional_sum("quantity"),
         )
     )
 
-    print(update_list.query)
+    # print(update_list.query)
     site_whse = SiteInfo.get_site_by_code("0001")
     whse_dct = {}
     for x in update_list:

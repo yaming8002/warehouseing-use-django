@@ -32,14 +32,14 @@ def get_site_genre():
 
 
 level = [
-    (0, "零星"),
     (1, "第一層"),
     (2, "第二層"),
     (3, "第三層"),
     (4, "第四層"),
     (5, "第五層"),
     (6, "第六層"),
-    (7, "第七層")
+    (7, "第七層"),
+    (0, "零星"),
 ]
 
 
@@ -49,7 +49,7 @@ def get_level_all():
 
 @register.simple_tag
 def get_level():
-    return level[1:]
+    return level[:-1]
 
 
 done_type_map = [

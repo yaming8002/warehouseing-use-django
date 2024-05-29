@@ -35,6 +35,7 @@
   <!-- 修改了 form 的 id 以便直接选中 -->
   <form style="with:100%" method="post" action="/steel_control/edit/">
     {% csrf_token %}
+    <div>工地編號 : {{  report.siteinfo.code }}</div>
     <div>工地 : {{ report.siteinfo.name }}</div>
     <div>業主 : {{ report.siteinfo.owner }}</div>
     <input type="hidden" name="id" id="id" value="{{ report.id }}">
@@ -42,33 +43,72 @@
            name="siteinfo_id"
            id="siteinfo_id"
            value="{{ report.siteinfo.id }}">
+    <input type="hidden"
+           name="siteinfo_code"
+           id="siteinfo_code"
+           value="{{ report.siteinfo.code }}">
+    <div>
+    <div>
+      <label for="yearMonthInput">結案月份:</label>
+      <input type="month"
+             id="yearMonthInput"
+             name="yearMonth"
+             value='{{ yearMonth }}'>
+    </div>
     <div>
       <label for='isdone'>是否結案</label>
-      <input id="isdone" name="isdone" type='checkbox'>
+      <input id="isdone" name="isdone" type='checkbox' checked>
     </div>
     <div>
       <table id="input_table" class="steel_table" style="width:1200px;">
         <tr>
           <th>項目</th>
-          <th>H300 <br>
-            支撐(m)</th>
-          <th>H300 <br>
-            中柱(m)</th>
-          <th>H350 <br>
-            支撐(m)</th>
-          <th>H350 <br>
-            中柱(m)</th>
-          <th>H400 <br>
-            支撐(m)</th>
-          <th>H400 <br>
-            中柱(m)</th>
-          <th>H408 <br>
-            支撐(m)</th>
-          <th>H414 <br>
-            支撐(m)</th>
-          <th>H414 <br>
-            中柱(m)</th>
-          <th>覆工板</th>      
+          <th>
+            H300
+            <br>
+            支撐(m)
+          </th>
+          <th>
+            H300
+            <br>
+            中柱(m)
+          </th>
+          <th>
+            H350
+            <br>
+            支撐(m)
+          </th>
+          <th>
+            H350
+            <br>
+            中柱(m)
+          </th>
+          <th>
+            H400
+            <br>
+            支撐(m)
+          </th>
+          <th>
+            H400
+            <br>
+            中柱(m)
+          </th>
+          <th>
+            H408
+            <br>
+            支撐(m)
+          </th>
+          <th>
+            H414
+            <br>
+            支撐(m)
+          </th>
+          <th>
+            H414
+            <br>
+            中柱(m)
+          </th>
+          <th>覆工板</th>
           <th>千斤頂(個)</th>
           <th>土壓計(個)</th>
           <th>備註</th>
@@ -84,9 +124,9 @@
           <td id="o.m_408">{{ report.m_408 }}</td>
           <td id="o.m_414">{{ report.m_414 }}</td>
           <td id="o.m_4141">{{ report.m_4141 }}</td>
-          <td id="o.m_11">{{ report.m_11 }}</td>
-          <td id="o.m_13">{{ report.m_13 }}</td>
-          <td id="o.m_14">{{ report.m_14 }}</td>
+          <td id="o.m_92">{{ report.m_92  }}</td>
+          <td id="o.m_12">{{ report.m_12 |floatformat:"0"  }}</td>
+          <td id="o.m_13">{{ report.m_13 |floatformat:"0"  }}</td>
           <td></td>
         </tr>
         <tr>
@@ -127,13 +167,13 @@
             <input type="text" id="change.m_4141" name="change.m_4141" value="0">
           </td>
           <td>
-            <input type="text" id="change.m_11" name="change.m_11" value="0">
+            <input type="text" id="change.m_92" name="change.m_92" value="0">
+          </td>
+          <td>
+            <input type="text" id="change.m_12" name="change.m_12" value="0">
           </td>
           <td>
             <input type="text" id="change.m_13" name="change.m_13" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_14" name="change.m_14" value="0">
           </td>
           <td>
             <textarea style="with:100%" id="change.remark" name="change.remark" row="5"></textarea>
@@ -201,13 +241,13 @@
                    value="{{ report.m_4141 }}">
           </td>
           <td>
-            <input type="text" id="cut.m_11" name="cut.m_11" value="{{ report.m_11 }}">
+            <input type="text" id="cut.m_92" name="cut.m_92" value="{{ report.m_92  }}">
           </td>
           <td>
-            <input type="text" id="cut.m_13" name="cut.m_13" value="{{ report.m_13 }}">
+            <input type="text" id="cut.m_12" name="cut.m_12" value="{{ report.m_12 |floatformat:'0' }}">
           </td>
           <td>
-            <input type="text" id="cut.m_14" name="cut.m_14" value="{{ report.m_14 }}">
+            <input type="text" id="cut.m_13" name="cut.m_13" value="{{ report.m_13 |floatformat:'0' }}">
           </td>
           <td>
             <textarea style="with:100%" id="cut.remark" name="cut.remark" row="5"></textarea>

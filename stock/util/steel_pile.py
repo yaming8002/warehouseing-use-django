@@ -87,7 +87,7 @@ def build_steel_pile_table(constn) -> Dict[str, Dict[str, any]]:
     return steel_map
 
 
-steel_ng_map = {26: "H300", 27: "H350", 28: "H400", 25: "鋼軌"}
+steel_ng_map = {26:("300","H300"), 27: ("350","H350"), 28: ("400","H400"), 25: ("3050","鋼軌")}
 
 
 def build_steel_ng_table(constn) -> Dict[str, Dict[str, any]]:
@@ -100,7 +100,7 @@ def build_steel_ng_table(constn) -> Dict[str, Dict[str, any]]:
     steel_map = {}
     for key, name in steel_ng_map.items():
         # name = f"m_{mat_code}"
-        steel_map[name] = {}
+        steel_map[name[1]] = {}
         tr_list: List[List[Any]] = [[] for _ in range(2)]
         max_length = 0
         summary = {
@@ -130,10 +130,11 @@ def build_steel_ng_table(constn) -> Dict[str, Dict[str, any]]:
         max_length = max(max_length, len(tr_list[0]), len(tr_list[1]))
 
         summary["max_length"] = max_length + 1
-        steel_map[name]["summary"] = summary
-        steel_map[name]["max_length"] = max_length + 2
-        steel_map[name]["table"] = transpose_list_of_lists(tr_list)
-        steel_map[name]["level_summary"] = level_summary_of_lists(tr_list)
+        steel_map[name[1]]["mat_code"] = name[0]
+        steel_map[name[1]]["summary"] = summary
+        steel_map[name[1]]["max_length"] = max_length + 2
+        steel_map[name[1]]["table"] = transpose_list_of_lists(tr_list)
+        steel_map[name[1]]["level_summary"] = level_summary_of_lists(tr_list)
     return steel_map
 
 

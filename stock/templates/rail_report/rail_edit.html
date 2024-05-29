@@ -4,6 +4,7 @@
   <form style="with:100%" method="post" action="/rail_control/edit/">
     {% csrf_token %}
     <input type='hidden' name="site_id" value="{{report.siteinfo.id}}">
+    <div>工地編號 : {{  report.siteinfo.code }}</div>
     <div>工地 : {{ report.siteinfo.name }} </div>
     <div>業主 : {{ report.siteinfo.owner }}</div>
     <div>
@@ -19,7 +20,7 @@
     </div>
     <div>
       <label for='isdone'>是否結案</label>
-      <input id="isdone" name="isdone" type='checkbox'>
+      <input id="isdone" name="isdone" type='checkbox' checked>
     </div>
     <div style="with:100%">
       <label for="remark">說明</label>

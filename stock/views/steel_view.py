@@ -12,6 +12,7 @@ from stock.models.done_steel_model import DoneSteelReport
 from stock.models.site_model import SiteInfo
 from stock.models.steel_pillar import SteelPillar
 from wcom.utils import MonthListView
+from wcom.utils.uitls import get_year_month
 
 static_column_code = [
         "300",
@@ -34,6 +35,10 @@ class SteelControlView(MonthListView):
     def get_queryset(self):
         year,month = self.get_year_month()
         query =  (Q(siteinfo__id__gt=4) & (Q(year__lt=year) | Q(year=year, month__lte=month)) )
+        exclude_query = Q()
+        for x in static_column_code:
+            exclude_query  |= ~Q(**{f'm_{x}': 0})
+        query &= exclude_query
         return SteelReport.get_current_by_query(query)
             
     def get_whse_martials(self,context ):
@@ -116,13 +121,16 @@ def get_steel_edit_done(request):
         context['year'] = split_year_month[0]
         context['month'] = split_year_month[1]
         context['title'] = '結案編輯'
-
+        context['yearMonth'] = f'{report.year}-{report.month:02d}'
         
         return render(request,'steel_report/steel_edit.html',context)
     else :
         report_id = request.POST.get('id')
+        site_code = request.POST.get('siteinfo_code')
         isdone = request.POST.get('isdone')
-        report = SteelReport.objects.select_related('siteinfo').get(id=report_id)
+        y, m = get_year_month(request.POST.get('yearMonth'))
+        # report = SteelReport.objects.select_related('siteinfo').get(id=report_id)
+        report = SteelReport.get_current_by_site(SiteInfo.get_site_by_code(site_code),y, m )
         report.is_done =  isdone is not None and isdone == 'on' 
         report.save()
         if report.is_done :
@@ -164,8 +172,6 @@ def get_edit_remark(request):
 
 
 def steel_update__total(constn:SteelReport,is_withdraw: bool):
-    site = constn.siteinfo
-    
     split_year_month = [int(x) for x in  (datetime.now()).strftime('%Y-%m') .split('-')]
     rail_objects = SteelReport.objects.select_related('siteinfo').filter(Q(year=split_year_month[0])&Q(month=split_year_month[1]))
     total= rail_objects.filter(siteinfo__code='0000').first()
