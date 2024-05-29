@@ -182,28 +182,6 @@ def update_done_steel_by_month(build_date):
                 detial.all_unit,
                 detial.remark,
             )
-        elif detial.translog.constn_site.code == "F002":
-            if detial.material.mat_code in ["301", "351", "401", "4141"]:
-                DoneSteelReport.pile_to_board(
-                    detial.translog.code,
-                    detial.translog.constn_site,
-                    year,
-                    month,
-                    detial.material.mat_code,
-                    detial.all_unit,
-                    "支撐轉中柱",
-                )
-
-        elif detial.translog.constn_site.code in ["G001", "F003"] and not is_whse_code(
-            detial.translog.code
-        ):
-            siteinfo = SiteInfo.get_site_by_code(detial.translog.constn_site.code)
-            column = f"m_{detial.material.mat_code}"
-            value = detial.quantity
-            SteelReport.update_column_value_by_before(
-                siteinfo, year, month, False, column, value
-            )
-            whse_dct[column] += value
         else:
             DoneSteelReport.add_new_mat(
                 detial.translog.code,
@@ -257,6 +235,7 @@ def update_done_steel_by_month_only_F(build_date):
             whse_dct[column] += value
         else:
             pass
+            
 
     site_whse = SiteInfo.get_site_by_code("0001")
     for k, v in whse_dct.items():
