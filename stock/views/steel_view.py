@@ -75,15 +75,20 @@ class SteelDoneView(MonthListView):
     
     def get_whse_martials(self,context ):
         year,month = self.get_year_month()
+        sum_report = self.get_queryset()
         context['total_report'] = SteelReport.get_current_by_site(SiteInfo.get_site_by_code('0000'),year,month)
         before_year,before_month = self.get_before_year_month(year,month)
         context['befote_total_report']= SteelReport.get_current_by_site(SiteInfo.get_site_by_code('0000'),before_year,before_month)
-        context['diff'] = self.get_diff_value(context['total_report'],context['befote_total_report'])
+        context['sum_report'] = context['befote_total_report']
+        for code in SteelReport.static_column_code:
+            column = f"m_{code}"
+            for item in sum_report :
+                setattr(context['sum_report'],column,getattr(context['sum_report'],column)+getattr(item,column))
+            
+        context['diff'] = self.get_diff_value(context['total_report'],context['sum_report'])
         context['before_yearMonth'] = f'{before_year}-{before_month:02d}'
 
-        context['h301'] = SteelPillar.get_value('301',year,month)
-        context['h351'] = SteelPillar.get_value('351',year,month)
-        context['h401'] = SteelPillar.get_value('401',year,month)
+   
 
 
         

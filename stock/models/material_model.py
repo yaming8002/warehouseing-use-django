@@ -66,7 +66,7 @@ class Materials(models.Model):
         return cls.objects.get(quest)
 
     class Meta:
-        unique_together = ["mat_code", "category", "specification"]
+        unique_together = ["mat_code", "category", "specification","name"]
 
     def __str__(self):
         return self.name

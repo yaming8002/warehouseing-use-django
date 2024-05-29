@@ -64,6 +64,7 @@ function checkColumns(columns, input) {
 async function handleFileProcessing(file) {
     const csrftoken = getCookie('csrftoken');
     const reader = new FileReader();
+    let count_date = null ;
     reader.onload = async function (e) {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
@@ -130,16 +131,17 @@ async function handleFileProcessing(file) {
             }
         });
         if (total_rows.length > 0 || rent_rows.length > 1) {
+            count_date = total_rows.slice(4)[5][1]
             // 驗證列名
             if (checkColumns(columns3, total_rows[2]) & checkColumns(columns4, total_rows[3])) {
                 // 如果驗證通過，則處理並分批上傳資料
-                await processAndUploadData(total_rows.slice(4), false,csrftoken); // 移除列名行
+                await processAndUploadData(count_date,total_rows.slice(4), false,csrftoken); // 移除列名行
             } else {
                 alert("總表檔案格式不正確");
             }
 
             if (checkColumns(columns3, rent_rows[2]) & checkColumns(columns4, rent_rows[3])) {
-                await processAndUploadData(rent_rows.slice(4), true,csrftoken); // 移除列名行
+                await processAndUploadData(count_date,rent_rows.slice(4), true,csrftoken); // 移除列名行
             } else {
                 alert("租賃檔案格式不正確");
             }
@@ -150,10 +152,9 @@ async function handleFileProcessing(file) {
 }
 
 
-async function processAndUploadData(rows, is_rent,csrftoken) {
+async function processAndUploadData( count_date , rows, is_rent,csrftoken) {
     const batchSize = 50;
     let batchData = [];
-    let count_date = rows[2][1]
 
     for (let i = 0; i < rows.length; i++) {
 
@@ -201,7 +202,7 @@ async function processAndUploadData(rows, is_rent,csrftoken) {
 
     // Update the end date if applicable
     if (is_rent) {
-        console.log(count_date)
+        console.log('count_date is ' + count_date) ;
         try {
             await $.ajax({
                 url: "/update_end_date/",
@@ -219,7 +220,7 @@ async function processAndUploadData(rows, is_rent,csrftoken) {
 
 function excelDateToJSDate(excelDate) {
     const date = new Date(1899, 11, 30); // 月份从 0 开始，11 代表 12 月
-    date.setDate(date.getDate() + excelDate - 1); // 减去1天校正
+    date.setDate(date.getDate() + excelDate ); 
     return date;
   }
 
