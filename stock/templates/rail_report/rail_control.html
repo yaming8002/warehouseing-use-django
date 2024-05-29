@@ -21,12 +21,10 @@
     }
 
     function searchThisMonth(){
-      var d = new Date(), m = d.getMonth(), y = d.getFullYear();
-      console.log(d);
-      console.log(m);
-      console.log(y);
-      console.log(y + '-0' + m);
-      $("#yearMonthInput").val( y + '-0' + m );
+      var d = new Date(), m = d.getMonth() + 1, y = d.getFullYear();
+      m = m < 10 ? '0' + m : m;
+
+      $("#yearMonthInput").val( y + '-' + m );
     }
 
     function editRow(id) {

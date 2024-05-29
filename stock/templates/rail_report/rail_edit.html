@@ -1,11 +1,66 @@
 {% extends 'base/model_edit.html' %}
+{% block javascript %}
+  <script>
+$(document).ready(function () {
+  // 選擇所有具有id="report"的表格，位於class="col-md-9 m-0"的div內
+  $(".col-md-9.m-0 table").not('.emptytable').each(function () {
+    // 添加所需的CSS類
+    $(this).addClass("table table-primary table-striped");
+  });
+
+  $("#base_table td").each(function () {
+    var value = parseFloat($(this).text()); // 尝试将内容转换为浮点数
+    if (!isNaN(value) && value < 0) { // 检查是否为负数
+        $(this).addClass("negative-value"); // 添加类以改变文本颜色
+    }
+
+  });
+
+  $("#base_table th").each(function () {
+    var value = parseFloat($(this).text()); // 尝试将内容转换为浮点数
+    if (!isNaN(value) && value < 0) { // 检查是否为负数
+        $(this).addClass("negative-value"); // 添加类以改变文本颜色
+    }
+
+  });
+
+  
+  $('#exceloutput').click(function() {
+    var fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
+    $('#base_table').tableExport({
+      type: 'excel',
+      mso: {
+        fileFormat: 'xlsx',
+      },
+      fileName: fileName // Using the captured file name
+    });
+  });
+
+setMaxHeight();
+$(window).resize(setMaxHeight);
+
+function setMaxHeight() {
+    var windowHeight = $(window).height(); // 获取视窗的总高度
+    console.log(windowHeight)
+    var barHeight = $('body > div.p-0.h-100.d-flex.flex-row > div.m-0.flex-shrink-0.p-2').outerHeight();
+    var formHeight = $('.formStyle').outerHeight(); // 获取表单的高度
+    var headerHight = $('header').outerHeight(); // 获取表单的高度
+    var desiredHeight = windowHeight - formHeight -headerHight - 20; // 分配剩余空间，这里的20可能是其他间隙或边距
+    var desiredHeight = barHeight - formHeight- 100;
+    $('.tableStyle').css('max-height', desiredHeight + 'px'); // 设置最大高度
+    $('#base_table').css('max-height', desiredHeight + 'px'); // 设置最大高度
+}
+
+});
+  </script>
+{% endblock %}
 {% block form %}
   <!-- 修改了 form 的 id 以便直接选中 -->
   <form style="with:100%" method="post" action="/rail_control/edit/">
     {% csrf_token %}
-    <input type='hidden' name="site_id" value="{{report.siteinfo.id}}">
-    <div>工地編號 : {{  report.siteinfo.code }}</div>
-    <div>工地 : {{ report.siteinfo.name }} </div>
+    <input type='hidden' name="site_id" value="{{ report.siteinfo.id }}">
+    <div>工地編號 : {{ report.siteinfo.code }}</div>
+    <div>工地 : {{ report.siteinfo.name }}</div>
     <div>業主 : {{ report.siteinfo.owner }}</div>
     <div>
       <label for="yearMonthInput">結案月份:</label>
@@ -16,7 +71,10 @@
     </div>
     <div>
       <label for='selled'>是否賣斷</label>
-      <input id="selled" name="selled" type='checkbox' {% if report.done_type == 1 %} checked {% endif %}>
+      <input id="selled"
+             name="selled"
+             type='checkbox'
+             {% if report.done_type == 1 %}checked{% endif %}>
     </div>
     <div>
       <label for='isdone'>是否結案</label>
@@ -25,10 +83,10 @@
     <div style="with:100%">
       <label for="remark">說明</label>
       <br>
-      <textarea style="with:100%" id="remark" name="remark" row="5" >{% if report.remark %}{{report.remark}}{% endif %}</textarea>
+      <textarea style="with:100%" id="remark" name="remark" row="5">{% if report.remark %}{{report.remark}}{% endif %}</textarea>
     </div>
     <div>
-      <table>
+      <table id="base_table">
         <tr>
           <th>項目</th>
           <th>5M</th>
@@ -47,54 +105,105 @@
         </tr>
         <tr>
           <td>出料</td>
-          <td>{{ report.out_5 }}</td>
-          <td>{{ report.out_6 }}</td>
-          <td>{{ report.out_7 }}</td>
-          <td>{{ report.out_8 }}</td>
-          <td>{{ report.out_9 }}</td>
-          <td>{{ report.out_10 }}</td>
-          <td>{{ report.out_11 }}</td>
-          <td>{{ report.out_12 }}</td>
-          <td>{{ report.out_13 }}</td>
-          <td>{{ report.out_14 }}</td>
-          <td>{{ report.out_15 }}</td>
-          <td>{{ report.out_16 }}</td>
-          <td>{{ report.out_total }}</td>
+          <td>
+            {% if report.out_5 != 0 %}{{ report.out_5 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.out_6 != 0 %}{{ report.out_6 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.out_7 != 0 %}{{ report.out_7 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.out_8 != 0 %}{{ report.out_8 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.out_9 != 0 %}{{ report.out_9 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.out_10 != 0 %}{{ report.out_10 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.out_11 != 0 %}{{ report.out_11 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.out_12 != 0 %}{{ report.out_12 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.out_13 != 0 %}{{ report.out_13 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.out_14 != 0 %}{{ report.out_14 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.out_15 != 0 %}{{ report.out_15 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.out_16 != 0 %}{{ report.out_16 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.out_total != 0 %}{{ report.out_total |floatformat:"0" }}{% endif %}
+          </td>
         </tr>
         <tr>
           <td>入料</td>
-          <td>{{ report.in_5 }}</td>
-          <td>{{ report.in_6 }}</td>
-          <td>{{ report.in_7 }}</td>
-          <td>{{ report.in_8 }}</td>
-          <td>{{ report.in_9 }}</td>
-          <td>{{ report.in_10 }}</td>
-          <td>{{ report.in_11 }}</td>
-          <td>{{ report.in_12 }}</td>
-          <td>{{ report.in_13 }}</td>
-          <td>{{ report.in_14 }}</td>
-          <td>{{ report.in_15 }}</td>
-          <td>{{ report.in_16 }}</td>
-          <td>{{ report.in_total }}</td>
+          <td>
+            {% if report.in_5 != 0 %}{{ report.in_5 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.in_6 != 0 %}{{ report.in_6 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.in_7 != 0 %}{{ report.in_7 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.in_8 != 0 %}{{ report.in_8 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.in_9 != 0 %}{{ report.in_9 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.in_10 != 0 %}{{ report.in_10 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.in_11 != 0 %}{{ report.in_11 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.in_12 != 0 %}{{ report.in_12 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.in_13 != 0 %}{{ report.in_13 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.in_14 != 0 %}{{ report.in_14 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.in_15 != 0 %}{{ report.in_15 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.in_16 != 0 %}{{ report.in_16 |floatformat:"0" }}{% endif %}
+          </td>
+          <td>
+            {% if report.in_total != 0 %}{{ report.in_total |floatformat:"0" }}{% endif %}
+          </td>
         </tr>
         <tr>
           <td>總計</td>
-          <td>{{ sum.sum_5 }}</td>
-          <td>{{ sum.sum_6 }}</td>
-          <td>{{ sum.sum_7 }}</td>
-          <td>{{ sum.sum_8 }}</td>
-          <td>{{ sum.sum_9 }}</td>
-          <td>{{ sum.sum_10 }}</td>
-          <td>{{ sum.sum_11 }}</td>
-          <td>{{ sum.sum_12 }}</td>
-          <td>{{ sum.sum_13 }}</td>
-          <td>{{ sum.sum_14 }}</td>
-          <td>{{ sum.sum_15 }}</td>
-          <td>{{ sum.sum_16 }}</td>
-          <td>{{ sum.sum_total }}</td>
+          <td>{{ sum.sum_5 |floatformat:"0" }}</td>
+          <td>{{ sum.sum_6 |floatformat:"0" }}</td>
+          <td>{{ sum.sum_7 |floatformat:"0" }}</td>
+          <td>{{ sum.sum_8 |floatformat:"0" }}</td>
+          <td>{{ sum.sum_9 |floatformat:"0" }}</td>
+          <td>{{ sum.sum_10 |floatformat:"0" }}</td>
+          <td>{{ sum.sum_11 |floatformat:"0" }}</td>
+          <td>{{ sum.sum_12 |floatformat:"0" }}</td>
+          <td>{{ sum.sum_13 |floatformat:"0" }}</td>
+          <td>{{ sum.sum_14 |floatformat:"0" }}</td>
+          <td>{{ sum.sum_15 |floatformat:"0" }}</td>
+          <td>{{ sum.sum_16 |floatformat:"0" }}</td>
+          <td>{{ sum.sum_total |floatformat:"0" }}</td>
         </tr>
       </table>
     </div>
-
   </form>
 {% endblock %}

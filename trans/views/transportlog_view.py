@@ -337,11 +337,12 @@ def update_end_date(request):
     )
     end_day.save()
     count_date_str = request.GET.get('count_date')
+    print(count_date_str)
     try:
         if 'NaN-NaN-NaN' != count_date_str:
             count_date = datetime.strptime(count_date_str, "%Y-%m-%d")
         else:
-            count_date = five_days_before
+            count_date = latest_date
     except (ValueError, TypeError):
         count_date = datetime.now()  # 使用當前日期
         

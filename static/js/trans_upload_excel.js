@@ -132,6 +132,7 @@ async function handleFileProcessing(file) {
         });
         if (total_rows.length > 0 || rent_rows.length > 1) {
             count_date = total_rows.slice(4)[5][1]
+            console.log('count_date is ' + count_date) ;
             // 驗證列名
             if (checkColumns(columns3, total_rows[2]) & checkColumns(columns4, total_rows[3])) {
                 // 如果驗證通過，則處理並分批上傳資料
@@ -226,12 +227,11 @@ function excelDateToJSDate(excelDate) {
 
 function formatDate(date) {
     let d = excelDateToJSDate(date)
-    let month = '' + (d.getUTCMonth() + 1), // getUTCMonth returns 0-11
-        day = '' + d.getUTCDate(),
-        year = d.getUTCFullYear();
+    let month = '' + (d.getMonth()+ 1), // getUTCMonth returns 0-11
+        day = '' + d.getDate(),
+        year = d.getFullYear();
 
     if (month.length < 2) month = '0' + month; // padding single-digit months
     if (day.length < 2) day = '0' + day; // padding single-digit days
-
     return [year, month, day].join('-'); // joining components with '-'
 }

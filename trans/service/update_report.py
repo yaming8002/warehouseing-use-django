@@ -55,6 +55,7 @@ def update_rail_by_month(build_date):
         )
         .annotate(quantity=Sum("quantity"), unit_sum=Sum("unit"))
     )
+    print(update_list.query)
 
     whse_dct = defaultdict(lambda: Decimal(0))
     total_dct = defaultdict(lambda: Decimal(0))
