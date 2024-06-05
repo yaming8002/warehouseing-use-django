@@ -6,11 +6,12 @@ from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
-
+import copy
 from stock.models import SteelReport
 from stock.models.done_steel_model import DoneSteelReport
 from stock.models.site_model import SiteInfo
 from stock.models.steel_pillar import SteelPillar
+from trans.service.update_done_steel_by_month import update_total_by_month
 from wcom.utils import MonthListView
 from wcom.utils.uitls import get_year_month
 
@@ -84,7 +85,7 @@ class SteelDoneView(MonthListView):
         context['total_report'] = SteelReport.get_current_by_site(SiteInfo.get_site_by_code('0000'),year,month)
         before_year,before_month = self.get_before_year_month(year,month)
         context['befote_total_report']= SteelReport.get_current_by_site(SiteInfo.get_site_by_code('0000'),before_year,before_month)
-        context['sum_report'] = context['befote_total_report']
+        context['sum_report'] = copy.deepcopy(context['befote_total_report'])
         for code in SteelReport.static_column_code:
             column = f"m_{code}"
             for item in sum_report :
@@ -93,10 +94,6 @@ class SteelDoneView(MonthListView):
         context['diff'] = self.get_diff_value(context['total_report'],context['sum_report'])
         context['before_yearMonth'] = f'{before_year}-{before_month:02d}'
 
-   
-
-
-        
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         self.get_whse_martials(context)
@@ -134,10 +131,9 @@ def get_steel_edit_done(request):
         report.is_done =  isdone is not None and isdone == 'on' 
         report.save()
         if report.is_done :
-            steel_update__total(report,False)
             DoneSteelReport.add_done_item('cut',request)
             DoneSteelReport.add_done_item('change',request)
-
+        update_total_by_month( y, m)
         context = {'msg':"成功"}
         return JsonResponse(context)
     
@@ -171,14 +167,14 @@ def get_edit_remark(request):
         return JsonResponse(context)
 
 
-def steel_update__total(constn:SteelReport,is_withdraw: bool):
-    split_year_month = [int(x) for x in  (datetime.now()).strftime('%Y-%m') .split('-')]
-    rail_objects = SteelReport.objects.select_related('siteinfo').filter(Q(year=split_year_month[0])&Q(month=split_year_month[1]))
-    total= rail_objects.filter(siteinfo__code='0000').first()
+# def steel_update__total(constn:SteelReport,is_withdraw: bool):
+#     split_year_month = [int(x) for x in  (datetime.now()).strftime('%Y-%m') .split('-')]
+#     rail_objects = SteelReport.objects.select_related('siteinfo').filter(Q(year=split_year_month[0])&Q(month=split_year_month[1]))
+#     total= rail_objects.filter(siteinfo__code='0000').first()
 
-    values= constn.__dict__
+#     values= constn.__dict__
     
-    for code in static_column_code:
-        setattr(total, f'm_{code}', getattr(total, f'm_{code}') + (values.get(f'm_{code}', 0)  if is_withdraw else -values.get(f'm_{code}', 0) ))
+#     for code in static_column_code:
+#         setattr(total, f'm_{code}', getattr(total, f'm_{code}') + (values.get(f'm_{code}', 0)  if is_withdraw else -values.get(f'm_{code}', 0) ))
 
-    total.save() 
+#     total.save() 

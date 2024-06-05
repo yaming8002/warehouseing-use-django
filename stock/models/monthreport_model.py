@@ -139,16 +139,14 @@ class MonthReport(MonthData):
 
     @classmethod
     def update_column_value_by_before(cls, site: SiteInfo,year:int,month:int, is_add: bool, column: str, value: Decimal):
-        update_value = Decimal(0)
-        
         now = cls.get_current_by_site(site,year, month)
-        update_value = Decimal(0)
         b_year,b_month=get_before_year_month(year, month)
         before = cls.get_current_by_site(site,b_year,b_month)
-        update_value =Decimal( getattr(before,column) )
-        update_value += value if is_add else -1 *value
+        update_value =Decimal( getattr(before,column,0) )
+        update_value += value if is_add else -value
         setattr(now,column,update_value)
         now.save()
+        return now
 
     @classmethod
     def update_column_value(cls, id: int, is_add: bool, column: str, value: Decimal):

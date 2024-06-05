@@ -176,7 +176,7 @@
       <td>{% if item.m_408 != 0 %}{{ item.m_408 }}{% endif%}</td>
       <td>{% if item.m_414 != 0 %}{{ item.m_414 }}{% endif%}</td>
       <td>{% if item.m_4141 != 0 %}{{ item.m_4141 }}{% endif%}</td>
-      <td>{% if item.m_92 != 0 %}{{ item.m_92 |floatformat:"0" }}{% endif%}</td>
+      <td>{% if item.m_92 != 0 %}{{ item.m_92 }}{% endif%}</td>
       <td>{% if item.m_12 != 0 %}{{ item.m_12 |floatformat:"0" }}{% endif%}</td>
       <td>{% if item.m_13 != 0 %}{{ item.m_13 |floatformat:"0" }}{% endif%}</td>
       <td colspan='6' style="text-align:left" >{% if item.remark %}{{ item.remark |safe}}<br>{% endif %}
@@ -196,7 +196,7 @@
     <th>{{ sum_report.m_408 }}</th>
     <th>{{ sum_report.m_414 }}</th>
     <th>{{ sum_report.m_4141 }}</th>
-    <th>{{ sum_report.m_92 |floatformat:"0" }}</th>
+    <th>{{ sum_report.m_92  }}</th>
     <th>{{ sum_report.m_12 |floatformat:"0" }}</th>
     <th>{{ sum_report.m_13 |floatformat:"0" }}</th>
     <th colspan='6'></th>
@@ -213,7 +213,7 @@
     <th>{{ total_report.m_408 }}</th>
     <th>{{ total_report.m_414 }}</th>
     <th>{{ total_report.m_4141 }}</th>
-    <th>{{ total_report.m_92 |floatformat:"0" }}</th>
+    <th>{{ total_report.m_92  }}</th>
     <th>{{ total_report.m_12 |floatformat:"0" }}</th>
     <th>{{ total_report.m_13 |floatformat:"0" }}</th>
     <th colspan='6'></th>
@@ -223,7 +223,7 @@
     <th colspan=3 >差異數)</th>
     {% for d in diff %}
       <th>
-        {% if forloop.counter < 8 %}
+        {% if forloop.counter < 9 %}
           {{ d }}
         {% else %}
           {{ d|floatformat:"0" }}

@@ -1,17 +1,15 @@
-from decimal import Decimal, ROUND_HALF_UP
+from datetime import datetime
+from decimal import ROUND_HALF_UP, Decimal
 
 from django.db import models
-from datetime import datetime
 from django.db.models import Q
-from stock.models.board_model import BoardReport
-from stock.models.done_steel_model import DoneSteelReport
+
 from stock.models.material_model import Materials
-from stock.models.rail_model import RailReport
 from stock.models.site_model import SiteInfo
-from stock.models.steel_model import SteelReport
 from stock.models.stock_model import Stock
 from trans.models.car_model import CarInfo
-from wcom.utils.uitls import excel_num_to_date, excel_value_to_str, get_month_range
+from wcom.utils.uitls import (excel_num_to_date, excel_value_to_str,
+                              get_month_range)
 
 
 class TransLog(models.Model):
@@ -130,7 +128,7 @@ class TransLogDetail(models.Model):
         unit = Decimal("{:.2f}".format(unit_req)) if unit_req else None
         quantity = Decimal(abs(item[15]))
         mat_code = excel_value_to_str(item[7])
-        level = int(item[21]) % 10 if item[21] else None
+        level = int(item[21]) % 10 if item[21] and isinstance(item[21], (int)) else None
         remark = str(item[20])
 
         mat = Materials.get_item_by_code(mat_code, remark, unit)
@@ -196,38 +194,8 @@ class TransLogDetail(models.Model):
             mat = detail.material
             quantity = detail.quantity
             all_unit = detail.all_unit
-            remark = detail.remark
             Stock.move_material(mat, quantity, all_unit, is_stock_add)
 
-            if DoneSteelReport.add_new_mat(
-                tran.constn_site,
-                tran.turn_site,
-                tran.build_date,
-                is_stock_add,
-                mat,
-                quantity,
-                all_unit,
-                remark,
-            ):
-                """if this case not new material"""
-                Stock.move_material(
-                    tran.constn_site, mat, quantity, all_unit, not is_stock_add
-                )
-                SteelReport.add_report(
-                    tran.constn_site,
-                    tran.build_date,
-                    is_stock_add,
-                    mat,
-                    quantity,
-                    all_unit,
-                )
-
-            RailReport.add_report(
-                tran.constn_site, tran.build_date, is_stock_add, mat, quantity
-            )
-            BoardReport.add_report(
-                tran.constn_site, remark, is_stock_add, mat, quantity
-            )
 
     class Meta:
         unique_together = [

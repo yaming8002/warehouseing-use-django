@@ -98,13 +98,15 @@
       {% if '22' in mat_code %}
         <td>{{ item.quantity2 | floatformat:"0" }}</td>
         <td>{{ item.quantity|add:item.quantity2 | floatformat:"0" }}</td>
-        <td>
-          {% if item.done_type > 0 %}O{% endif %}
-        </td>
       {% endif %}
       <td>
-        {% if item.done_type > 1 %}O{% endif %}
+        {% if item.done_type > 0 %}O{% endif %}
       </td>
+      {% if '22' in mat_code %}
+        <td>
+          {% if item.done_type > 1 %}O{% endif %}
+        </td>
+      {% endif %}
       <td>
         {% if item.siteinfo.member %}{{ item.siteinfo.member }}{% endif %}
       </td>
@@ -131,21 +133,21 @@
       <th></th>
     </tr>
   {% endif %}
-    {% if lk_report  %}
-      <tr class="table-warning">
-        <th colspan="4">{{ lk_report.siteinfo.name }}</th>
-        <th>{{ lk_report.quantity | floatformat:"0" }}</th>
-        {% if request.GET.mat_code == '22' %}
-          <th>{{ lk_report.quantity2 | floatformat:"0" }}</th>
-          <th>{{ lk_report.quantity|add:lk_report.quantity2 | floatformat:"0" }}</th>
-          <th></th>
-        {% endif %}
+  {% if lk_report %}
+    <tr class="table-warning">
+      <th colspan="4">{{ lk_report.siteinfo.name }}</th>
+      <th>{{ lk_report.quantity | floatformat:"0" }}</th>
+      {% if request.GET.mat_code == '22' %}
+        <th>{{ lk_report.quantity2 | floatformat:"0" }}</th>
+        <th>{{ lk_report.quantity|add:lk_report.quantity2 | floatformat:"0" }}</th>
         <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-      </tr>
-    {% endif %}
+      {% endif %}
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  {% endif %}
   {% if warning_lk_report and request.GET.mat_code == '22' %}
     <tr class="table-warning">
       <th colspan="4">{{ warning_lk_report.siteinfo.name }} 整片不堪使用</th>

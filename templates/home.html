@@ -86,15 +86,23 @@
       }
       
       function reLoadMainPage(toUrl) {
-        console.info(mainUrl)
-        $.ajax({
-          url: toUrl? toUrl: mainUrl,
-          method: 'GET',
-          success: function (data) {
-            // console.log(data);
-            $('#main').html(data) // 将加载的内容放入main区块
-          }
-        })
+        console.info(mainUrl);
+        
+        // 检查是否存在带有 id="search" 的 form 元素
+        if ($('#search').length > 0) {
+          // 存在则重新提交该表单
+          $('#search').submit();
+        } else {
+          // 不存在则执行 AJAX 请求
+          $.ajax({
+            url: toUrl ? toUrl : mainUrl,
+            method: 'GET',
+            success: function (data) {
+              // console.log(data);
+              $('#main').html(data); // 将加载的内容放入 main 区块
+            }
+          });
+        }
       }
       
       function changePage(event, pageNum) {

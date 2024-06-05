@@ -63,19 +63,16 @@ def get_board_edit_done(request):
         return render(request,'board_report/board_edit.html',context)
     else :
         report_id = request.POST.get('id')
-        is_done = request.POST.get('is_done')
-        done_type = request.POST.get('done_type')
-        close = request.POST.get('close')
+        done_type = request.POST.get('board_stuts')
         is_lost = request.POST.get('is_lost')
+        is_close = request.POST.get('is_close')
         member = request.POST.get('member')
         remark = request.POST.get('remark')
 
         report = BoardReport.objects.select_related('siteinfo').get(id=report_id)
         report.siteinfo.member = member
         report.siteinfo.save()
-        report.is_done =  is_done is not None and is_done == 'on' 
-        report.done_type = 1 if done_type is not None and done_type == 'on'  else 0
-        report.close = close is not None and close == 'on' 
+        report.done_type = done_type
         report.is_lost = is_lost is not None and is_lost == 'on' 
         report.remark = remark if remark else ""
         report.save()

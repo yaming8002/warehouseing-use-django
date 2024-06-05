@@ -35,6 +35,7 @@
   <!-- 修改了 form 的 id 以便直接选中 -->
   <form style="with:100%" method="post" action="/board_report/edit/">
     {% csrf_token %}
+    <div>工地代號 : {{ report.siteinfo.code }}</div>
     <div>工地 : {{ report.siteinfo.name }}</div>
     <div>業主 : {{ report.siteinfo.owner }}</div>
     <input type="hidden" name="id" id="id" value="{{ report.id }}">
@@ -43,36 +44,54 @@
            id="siteinfo_id"
            value="{{ report.siteinfo.id }}">
     <div>
-      <label for='close'>結案</label>
-      <input id="close" name="close" type='checkbox'>
+        <label for="is_lost">關閉</label>
+          <input class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="is_close"
+          name="is_close">
+   </div>
+    <div>
+      <label for="is_lost">遺失</label>
+        <input class="form-check-input"
+        type="checkbox"
+        role="switch"
+        id="is_lost"
+        name="is_lost"
+        {% if report.is_lost %}checked{% endif %}>
     </div>
     <div>
+      <label for="board_stuts">狀態</label>
+      <select id="board_stuts" name="board_stuts">
+        <option value='0' >無</option>
+        <option value='1'>{% if report.mat_code == '22' %}完成支撐{% else %} 完工{% endif %} </option>
+        {% if report.mat_code == '22' %}<option value='2'>簽單<option>{% endif %}
+      </select>
+    </div>
+
+    <div>
       <table>
-        {% if report.mat_code == '21' %}
+        {% if report.mat_code == '22' %}
           鐵板
-        {% elif report.mat_code == '11' %}
+        {% elif report.mat_code == '92' %}
           簍空覆工板
-        {% elif report.mat_code == '11' %}
+        {% elif report.mat_code == '95' %}
           洗車板
         {% endif %}
       </caption>
       <tr>
-        {% if  report.mat_code == '21' %}
+        {% if  report.mat_code == '22' %}
           <th>鐵板 全</th>
           <th>鐵板 半</th>
-          <th>完成支撐</th>
-          <th>簽單</th>
         {% else %}
           <th>數量</th>
-          <th>完工</th>
         {% endif %}
-        <th>遺失</th>
         <th>現場人員</th>
         <th>備註</th>
       </tr>
       <tr>
         <td>{{ report.quantity|floatformat:"0" }}</td>
-        {% if report.mat_code == '21' %}
+        {% if report.mat_code == '22' %}
           <td>{{ report.quantity2|floatformat:"0" }}</td>
           <td>
             <input class="form-check-input"
@@ -82,20 +101,6 @@
                    {% if report.done_type == 1 %}checked{% endif %}>
           </td>
         {% endif %}
-        <td>
-          <input class="form-check-input"
-                 type="checkbox"
-                 role="switch"
-                 name="is_done"
-                 {% if report.is_done %}checked{% endif %}>
-        </td>
-        <td>
-          <input class="form-check-input"
-                 type="checkbox"
-                 role="switch"
-                 name="is_lost"
-                 {% if report.is_lost %}checked{% endif %}>
-        </td>
         <td>
           <input type="text"
                  name="member"

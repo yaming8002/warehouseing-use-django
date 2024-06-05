@@ -2,21 +2,18 @@ import json
 import logging
 # # Create your models here.
 import logging.config
-import sys
 import traceback
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.views import View
 
 from stock.models.material_model import MatCat, Materials
 from stock.models.site_model import SiteInfo
 # from trans.forms import TransLogDetailForm
 from trans.models import TransLog, TransLogDetail
-from trans.service.update_report import (update_board_by_month, update_done_steel_by_month, update_done_steel_by_month_only_F, update_rail_by_month, update_steel_by_month)
+from trans.service.update_report import count_all_report
 from wcom.models.menu import SysInfo
 from wcom.utils.excel_tool import ImportData2Generic
 from wcom.utils.pagelist import PageListView
@@ -185,6 +182,7 @@ class ImportTransportView(ImportData2Generic):
                     if TransLog.objects.filter(code=trancode).exists():
                         tran = TransLog.objects.get(code=trancode)
                         TransLogDetail.rollback(tran)
+                        
                     continue
 
                 tran = TransLog.create(code=trancode, item=item)
@@ -346,11 +344,7 @@ def update_end_date(request):
     except (ValueError, TypeError):
         count_date = datetime.now()  # 使用當前日期
         
-    update_rail_by_month(count_date)
-    update_steel_by_month(count_date)
-    update_board_by_month(count_date)
-    update_done_steel_by_month_only_F(count_date)
-    update_done_steel_by_month(count_date)
+    count_all_report(count_date)
     response_data = {
         "success": True,
         "msg": "上傳成功",
@@ -385,6 +379,7 @@ def trans_detial_rollback_view(request):
     )
 
     end_day.save()
+    count_all_report(latest_date)
     response_data = {
         "success": True,
         "msg": "作廢成功",

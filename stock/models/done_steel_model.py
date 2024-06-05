@@ -17,13 +17,8 @@ logging.config.dictConfig(settings.LOGGING)
 logger = logging.getLogger(__name__)
 
 
-change_mapping = {
-    '301':'300','351':'350','401':'400','4141':'414'
-}
-
 class DoneSteelReport(BaseSteelReport):
-
-    trans_code = models.CharField( max_length=100, null=True, verbose_name="進出單號")
+    trans_code = models.CharField(max_length=100, null=True, verbose_name="進出單號")
 
     turn_site = models.ForeignKey(
         SiteInfo,
@@ -32,7 +27,6 @@ class DoneSteelReport(BaseSteelReport):
         on_delete=models.CASCADE,
         verbose_name="轉單",
     )
-
 
     class Meta:
         unique_together = [
@@ -43,71 +37,51 @@ class DoneSteelReport(BaseSteelReport):
                 "month",
                 "done_type",
                 "is_done",
+                "trans_code",
             )
         ]
         verbose_name = "變動資訊"
         verbose_name_plural = "變動資訊"
-        ordering = ["done_type", "siteinfo","id"]  # 按照 id 升序排序
+        ordering = ["done_type", "siteinfo", "id"]  # 按照 id 升序排序
 
     @classmethod
     def whse_reomve_matials(
         cls,
-        trans_code,
         mat: Materials,
         year: int,
         month: int,
         all_quantity: Decimal,
         all_unit: Decimal,
-        remark: str,
     ):
-        if cls.objects.filter(trans_code = trans_code).exists():
-            return 
         if not year:
             now = datetime.now()
             year, month = now.year, now.month
 
-        whse = SteelReport.get_current_by_site(
-            SiteInfo.get_site_by_code("0001"), year, month
-        )
-        total = SteelReport.get_current_by_site(
-            SiteInfo.get_site_by_code("0000"), year, month
-        )
-
         column = f"m_{mat.mat_code}"
         value = all_quantity if mat.mat_code in ["92", "12", "13"] else all_unit
-        setattr(whse, column, getattr(whse, column) - value)
-        setattr(total, column, getattr(total, column) - value)
-        cls.add_new_mat(
-            trans_code,
-            SiteInfo.get_site_by_code("0000"),
-            None,
-            year,
-            month,
-            mat.mat_code,
-            all_quantity,
-            all_unit,
-            remark
+        donesteel, _ = cls.objects.get_or_create(
+            siteinfo=SiteInfo.get_site_by_code("0000"),
+            year=year,
+            month=month,
+            done_type=2,
+            is_done=True,
         )
+        setattr(donesteel, column, 0 - value)
+        donesteel.save()
 
     @classmethod
     def add_new_mat(
         cls,
-        trans_code,
         site: SiteInfo,
-        turn_site:Optional[SiteInfo],
+        turn_site: Optional[SiteInfo],
         year: int,
         month: int,
         mat_code: str,
         all_quantity: Decimal,
         all_unit: Decimal,
-        remark: str,
+        remark: Optional[str],
     ):
-        if cls.objects.filter(trans_code = trans_code).exists():
-            return 
         column = f"m_{mat_code}"
-        total = SteelReport.get_current_by_site(
-            site=SiteInfo.get_site_by_code("0000"), year=year, month=month
-        )
         donesteel, _ = cls.objects.get_or_create(
             siteinfo=site,
             turn_site=turn_site,
@@ -116,54 +90,15 @@ class DoneSteelReport(BaseSteelReport):
             done_type=2,
             is_done=True,
         )
-        if mat_code in ["92", "12", "13"]:
-            setattr(total, column, Decimal(getattr(total, column)) + all_quantity)
-            setattr(
-                donesteel, column, Decimal(getattr(donesteel, column)) + all_quantity
-            )
-        else:
-            setattr(total, column, Decimal(getattr(total, column)) + all_unit)
-            setattr(donesteel, column, Decimal(getattr(donesteel, column)) + all_unit)
+
+        value = all_quantity if mat_code in ["92", "12", "13"] else all_unit
+        setattr(donesteel, column, value)
+
         donesteel.remark = (
             f"{site.owner} {(remark if remark and remark !='None' else '')}"
         )
-        total.save()
         donesteel.save()
-
-    @classmethod
-    def pile_to_board(
-        cls,
-        trans_code,
-        site: SiteInfo,
-        year: int,
-        month: int,
-        mat_code: str,
-        all_unit: Decimal,
-        remark: str,
-    ):
-        if cls.objects.filter(trans_code = trans_code).exists():
-            return 
-        column = f"m_{mat_code}"
-        column_by = f"m_{change_mapping[mat_code]}"
-        total = SteelReport.get_current_by_site(
-            site=SiteInfo.get_site_by_code("0000"), year=year, month=month
-        )
-        donesteel, _ = cls.objects.get_or_create(
-            siteinfo=site,
-            year=year,
-            month=month,
-            done_type=2,
-            is_done=True,
-        )
-
-        setattr(total, column, Decimal(getattr(total, column)) + all_unit)
-        setattr(donesteel, column, Decimal(getattr(donesteel, column)) + all_unit)
-        setattr(total, column_by, Decimal(getattr(total, column_by)) - all_unit)
-        setattr(donesteel, column_by, Decimal(getattr(donesteel, column_by)) - all_unit)
-        donesteel.remark = remark
-        total.save()
-        donesteel.save()
-
+        return donesteel
 
     @classmethod
     def roll_back(cls, site: SiteInfo):
@@ -183,7 +118,7 @@ class DoneSteelReport(BaseSteelReport):
     @classmethod
     def add_done_item(cls, case_name, request):
         site_id = request.POST.get("siteinfo_id")
-        y, m = get_year_month(request.POST.get('yearMonth'))
+        y, m = get_year_month(request.POST.get("yearMonth"))
         type_val = request.POST.get(f"{case_name}.done_type")
         isdone = (
             request.POST.get("isdone") is not None
@@ -191,12 +126,16 @@ class DoneSteelReport(BaseSteelReport):
         )
         site = SiteInfo.objects.get(id=site_id)
 
-        done_report_obj = cls.objects.select_related("siteinfo").filter(
-            siteinfo=site,
-            year=y,
-            month=m,
-            done_type=type_val,
-        ).order_by("-year","-month")
+        done_report_obj = (
+            cls.objects.select_related("siteinfo")
+            .filter(
+                siteinfo=site,
+                year=y,
+                month=m,
+                done_type=type_val,
+            )
+            .order_by("-year", "-month")
+        )
 
         if done_report_obj.exists():
             done_report = done_report_obj.first()
@@ -211,8 +150,8 @@ class DoneSteelReport(BaseSteelReport):
             )
 
         for k, _ in done_report.static_column_code.items():
-            value =request.POST.get(f"{case_name}.m_{k}")
-            value = value if value else Decimal(0)
+            value = request.POST.get(f"{case_name}.m_{k}")
+            value = Decimal(value) *-1 if value else Decimal(0)
             setattr(done_report, f"m_{k}", value)
 
         done_report.save()
