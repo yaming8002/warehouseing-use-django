@@ -30,7 +30,7 @@ class Stock(models.Model):
     @classmethod
     def getItem(cls, site: SiteInfo, mat: Materials):
         try:
-            stock, created = cls.objects.get_or_create(siteinfo=site, material=mat)
+            stock, _ = cls.objects.get_or_create(siteinfo=site, material=mat)
             return stock
         except cls.MultipleObjectsReturned:
             stocks = cls.objects.filter(siteinfo=site, material=mat)
@@ -38,7 +38,7 @@ class Stock(models.Model):
             return stocks.first()
 
     @classmethod
-    def move_material(cls, site, mat, quantity, unit, is_in=True):
+    def move_material(cls, site: SiteInfo, mat: Materials, quantity=Decimal(0), unit=Decimal(0), is_in=True):
         stock = cls.getItem(site, mat)
         stock.change_quantity_util(is_in, quantity, unit)
         stock.save()

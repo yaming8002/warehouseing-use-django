@@ -186,6 +186,7 @@ class TransLogDetail(models.Model):
             detials = cls.objects.select_related("translog").filter(id=detial_id).all()
         else:
             detials = cls.objects.select_related("translog").filter(translog=tran).all()
+            
         for detail in detials:
             cls.objects.select_related("translog").filter(
                 translog__code=tran, material=detail.material
@@ -196,38 +197,8 @@ class TransLogDetail(models.Model):
             mat = detail.material
             quantity = detail.quantity
             all_unit = detail.all_unit
-            remark = detail.remark
-            Stock.move_material(mat, quantity, all_unit, is_stock_add)
+            Stock.move_material( tran.constn_site,mat, quantity, all_unit, is_stock_add)
 
-            if DoneSteelReport.add_new_mat(
-                tran.constn_site,
-                tran.turn_site,
-                tran.build_date,
-                is_stock_add,
-                mat,
-                quantity,
-                all_unit,
-                remark,
-            ):
-                """if this case not new material"""
-                Stock.move_material(
-                    tran.constn_site, mat, quantity, all_unit, not is_stock_add
-                )
-                SteelReport.add_report(
-                    tran.constn_site,
-                    tran.build_date,
-                    is_stock_add,
-                    mat,
-                    quantity,
-                    all_unit,
-                )
-
-            RailReport.add_report(
-                tran.constn_site, tran.build_date, is_stock_add, mat, quantity
-            )
-            BoardReport.add_report(
-                tran.constn_site, remark, is_stock_add, mat, quantity
-            )
 
     class Meta:
         unique_together = [
