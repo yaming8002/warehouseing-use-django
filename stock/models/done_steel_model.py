@@ -47,7 +47,7 @@ class DoneSteelReport(BaseSteelReport):
     @classmethod
     def whse_reomve_matials(
         cls,
-        mat: Materials,
+        mat_code: str,
         year: int,
         month: int,
         all_quantity: Decimal,
@@ -57,14 +57,15 @@ class DoneSteelReport(BaseSteelReport):
             now = datetime.now()
             year, month = now.year, now.month
 
-        column = f"m_{mat.mat_code}"
-        value = all_quantity if mat.mat_code in ["92", "12", "13"] else all_unit
+        column = f"m_{mat_code}"
+        value = all_quantity if mat_code in ["92", "12", "13"] else all_unit
         donesteel, _ = cls.objects.get_or_create(
             siteinfo=SiteInfo.get_site_by_code("0000"),
             year=year,
             month=month,
             done_type=2,
             is_done=True,
+            remark='林口倉報廢'
         )
         setattr(donesteel, column, 0 - value)
         donesteel.save()

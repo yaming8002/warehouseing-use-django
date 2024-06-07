@@ -93,13 +93,6 @@
         <td>{{ report.quantity|floatformat:"0" }}</td>
         {% if report.mat_code == '22' %}
           <td>{{ report.quantity2|floatformat:"0" }}</td>
-          <td>
-            <input class="form-check-input"
-                   type="checkbox"
-                   role="switch"
-                   name="done_type"
-                   {% if report.done_type == 1 %}checked{% endif %}>
-          </td>
         {% endif %}
         <td>
           <input type="text"

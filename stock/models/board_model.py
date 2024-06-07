@@ -126,6 +126,7 @@ class BoardReport(MonthReport):
             .filter(id__in=ids)
             .filter(is_done=is_done)
             .filter(close=False)
+            .filter( ~( Q(quantity=0) & Q(quantity2=0)) )
             .order_by("done_type", "siteinfo__code", "siteinfo__genre")
             .all()
         )
@@ -156,4 +157,6 @@ class BoardReport(MonthReport):
 
         if now.quantity + now.quantity2 == 0:
             now.close = True
+        else:
+            now.close = False
         now.save()

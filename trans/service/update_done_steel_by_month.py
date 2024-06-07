@@ -19,7 +19,9 @@ def reomve_total_steel(first_day_of_month, last_day_of_month):
     query = (
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
         & Q(translog__transaction_type="OUT")
-        & Q(translog__constn_site__code="0000")
+        & ~Q(translog__constn_site__genre=1)
+        & ~Q(translog__constn_site__code="0003")
+        & ~Q(translog__constn_site__code__startswith="F")
         & Q(material__mat_code__in=SteelReport.static_column_code.keys())
         & Q(is_rollback=False)
     )
@@ -28,23 +30,41 @@ def reomve_total_steel(first_day_of_month, last_day_of_month):
         TransLogDetail.objects.select_related("translog", "material")
         .filter(query)
         .values(
+            site_code=F("translog__constn_site__code"),
             mat_code=F("material__mat_code"),  # mat_code
-            spec_id=F("material__specification_id"),  # specification_id
         )
         .annotate(
-            quantity=conditional_sum("quantity"),
-            all_unit_sum=conditional_sum("all_unit"),
+            quantity=Sum("quantity"),
+            all_unit_sum=Sum("all_unit"),
         )
     )
+    # print(update_list.query)
 
     for detial in update_list:
-        DoneSteelReport.whse_reomve_matials(
-            Materials.objects.get(mat_code=detial["mat_code"],specification=detial["spec_id"]),
-            first_day_of_month.year,
-            first_day_of_month.month,
-            detial["quantity"],
-            detial["all_unit_sum"],
-        )
+        if detial["site_code"] == "0000":
+            DoneSteelReport.whse_reomve_matials(
+                detial["mat_code"],
+                first_day_of_month.year,
+                first_day_of_month.month,
+                detial["quantity"],
+                detial["all_unit_sum"],
+            )
+        else:
+            # 到維護廠處裡
+            column = f"m_{detial['mat_code']}"
+            value = (
+                detial["quantity"]
+                if detial["mat_code"] in ["92", "12", "13"]
+                else detial["all_unit_sum"]
+            )
+            SteelReport.update_column_value_by_before(
+                SiteInfo.get_site_by_code(detial["site_code"]),
+                first_day_of_month.year,
+                first_day_of_month.month,
+                True,
+                column,
+                value,
+            )
 
 
 def update_done_steel_by_month(build_date):
@@ -91,15 +111,19 @@ def update_done_steel_by_month(build_date):
             turn_site,
             year,
             month,
-            detial['mat_code'],
-            detial['quantity'] ,
-            detial['all_unit_sum'],
-            '',
+            detial["mat_code"],
+            detial["quantity"],
+            detial["all_unit_sum"],
+            "",
         )
 
 
-
 change_mapping = {"301": "300", "351": "350", "401": "400", "4141": "414"}
+
+mat_list = [
+    "300","301","350","351","390","400","401","408","414",
+    "4141","92","12","13","2301","2302","10","4144",
+]
 
 
 def update_done_steel_by_month_only_F(build_date):
@@ -112,22 +136,23 @@ def update_done_steel_by_month_only_F(build_date):
 
     query = (
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
-        & Q(material__mat_code__in=SteelReport.static_column_code.keys())
+        & Q(material__mat_code__in=mat_list)
         & Q(translog__constn_site__code__startswith="F")
         & Q(is_rollback=False)
     )
 
     update_list = (
-        TransLogDetail.objects.select_related("translog","translog__constn_site","translog__turn_site", "material")
+        TransLogDetail.objects.select_related(
+            "translog", "translog__constn_site", "translog__turn_site", "material"
+        )
         .filter(query)
         .all()
     )
 
-    # print(update_list.query)
+    print(update_list.query)
 
     f002_dct = defaultdict(lambda: Decimal(0))
     for detial in update_list:
-
         if detial.translog.transaction_type == "OUT":
             column = f"m_{detial.material.mat_code}"
             if detial.material.mat_code not in SteelReport.static_column_code:
@@ -142,14 +167,14 @@ def update_done_steel_by_month_only_F(build_date):
             continue
         elif detial.material.mat_code in ["2301", "2302"]:
             """斜撐"""
+            print("""斜撐""")
             column = f"m_{'300' if detial.material.mat_code=='2301' else '350' }"
             all_unit = detial.quantity * (
-                1.25 if detial.material.mat_code == "2301" else 1.2
+                Decimal('1.25') if detial.material.mat_code == "2301" else Decimal(1.2)
             )
             # setattr(steel_f,column,getattr(steel_f,column) - all_unit)
-            f002_dct[column] -= value
+            f002_dct[column] -= all_unit
             DoneSteelReport.add_new_mat(
-                detial.translog.code,
                 SiteInfo.get_site_by_code("F002"),
                 detial.translog.turn_site,
                 year,
@@ -157,10 +182,11 @@ def update_done_steel_by_month_only_F(build_date):
                 "300" if detial.material.mat_code == "2301" else "350",
                 detial.quantity,
                 -all_unit,
-                detial.remark,
+                f"轉斜撐   {detial.remark}",
             )
         elif detial.material.mat_code in ["10", "4144"]:
             """短接"""
+            print("""短接""")
             column = f"m_{'350' if detial.material.mat_code=='10' else detial.material.mat_code[:-1] }"
             donesteel, _ = DoneSteelReport.objects.get_or_create(
                 siteinfo=detial.translog.constn_site,
@@ -168,13 +194,16 @@ def update_done_steel_by_month_only_F(build_date):
                 year=year,
                 month=month,
                 done_type=2,
-                is_done=True,
+                is_done=True
             )
-            f002_dct[column] -= value
             # setattr(steel_f, column, Decimal(getattr(steel_f, column)) - all_unit)
-            setattr(donesteel, column, Decimal(getattr(donesteel, column)) + detial.quantity)
-
+            donesteel.remark = f"轉短接 [米數需要調整]   {detial.remark}"
+            setattr(
+                donesteel, column, Decimal(getattr(donesteel, column)) + detial.quantity
+            )
+            donesteel.save()
         elif detial.material.mat_code in change_mapping.keys():
+            print("""轉中柱""")
             """轉中柱"""
             donesteel, _ = DoneSteelReport.objects.get_or_create(
                 siteinfo=detial.translog.constn_site,
@@ -183,14 +212,28 @@ def update_done_steel_by_month_only_F(build_date):
                 month=month,
                 done_type=2,
                 is_done=True,
+                defaults={
+                    "remark":f"轉中柱   {detial.remark}"
+                }
             )
             column = f"m_{detial.material.mat_code}"
             column_by = f"m_{change_mapping[detial.material.mat_code]}"
-            f002_dct[column_by] -= value
-            setattr(donesteel, column, Decimal(getattr(donesteel, column)) + Decimal(detial.all_unit))
-            setattr(
-                donesteel, column_by, Decimal(getattr(donesteel, column_by)) - Decimal(detial.all_unit)
+            f002_dct[column_by] -= detial.all_unit
+            print(Decimal(getattr(donesteel, column)) + Decimal(detial.all_unit))
+            print(
+                Decimal(getattr(donesteel, column_by)) - Decimal(detial.all_unit),
             )
+            setattr(
+                donesteel,
+                column,
+                Decimal(getattr(donesteel, column)) + Decimal(detial.all_unit),
+            )
+            setattr(
+                donesteel,
+                column_by,
+                Decimal(getattr(donesteel, column_by)) - Decimal(detial.all_unit),
+            )
+            donesteel.save()
         elif detial.material.mat_code in change_mapping.values():
             siteinfo = SiteInfo.get_site_by_code("F002")
             column = f"m_{detial.material.mat_code}"

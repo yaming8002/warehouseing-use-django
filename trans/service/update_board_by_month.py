@@ -41,28 +41,27 @@ def update_board_by_month(build_date):
         )
         .filter(query)
         .values(
-            "translog__constn_site__code",  # sitecode
-            "translog__constn_site__genre",
-            "material__mat_code",  # mat_code
-            "remark",  # mat_code
+           site_code=F( "translog__constn_site__code"), 
+           genre=F("translog__constn_site__genre"),
+           mat_code=F("material__mat_code")
         )
         .annotate(
-            quantity=conditional_sum("quantity"),
+            sum_quantity=conditional_sum("quantity"),
         )
     )
 
     print(update_list.query)
     whse_dct = {}
     for x in update_list:
-        siteinfo = SiteInfo.get_site_by_code(x["translog__constn_site__code"])
-        column = x["material__mat_code"]
-        if x["translog__constn_site__genre"] == 1:
+        siteinfo = SiteInfo.get_site_by_code(x["site_code"])
+        column = x["mat_code"]
+        if x["genre"] == 1 or x["site_code"]=='0003' :
             BoardReport.update_column_value_by_before(
-                siteinfo, year, month, False, column, x["quantity"]
+                siteinfo, year, month, False, column, x["sum_quantity"]
             )
         if column not in whse_dct.keys():
             whse_dct[column] = Decimal(0)
-        whse_dct[column] += x["quantity"]
+        whse_dct[column] += x["sum_quantity"]
         
     site_whse = SiteInfo.get_site_by_code("0001")
     for k, v in whse_dct.items():

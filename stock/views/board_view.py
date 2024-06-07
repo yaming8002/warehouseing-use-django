@@ -26,6 +26,7 @@ class BoardControlView(MonthListView):
         mat_code = '22' if '22' in mat_code  else mat_code
         query =  Q(siteinfo_id__gt=4) & (Q(year__lt=year) | Q(year=year, month__lte=month))
         query &= Q(mat_code=mat_code) & Q(is_lost=is_lost)
+
         return BoardReport.get_current_by_query(query)
 
     def get_whse_martials(self, context):
@@ -65,7 +66,6 @@ def get_board_edit_done(request):
         report_id = request.POST.get('id')
         done_type = request.POST.get('board_stuts')
         is_lost = request.POST.get('is_lost')
-        is_close = request.POST.get('is_close')
         member = request.POST.get('member')
         remark = request.POST.get('remark')
 

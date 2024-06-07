@@ -36,7 +36,7 @@ class SiteViewList(PageListView):
         genre = self.request.GET.get("genre")
 
         if code:
-            result = result.filter(code=code)
+            result = result.filter(code__istartswith=code)
         if owner:
             result = result.filter(owner__istartswith=owner)
         if name:

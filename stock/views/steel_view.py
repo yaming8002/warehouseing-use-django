@@ -22,9 +22,9 @@ static_column_code = [
         "351",
         "400",
         "401",
+        "408",
         "414",
         "4141",
-        "408",
         "92",
         "12",
         "13",
@@ -76,7 +76,7 @@ class SteelDoneView(MonthListView):
 
     def get_queryset(self):
         year,month = self.get_year_month()
-        query =  (Q(siteinfo__id__gt=4) & (Q(year=year) & Q( month=month)) )
+        query =  ( (Q(year=year) & Q( month=month)) )
         return DoneSteelReport.objects.filter(query).all()
     
     def get_whse_martials(self,context ):

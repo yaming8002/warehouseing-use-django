@@ -90,7 +90,7 @@
   </tr>
   {% for item in list %}
     <tr>
-      <td>{{ forloop.counter }}</td>
+      <td>{{ forloop.counter }},{{item.id}}</td>
       <td>{{ item.siteinfo.code }}</td>
       <td>{{ item.siteinfo.owner }}</td>
       <td>{{ item.siteinfo.name }}</td>
