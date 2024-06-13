@@ -35,7 +35,7 @@
   <!-- 修改了 form 的 id 以便直接选中 -->
   <form style="with:100%" method="post" action="/steel_control/edit/">
     {% csrf_token %}
-    <div>工地編號 : {{  report.siteinfo.code }}</div>
+    <div>工地編號 : {{ report.siteinfo.code }}</div>
     <div>工地 : {{ report.siteinfo.name }}</div>
     <div>業主 : {{ report.siteinfo.owner }}</div>
     <input type="hidden" name="id" id="id" value="{{ report.id }}">
@@ -48,211 +48,246 @@
            id="siteinfo_code"
            value="{{ report.siteinfo.code }}">
     <div>
-    <div>
-      <label for="yearMonthInput">結案月份:</label>
-      <input type="month"
-             id="yearMonthInput"
-             name="yearMonth"
-             value='{{ yearMonth }}'>
+      <div>
+        <label for="yearMonthInput">結案月份:</label>
+        <input type="month"
+               id="yearMonthInput"
+               name="yearMonth"
+               value='{{ yearMonth }}'>
+      </div>
+      <div>
+        <label for='isdone'>是否結案</label>
+        <input id="isdone" name="isdone" type='checkbox' checked>
+      </div>
+      <div>
+        <table id="input_table" class="steel_table" style="width:1200px;">
+          <tr>
+            <th>項目</th>
+            <th>
+              H300
+              <br>
+              支撐(m)
+            </th>
+            <th>
+              H300
+              <br>
+              中柱(m)
+            </th>
+            <th>
+              H350
+              <br>
+              支撐(m)
+            </th>
+            <th>
+              H350
+              <br>
+              中柱(m)
+            </th>
+            <th>
+              H400
+              <br>
+              支撐(m)
+            </th>
+            <th>
+              H400
+              <br>
+              中柱(m)
+            </th>
+            <th>
+              H408
+              <br>
+              支撐(m)
+            </th>
+            <th>
+              H414
+              <br>
+              支撐(m)
+            </th>
+            <th>
+              H414
+              <br>
+              中柱(m)
+            </th>
+            <th>覆工板</th>
+            <th>千斤頂(個)</th>
+            <th>土壓計(個)</th>
+            <th>備註</th>
+          </tr>
+          <tr>
+            <td>剩餘物料</td>
+            <td id="o.m_300">
+              {% if report.m_300 %}{{ report.m_300 }}{% endif %}
+            </td>
+            <td id="o.m_301">
+              {% if report.m_301 %}{{ report.m_301 }}{% endif %}
+            </td>
+            <td id="o.m_350">
+              {% if report.m_350 %}{{ report.m_350 }}{% endif %}
+            </td>
+            <td id="o.m_351">
+              {% if report.m_351 %}{{ report.m_351 }}{% endif %}
+            </td>
+            <td id="o.m_400">
+              {% if report.m_400 %}{{ report.m_400 }}{% endif %}
+            </td>
+            <td id="o.m_401">
+              {% if report.m_401 %}{{ report.m_401 }}{% endif %}
+            </td>
+            <td id="o.m_408">
+              {% if report.m_408 %}{{ report.m_408 }}{% endif %}
+            </td>
+            <td id="o.m_414">
+              {% if report.m_414 %}{{ report.m_414 }}{% endif %}
+            </td>
+            <td id="o.m_4141">
+              {% if report.m_4141 %}{{ report.m_4141 }}{% endif %}
+            </td>
+            <td id="o.m_92">
+              {% if report.m_92 %}{{ report.m_92 }}{% endif %}
+            </td>
+            <td id="o.m_12">
+              {% if report.m_12 %}{{ report.m_12 |floatformat:"0" }}{% endif %}
+            </td>
+            <td id="o.m_13">
+              {% if report.m_13 %}{{ report.m_13 |floatformat:"0" }}{% endif %}
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>
+              異動變動
+              <input type="hidden" id="change.year" name="change.year" value="{{ year }}">
+              <input type="hidden"
+                     id="change.month"
+                     name="change.month"
+                     value="{{ month }}">
+              <input type="hidden" id="change.done_type" name="change.done_type" value="3">
+            </td>
+            <td>
+              <input type="text" id="change.m_300" name="change.m_300">
+            </td>
+            <td>
+              <input type="text" id="change.m_301" name="change.m_301">
+            </td>
+            <td>
+              <input type="text" id="change.m_350" name="change.m_350">
+            </td>
+            <td>
+              <input type="text" id="change.m_351" name="change.m_351">
+            </td>
+            <td>
+              <input type="text" id="change.m_400" name="change.m_400">
+            </td>
+            <td>
+              <input type="text" id="change.m_401" name="change.m_401">
+            </td>
+            <td>
+              <input type="text" id="change.m_408" name="change.m_408">
+            </td>
+            <td>
+              <input type="text" id="change.m_414" name="change.m_414">
+            </td>
+            <td>
+              <input type="text" id="change.m_4141" name="change.m_4141">
+            </td>
+            <td>
+              <input type="text" id="change.m_92" name="change.m_92">
+            </td>
+            <td>
+              <input type="text" id="change.m_12" name="change.m_12">
+            </td>
+            <td>
+              <input type="text" id="change.m_13" name="change.m_13">
+            </td>
+            <td>
+              <textarea style="with:100%" id="change.remark" name="change.remark" row="5"></textarea>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              切除變動
+              <input type="hidden" id="cut.year" name="cut.year" value="{{ year }}">
+              <input type="hidden" id="cut.month" name="cut.month" value="{{ month }}">
+              <input type="hidden" id="cut.done_type" name="cut.done_type" value="4">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_300"
+                     name="cut.m_300"
+                     value="{% if report.m_300 %}{{ report.m_300 }}{% endif %}">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_301"
+                     name="cut.m_301"
+                     value="{% if report.m_301 %}{{ report.m_301 }}{% endif %}">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_350"
+                     name="cut.m_350"
+                     value="{% if report.m_350 %}{{ report.m_350 }}{% endif %}">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_351"
+                     name="cut.m_351"
+                     value="{% if report.m_351 %}{{ report.m_351 }}{% endif %}">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_400"
+                     name="cut.m_400"
+                     value="{% if report.m_400 %}{{ report.m_400 }}{% endif %}">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_401"
+                     name="cut.m_401"
+                     value="{% if report.m_401 %}{{ report.m_401 }}{% endif %}">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_408"
+                     name="cut.m_408"
+                     value="{% if report.m_408 %}{{ report.m_408 }}{% endif %}">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_414"
+                     name="cut.m_414"
+                     value="{% if report.m_414 %}{{ report.m_414 }}{% endif %}">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_4141"
+                     name="cut.m_4141"
+                     value="{% if report.m_4141 %}{{ report.m_4141 }}{% endif %}">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_92"
+                     name="cut.m_92"
+                     value="{% if report.m_92 %}{{ report.m_92 }}{% endif %}">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_12"
+                     name="cut.m_12"
+                     value="{% if report.m_12 %}{{ report.m_12 |floatformat:'0' }}{% endif %}">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_13"
+                     name="cut.m_13"
+                     value="{% if report.m_13 %}{{ report.m_13 |floatformat:'0' }}{% endif %}">
+            </td>
+            <td>
+              <textarea style="with:100%" id="cut.remark" name="cut.remark" row="5"></textarea>
+            </td>
+          </tr>
+        </table>
+      </div>
     </div>
-    <div>
-      <label for='isdone'>是否結案</label>
-      <input id="isdone" name="isdone" type='checkbox' checked>
-    </div>
-    <div>
-      <table id="input_table" class="steel_table" style="width:1200px;">
-        <tr>
-          <th>項目</th>
-          <th>
-            H300
-            <br>
-            支撐(m)
-          </th>
-          <th>
-            H300
-            <br>
-            中柱(m)
-          </th>
-          <th>
-            H350
-            <br>
-            支撐(m)
-          </th>
-          <th>
-            H350
-            <br>
-            中柱(m)
-          </th>
-          <th>
-            H400
-            <br>
-            支撐(m)
-          </th>
-          <th>
-            H400
-            <br>
-            中柱(m)
-          </th>
-          <th>
-            H408
-            <br>
-            支撐(m)
-          </th>
-          <th>
-            H414
-            <br>
-            支撐(m)
-          </th>
-          <th>
-            H414
-            <br>
-            中柱(m)
-          </th>
-          <th>覆工板</th>
-          <th>千斤頂(個)</th>
-          <th>土壓計(個)</th>
-          <th>備註</th>
-        </tr>
-        <tr>
-          <td>剩餘物料</td>
-          <td id="o.m_300">{{ report.m_300 }}</td>
-          <td id="o.m_301">{{ report.m_301 }}</td>
-          <td id="o.m_350">{{ report.m_350 }}</td>
-          <td id="o.m_351">{{ report.m_351 }}</td>
-          <td id="o.m_400">{{ report.m_400 }}</td>
-          <td id="o.m_401">{{ report.m_401 }}</td>
-          <td id="o.m_408">{{ report.m_408 }}</td>
-          <td id="o.m_414">{{ report.m_414 }}</td>
-          <td id="o.m_4141">{{ report.m_4141 }}</td>
-          <td id="o.m_92">{{ report.m_92  }}</td>
-          <td id="o.m_12">{{ report.m_12 |floatformat:"0"  }}</td>
-          <td id="o.m_13">{{ report.m_13 |floatformat:"0"  }}</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>
-            異動變動
-            <input type="hidden" id="change.year" name="change.year" value="{{ year }}">
-            <input type="hidden"
-                   id="change.month"
-                   name="change.month"
-                   value="{{ month }}">
-            <input type="hidden" id="change.done_type" name="change.done_type" value="3">
-          </td>
-          <td>
-            <input type="text" id="change.m_300" name="change.m_300" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_301" name="change.m_301" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_350" name="change.m_350" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_351" name="change.m_351" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_400" name="change.m_400" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_401" name="change.m_401" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_408" name="change.m_408" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_414" name="change.m_414" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_4141" name="change.m_4141" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_92" name="change.m_92" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_12" name="change.m_12" value="0">
-          </td>
-          <td>
-            <input type="text" id="change.m_13" name="change.m_13" value="0">
-          </td>
-          <td>
-            <textarea style="with:100%" id="change.remark" name="change.remark" row="5"></textarea>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            切除變動
-            <input type="hidden" id="cut.year" name="cut.year" value="{{ year }}">
-            <input type="hidden" id="cut.month" name="cut.month" value="{{ month }}">
-            <input type="hidden" id="cut.done_type" name="cut.done_type" value="4">
-          </td>
-          <td>
-            <input type="text"
-                   id="cut.m_300"
-                   name="cut.m_300"
-                   value="{{ report.m_300 }}">
-          </td>
-          <td>
-            <input type="text"
-                   id="cut.m_301"
-                   name="cut.m_301"
-                   value="{{ report.m_301 }}">
-          </td>
-          <td>
-            <input type="text"
-                   id="cut.m_350"
-                   name="cut.m_350"
-                   value="{{ report.m_350 }}">
-          </td>
-          <td>
-            <input type="text"
-                   id="cut.m_351"
-                   name="cut.m_351"
-                   value="{{ report.m_351 }}">
-          </td>
-          <td>
-            <input type="text"
-                   id="cut.m_400"
-                   name="cut.m_400"
-                   value="{{ report.m_400 }}">
-          </td>
-          <td>
-            <input type="text"
-                   id="cut.m_401"
-                   name="cut.m_401"
-                   value="{{ report.m_401 }}">
-          </td>
-          <td>
-            <input type="text"
-                   id="cut.m_408"
-                   name="cut.m_408"
-                   value="{{ report.m_408 }}">
-          </td>
-          <td>
-            <input type="text"
-                   id="cut.m_414"
-                   name="cut.m_414"
-                   value="{{ report.m_414 }}">
-          </td>
-          <td>
-            <input type="text"
-                   id="cut.m_4141"
-                   name="cut.m_4141"
-                   value="{{ report.m_4141 }}">
-          </td>
-          <td>
-            <input type="text" id="cut.m_92" name="cut.m_92" value="{{ report.m_92  }}">
-          </td>
-          <td>
-            <input type="text" id="cut.m_12" name="cut.m_12" value="{{ report.m_12 |floatformat:'0' }}">
-          </td>
-          <td>
-            <input type="text" id="cut.m_13" name="cut.m_13" value="{{ report.m_13 |floatformat:'0' }}">
-          </td>
-          <td>
-            <textarea style="with:100%" id="cut.remark" name="cut.remark" row="5"></textarea>
-          </td>
-        </tr>
-      </table>
-    </form>
-  {% endblock %}
+  </form>
+{% endblock %}

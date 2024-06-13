@@ -29,8 +29,14 @@
         action="/transport_log/uploadexcel/"
         enctype="multipart/form-data">
     {% csrf_token %}
+    <div>
     <input type="file" id="excelFile" name="excel_file" accept=".xlsx" />
+    </div>
     <!-- 修改了按鈕的 ID 以防止與 form 的 ID 混淆 -->
+    <div>
+      <label for="is_all">全部上傳</label>
+      <input type='checkbox' id='is_all' name="is_all" />
+    </div>
     <button type="button" id="upload_button">上傳</button>
   </form>
 {% endblock %}

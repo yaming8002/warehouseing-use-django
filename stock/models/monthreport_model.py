@@ -112,7 +112,7 @@ class MonthReport(MonthData):
         return report
 
     @classmethod
-    def get_current_by_query(cls, query, is_done=False):
+    def get_current_by_query(cls, query,final_query=None, is_done=False):
         query_set = (
             cls.objects.annotate(
                 rank=Window(
@@ -128,10 +128,14 @@ class MonthReport(MonthData):
         )
 
         ids = [item["id"] for item in query_set]
+        if final_query:
+            final_query &=Q(id__in=ids) & Q(is_done=is_done)
+        else:
+            final_query =Q(id__in=ids) & Q(is_done=is_done)
+
         return (
             cls.objects.select_related("siteinfo")
-            .filter(id__in=ids)
-            .filter(is_done=is_done)
+            .filter(final_query)
             .order_by("siteinfo__genre","siteinfo__code")
             .all()
         )
@@ -144,6 +148,8 @@ class MonthReport(MonthData):
         before = cls.get_current_by_site(site,b_year,b_month)
         update_value =Decimal( getattr(before,column,0) )
         update_value += value if is_add else -value
+        if site.genre > 1 and update_value < 0:
+            return None
         setattr(now,column,update_value)
         now.save()
         return now

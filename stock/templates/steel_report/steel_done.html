@@ -182,7 +182,7 @@
       <td colspan='6' style="text-align:left" >{% if item.remark %}{{ item.remark |safe}}<br>{% endif %}
         {% if item.turn_site_id %}目的地:[{{item.turn_site.code}}]{{item.turn_site.owner}}{% endif %}
       </td>
-      <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯說明</a>{% if item.done_type > 2 %} <a href="#" onclick="rollback({{ item.id }})">退回</a>{% endif %}</td>
+      <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>{% if item.done_type > 2 %} <a href="#" onclick="rollback({{ item.id }})">退回</a>{% endif %}</td>
     </tr>
   {% endfor %}
   <tr>

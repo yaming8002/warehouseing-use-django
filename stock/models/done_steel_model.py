@@ -18,8 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 class DoneSteelReport(BaseSteelReport):
-    trans_code = models.CharField(max_length=100, null=True, verbose_name="進出單號")
 
+    mat_code = models.CharField(max_length=20, default=None,null=True, verbose_name="物料編號")
+    """主要是針對皓民的物料資料進行分割"""
     turn_site = models.ForeignKey(
         SiteInfo,
         null=True,
@@ -37,7 +38,7 @@ class DoneSteelReport(BaseSteelReport):
                 "month",
                 "done_type",
                 "is_done",
-                "trans_code",
+                "mat_code",
             )
         ]
         verbose_name = "變動資訊"
@@ -90,14 +91,14 @@ class DoneSteelReport(BaseSteelReport):
             month=month,
             done_type=2,
             is_done=True,
+            defaults={
+                'remark': remark if remark else ''
+            }
         )
 
         value = all_quantity if mat_code in ["92", "12", "13"] else all_unit
         setattr(donesteel, column, value)
 
-        donesteel.remark = (
-            f"{site.owner} {(remark if remark and remark !='None' else '')}"
-        )
         donesteel.save()
         return donesteel
 
@@ -152,7 +153,8 @@ class DoneSteelReport(BaseSteelReport):
 
         for k, _ in done_report.static_column_code.items():
             value = request.POST.get(f"{case_name}.m_{k}")
-            value = Decimal(value) *-1 if value else Decimal(0)
+            print(f'check>{value}<')
+            value = - Decimal(value)  if value else Decimal(0)
             setattr(done_report, f"m_{k}", value)
 
         done_report.save()

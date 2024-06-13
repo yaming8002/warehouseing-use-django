@@ -156,10 +156,10 @@ async function handleFileProcessing(file) {
 async function processAndUploadData( count_date , rows, is_rent,csrftoken) {
     const batchSize = 50;
     let batchData = [];
-
+    let is_all=$('#is_all').is(':checked') ;
     for (let i = 0; i < rows.length; i++) {
 
-        if (end_date < rows[i][1]) {
+        if (end_date < rows[i][1] || is_all ) {
             batchData.push(rows[i]);
         }
 

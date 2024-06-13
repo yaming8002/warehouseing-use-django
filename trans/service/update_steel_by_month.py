@@ -20,7 +20,8 @@ def update_steel_by_month(build_date):
     query_by_month = (
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
         & Q(material__mat_code__in=SteelReport.static_column_code.keys())
-        & ( Q(translog__constn_site__genre=1) | Q(translog__constn_site__code='0003') )
+        & ( Q(translog__constn_site__genre__gte=1) | Q(translog__constn_site__code='0003') )
+        & ~Q(translog__constn_site__code__startswith="F")
         & Q(is_rollback=False)
     )
 
@@ -28,23 +29,22 @@ def update_steel_by_month(build_date):
         TransLogDetail.objects.select_related("translog__constn_site", "material")
         .filter(query_by_month)
         .values(
-            "translog__constn_site__code",  # sitecode
-            "material__mat_code",  # mat_code
+           site_code = F( "translog__constn_site__code"),  # sitecode
+           genre = F( "translog__constn_site__genre"),  # sitecode
+           mat_code=F( "material__mat_code"),  # mat_code
         )
         .annotate(
             quantity=conditional_sum("quantity"),
             all_unit_sum=conditional_sum("all_unit"),
         )
     )
-    print()
-    print(update_list.query)
-    print()
+
     for x in update_list:
-        siteinfo = SiteInfo.get_site_by_code(x["translog__constn_site__code"])
-        column = f"m_{x['material__mat_code']}"
+        siteinfo = SiteInfo.get_site_by_code(x["site_code"])
+        column = f"m_{x['mat_code']}"
         value = (
             x["quantity"]
-            if x["material__mat_code"] in ["92", "12", "13"]
+            if x["mat_code"] in ["92", "12", "13"]
             else x["all_unit_sum"]
         )
         SteelReport.update_column_value_by_before(

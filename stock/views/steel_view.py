@@ -1,6 +1,7 @@
 
 # Create your views here.
 from datetime import datetime
+from decimal import Decimal
 
 from django.db.models import Q
 from django.forms.models import model_to_dict
@@ -39,8 +40,7 @@ class SteelControlView(MonthListView):
         exclude_query = Q()
         for x in static_column_code:
             exclude_query  |= ~Q(**{f'm_{x}': 0})
-        query &= exclude_query
-        return SteelReport.get_current_by_query(query)
+        return SteelReport.get_current_by_query(query,final_query=exclude_query)
             
     def get_whse_martials(self,context ):
         year,month = self.get_year_month()
@@ -158,9 +158,15 @@ def get_edit_remark(request):
         return render(request,'steel_report/steel_edit_remark.html',context)
     else :
         report_id = request.POST.get('id')
-        remark = request.POST.get('remark')
         report = DoneSteelReport.objects.get(id=report_id)
-        report.remark = remark
+        report.remark = request.POST.get('remark')
+        for mat_code in DoneSteelReport.static_column_code:
+            column = f'm_{mat_code}'
+            value_str = request.POST.get(column)
+            value = Decimal(value_str) if value_str else Decimal(0)
+            print(column,value)
+            setattr(report,column,value)
+        print(model_to_dict(report))
         report.save()
 
         context = {'msg':"成功"}
