@@ -184,6 +184,7 @@ class TransLogDetail(models.Model):
             detials = cls.objects.select_related("translog").filter(id=detial_id).all()
         else:
             detials = cls.objects.select_related("translog").filter(translog=tran).all()
+            
         for detail in detials:
             cls.objects.select_related("translog").filter(
                 translog__code=tran, material=detail.material
@@ -194,7 +195,7 @@ class TransLogDetail(models.Model):
             mat = detail.material
             quantity = detail.quantity
             all_unit = detail.all_unit
-            Stock.move_material(mat, quantity, all_unit, is_stock_add)
+            Stock.move_material( tran.constn_site,mat, quantity, all_unit, is_stock_add)
 
 
     class Meta:
