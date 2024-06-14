@@ -42,7 +42,7 @@ def update_rail_by_month(build_date):
         )
         .annotate(quantity=Sum("quantity"), unit_sum=Sum("unit"))
     )
-    print(update_list.query)
+    # print(update_list.query)
     whse_dct = defaultdict(lambda: Decimal(0))
     total_dct = defaultdict(lambda: Decimal(0))
     for x in update_list:
@@ -65,11 +65,8 @@ def update_rail_by_month(build_date):
         whse_dct[spec_id] += x["quantity"] if is_in else -x["quantity"]
 
     site_whse = SiteInfo.get_site_by_code("0001")
-    print("whse_dct")
-    print(whse_dct)
-    print("whse_dct")
+
     for k, v in whse_dct.items():
-        print(f"year={year},month={month}")
         RailReport.update_column_value_by_before(
             site_whse, year, month, True, f"in_{k}", v
         )

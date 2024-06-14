@@ -70,25 +70,30 @@ class ConstnStockViewList(PageListView):
     title_name = "工地庫存"
 
     def get_queryset(self):
-        constn = SiteInfo.objects.filter()
         owner = self.request.GET.get("owner")
         code = self.request.GET.get("code")
         address = self.request.GET.get("address")
         state = self.request.GET.get("state")
+        mat_code = self.request.GET.get("mat_code")
+        mat_name = self.request.GET.get("mat_name")
+        category_id = self.request.GET.get("category_id")
 
+        query = Q(siteinfo__id__gt=4)
         if code:
-            constn = constn.filter(code=code)
+            query &= Q(siteinfo__code=code)
         if owner:
-            constn = constn.filter(owner__istartswith=owner)
+            query &= Q(siteinfo__owner__istartswith=owner)
         if address:
-            constn = constn.filter(address__istartswith=address)
+            query &= Q(siteinfo__address__istartswith=address)
         if state:
-            state_int = int(state)
-            constn = constn.filter(state=state_int)
-
-        stock = Stock.objects.select_related("material")
-        result = stock.filter(siteinfo__in=constn.all())
-        return result.all()
+            query &= Q(siteinfo__state=int(state))
+        if mat_code:
+            query &= Q(material__mat_code=mat_code)
+        if mat_name:
+            query &= Q(material__mat_name=mat_name)
+        if category_id:
+            query &= Q(material__category_id=category_id)
+        return Stock.objects.select_related("siteinfo","material").filter(query).all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

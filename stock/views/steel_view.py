@@ -164,9 +164,7 @@ def get_edit_remark(request):
             column = f'm_{mat_code}'
             value_str = request.POST.get(column)
             value = Decimal(value_str) if value_str else Decimal(0)
-            print(column,value)
             setattr(report,column,value)
-        print(model_to_dict(report))
         report.save()
 
         context = {'msg':"成功"}

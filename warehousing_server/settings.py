@@ -23,14 +23,14 @@ os_environ = os.environ
 ALLOWED_HOSTS_VALUE = [
     origin.strip() for origin in os_environ["MY_ALLOWED_HOSTS"].split(",") if origin
 ]
-print(f"ALLOWED_HOSTS_VALUE{ALLOWED_HOSTS_VALUE}")
+# print(f"ALLOWED_HOSTS_VALUE{ALLOWED_HOSTS_VALUE}")
 
 CSRF_TRUSTED_ORIGINS_VALUE = [
     origin.strip()
     for origin in os_environ["MY_CSRF_TRUSTED_ORIGINS"].split(",")
     if origin
 ]
-print(f"CSRF_TRUSTED_ORIGINS_VALUE{CSRF_TRUSTED_ORIGINS_VALUE}")
+# print(f"CSRF_TRUSTED_ORIGINS_VALUE{CSRF_TRUSTED_ORIGINS_VALUE}")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/

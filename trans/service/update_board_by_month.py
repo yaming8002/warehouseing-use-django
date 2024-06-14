@@ -50,7 +50,7 @@ def update_board_by_month(build_date):
         )
     )
 
-    print(update_list.query)
+    # print(update_list.query)
     whse_dct = {}
     for x in update_list:
         siteinfo = SiteInfo.get_site_by_code(x["site_code"])

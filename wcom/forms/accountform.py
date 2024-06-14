@@ -1,7 +1,6 @@
-from django.contrib.auth.forms import UserCreationForm
 from xml.dom import ValidationErr
 from django import forms
-from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
+from django.contrib.auth.forms import PasswordChangeForm , UserCreationForm
 from django.utils.translation import gettext_lazy as _
 
 from wcom.models.account import Muser
@@ -20,6 +19,7 @@ class AddMuserForm(UserCreationForm):
             "group",
             "email",
         ]
+
 
     username = forms.CharField(
         label="帳號", widget=forms.TextInput(attrs={"class": "form-control required"})

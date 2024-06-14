@@ -1,7 +1,4 @@
 import logging
-
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.views import LoginView, LogoutView
 import os
 
 from django.contrib.auth import authenticate, login, logout
@@ -15,10 +12,6 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 
-from wcom.forms.accountform import AddMuserForm
-from wcom.models import Menu, Muser, UserGroup
-from wcom.templatetags import menu_category
-from wcom.utils.pagelist import PageListView
 from wcom.forms.accountform import AddMuserForm, CustomPasswordChangeForm
 from wcom.models import Menu, Muser, UserGroup
 from wcom.models.menu import SysInfo
@@ -37,8 +30,7 @@ class AccountLogin(LoginView):
         password = self.request.POST["password"]
 
         account = authenticate(request, username=username, password=password)
-        for x in Muser.objects.all():
-            print(x)
+
             
         if account :
             login(request, account)  # 登錄用戶
@@ -90,7 +82,7 @@ def home(request):
 
 class MuserListView(PageListView):
     model = Muser
-    template_name = "wcommmon/muser_list.html"
+    template_name = "wcom/muser_list.html"
     title_name = "帳號"
 
     def get_queryset(self):
@@ -150,7 +142,7 @@ def account_edit(request):
         return JsonResponse(response_data)
 
 
-class MuserCreateView(CreateView):
+class MuserCreateView(SaveControlView):
     model = Muser
     form_class = AddMuserForm
     template_name = "base/model_edit.html"
@@ -299,8 +291,7 @@ class CustomPasswordChangeView(SaveControlView):
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(user=request.user, data=request.POST)  # 同样，向表单传递当前用户
-        print(form)
-        print(form.__dict__)
+
         if form.is_valid():
             form.save()
             # 处理保存后的逻辑，例如重定向到列表页面

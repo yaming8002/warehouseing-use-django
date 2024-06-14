@@ -38,8 +38,6 @@
              id="address"
              name="address"
              value="{{ request.GET.address }}" />
-    </p>
-    <p>
       {% get_constn_state as constn_state %}  <!-- 调用模板标签并将结果赋值给变量 -->
       <!-- {{constn_state}}-->
       <label for="state">狀態</label>
@@ -52,6 +50,21 @@
         {% endfor %}
       </select>
     </p>
+    <p>
+      <label for="mat_code">料號:</label>
+      <input type="text" id="mat_code" name="mat_code" value="{{ request.GET.mat_code }}" />
+      <label for="mat_name">料名:</label>
+      <input type="text" id="mat_name" name="mat_name" value="{{ request.GET.mat_name }}" />
+      <label for="category_id">分類 :</label>
+      <select id="category_id" name="category_id">
+        <option value> 全部 </option>
+        {% for category in categorys %}
+        <option value="{{ category.id }}" 
+        {% if request.GET.category_id and request.GET.category_id|stringformat:"s" == category.id|stringformat:"s" %} selected {% endif %}>
+          {{ category.name }}</option>
+        {% endfor %}
+      </select>
+</p>
     <input type="submit" value="查詢" />
   </form>
   <div id="modalContainer"></div>
@@ -63,6 +76,7 @@
       <th scope="col">工地編號</th>
       <th scope="col">業主</th>
       <th scope="col">工程名稱</th>
+      <th scope="col">料號</th>
       <th scope="col">料名</th>
       <th scope="col">類型</th>
       <th scope="col">規格</th>
@@ -80,6 +94,7 @@
         <td>{{ item.siteinfo.code }}</td>
         <td>{{ item.siteinfo.owner }}</td>
         <td>{{ item.siteinfo.name }}</td>
+        <td>{{ item.material.mat_code }}</td>
         <td>{{ item.material.name }}</td>
         <td>{{ item.material.category.name }}</td>
         <td>{{ item.material.specification.name }}</td>

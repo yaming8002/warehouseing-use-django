@@ -49,8 +49,6 @@ class ImportDataGeneric(View):
     def check_column(self, worksheet) :
         # 检查列名是否符合预期
         actual_columns =self.clean_column_name(worksheet[1])
-        print(f"actual_columns:{actual_columns}")
-        print(f"self.columns:{self.columns}")
         return self.compare_lists(actual_columns,self.columns)
 
     def clean_column_name(self,sheet:Worksheet):
