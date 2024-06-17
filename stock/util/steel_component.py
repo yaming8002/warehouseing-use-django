@@ -248,7 +248,7 @@ def build_component_table(constn, level, map_list) -> Dict[str, Dict[str, any]]:
         steel_map[name]["max_length"] = max_length + 1
         steel_map[name]["table"] = transpose_list_of_lists(tr_list)
         steel_map[name]["level_summary"] = level_summary_of_lists(tr_list)
-     
+    
     return steel_map
 
 

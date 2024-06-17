@@ -84,11 +84,11 @@
 {% block table %}
   <caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}-支撐</caption>
   {% for key, tran_map in steel_pile_table.items %}
-    {% if tran_map.max_length > 2 %}
+    {% if tran_map.max_length > 1 %}
       <tbody>
         <tr>
           <th class="s2" dir="ltr">規格:</th>
-          {% get_level as levels %}
+          {% get_level_all as levels %}
           {% for level in levels %}
             {% if level.0 <= table_level %}
               <th class="s3 table-danger"
@@ -101,22 +101,6 @@
                   style="border-left: 1px solid black">{{ level.1 }}入料</th>
             {% endif %}
           {% endfor %}
-          <!--
-    <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第一層出料</th>
-    <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第一層入料</th>
-    <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第二層出料</th>
-    <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第二層入料</th>
-    <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第三層出料</th>
-    <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第三層入料</th>
-    <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第四層出料</th>
-    <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第四層入料</th>
-    <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第五層出料</th>
-    <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第五層入料</th>
-    <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第六層出料</th>
-    <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第六層入料</th>
-    <th class="s3 table-danger" dir="ltr" colspan="5" style="border-left: 1px solid black">第七層出料</th>
-    <th class="s2 table-success" dir="ltr" colspan="5" style="border-left: 1px solid black">第七層入料</th>
--->
           <th class="s4" dir="ltr" rowspan="2" style="border-left: 1px solid black">
             出支
             <br>
@@ -192,11 +176,11 @@
             {% endif %}
           </tr>
         {% endfor %}
-        <tr style="height: 20px" class="ttttt">
+        <tr style="height: 20px" >
           {% for row in tran_map.level_summary %}
             <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"
                 style="border-left: 1px solid black"
-                class="ttttt">總計:</td>
+                >總計:</td>
             <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
               {{ row.count |floatformat:"0" }}
             </td>

@@ -41,7 +41,7 @@ def steel_brace_view(request):
             context["select_level"] = [x for x in get_level() if (x[0] > 0)]
 
     context["table_level"] = table_level
-    context["column_count"] = range(table_level * 2)
+    context["column_count"] = range((table_level+1) * 2)
     return render(request, "constn_report/steel_brace.html", context)
 
 

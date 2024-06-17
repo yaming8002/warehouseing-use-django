@@ -28,27 +28,24 @@ class SiteViewList(PageListView):
     title_name = "工地列表"
 
     def get_queryset(self):
-        result = SiteInfo.objects
         owner = self.request.GET.get("owner")
         code = self.request.GET.get("code")
         name = self.request.GET.get("name")
         state = self.request.GET.get("state")
         genre = self.request.GET.get("genre")
-
+        query = Q()
         if code:
-            result = result.filter(code__istartswith=code)
+            query &= Q(code__istartswith=code)
         if owner:
-            result = result.filter(owner__istartswith=owner)
+            query &= Q(owner__istartswith=owner)
         if name:
-            result = result.filter(name__istartswith=name)
+            query &= Q(name__istartswith=name)
         if state:
-            state_int = int(state)
-            result = result.filter(state=state_int)
+            query &= Q(state=int(state))
         if genre:
-            genre_int = int(genre)
-            result = result.filter(genre=genre_int)
+            query &= Q(genre=int(genre))
 
-        return result.all()
+        return SiteInfo.objects.filter(query).all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

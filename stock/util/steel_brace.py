@@ -5,7 +5,7 @@ from typing import Dict, List, Any
 
 from django.db.models import F, Sum
 from django.shortcuts import render
-
+from django.db.models import Q, F
 
 from stock.models.material_model import Materials
 from trans.models import TransLogDetail, TransLog
@@ -27,7 +27,7 @@ def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
     )
 
     steel_map = dict()
-    
+    level +=1
     for mat_code, name in support_list.items():
         # name = f"m_{mat_code}"
         steel_map[name] = {}
@@ -39,10 +39,17 @@ def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
             "count_out": Decimal(0),
             "unit_out": Decimal(0),
         }
-        
+
         for seat in range(level):
+            query= Q(material__mat_code=mat_code)
+            if seat==0:
+                query &= (Q(level = seat) | Q(level__isnull=True) )
+            else:
+                query &= Q(level = seat) 
+
+
             total_quantity_and_unit = (
-                transdefaullog.filter(material__mat_code=mat_code, level=(seat + 1))
+                transdefaullog.filter(query)
                 .values(
                     code=F("translog__code"),  # 将物流编号包含在结果中
                     build_date=F("translog__build_date"),  # 将物流建立日期包含在结果中
@@ -61,7 +68,7 @@ def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
             site_in = (seat * 2) + 1
             site_out = seat * 2
             for item in total_quantity_and_unit:
-                print(item)
+                # print(item['level_annotation'])
                 if item["transaction_type"] == "IN":
                     tr_list[site_in].append(item)
                     summary["count_in"] += Decimal(item["total_quantity"])
@@ -71,6 +78,7 @@ def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
                     summary["count_out"] += Decimal(item["total_quantity"])
                     summary["unit_out"] += Decimal(item["total_unit"])
             max_length = max(max_length, len(tr_list[site_in]), len(tr_list[site_out]))
+
 
         summary["diff_count"] = summary["count_in"] - summary["count_out"]
         summary["diff_unit"] = summary["unit_in"] - summary["unit_out"]

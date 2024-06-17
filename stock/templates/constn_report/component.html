@@ -159,6 +159,7 @@
   </form>
 {% endblock %}
 {% block table %}
+{% load custom_filters %}
   <caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}-配件</caption>
   {% for key, tran_map in steel_pile_table.items %}
     {% if tran_map.max_length > 1 %}
@@ -180,7 +181,6 @@
         {% endfor %}
         <th class="s4" dir="ltr" colspan="3" style="border-left: 1px solid black">合計</th>
       </tr>
-      {% load custom_filters %}
       <tbody>
         <tr style="height: 20px">
           <th class="s5"
