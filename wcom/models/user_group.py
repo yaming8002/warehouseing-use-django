@@ -12,3 +12,4 @@ class UserGroup(models.Model):
     class Meta:
         verbose_name = "ugroup"
         verbose_name_plural = "ugroups"
+

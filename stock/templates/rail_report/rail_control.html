@@ -56,7 +56,7 @@
              value='{{ yearMonth }}'>
     </p>
     <input type="submit" value="查詢" />
-    <input type="button" onclick="searchThisMonth()"  value="本月" />
+     <!-- <input type="button" onclick="searchThisMonth()"  value="本月" />-->
     <!-- <input type="button" id="exceloutput" value="匯出EXCEL" />-->
   </form>
   <div id="modalContainer"></div>
@@ -79,7 +79,7 @@
       <br>
       (公斤)
     </th>
-    {% if request.session.can_edit %}<th rowspan='2'>編輯</th>{% endif %}
+    {% if request.session.u_permission > 1  %}<th rowspan='2'>編輯</th>{% endif %}
   </tr>
   <tr class="sticky-header">
     <th>項次</th>
@@ -199,7 +199,7 @@
       <td>
         {% if item.rail_ng != 0 %}{{ item.rail_ng |floatformat:"0" }}{% endif %}
       </td>
-      {% if request.session.can_edit %}
+      {% if request.session.u_permission > 1  %}
         <td>
           <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a>
         </td>
@@ -235,7 +235,7 @@
     <th class='table-success'>{{ summary.in_16  |floatformat:"0" }}</th>
     <th class='table-success'>{{ summary.in_total |floatformat:"0" }}</th>
     <th>{{ summary.rail_ng |floatformat:"0" }}</th>
-    {% if request.session.can_edit %}
+    {% if request.session.u_permission > 1  %}
     <th></th>
     {% endif %} 
   </tr>

@@ -94,7 +94,7 @@
     <th>15M</th>
     <th>16M</th>
     <th>總支數</th>
-    {% if request.session.can_edit %}
+    {% if request.session.u_permission > 1  %}
     <th>編輯</th>
     {% endif %} 
   </tr>
@@ -121,7 +121,7 @@
       <td>{{ item.out_15|floatformat:"0" }}</td>
       <td>{{ item.out_16|floatformat:"0" }}</td>
       <td>{{ item.out_total|floatformat:"0" }}</td>
-      {% if request.session.can_edit %}
+      {% if request.session.u_permission > 1  %}
       <td rowspan='3'>
         <a href="#" onclick="editRow({{item.id}},{{ item.siteinfo.id }})">退回</a>
       </td>

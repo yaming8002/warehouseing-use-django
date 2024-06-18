@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 from wcom.forms.accountform import AddMuserForm, CustomPasswordChangeForm
 from wcom.models import Menu, Muser, UserGroup
-from wcom.models.menu import SysInfo
+from wcom.models.menu import SysInfo, UserPermissions
 from wcom.templatetags import menu_category
 from wcom.utils.pagelist import PageListView
 from wcom.utils.save_control import SaveControlView
@@ -58,7 +58,9 @@ def home(request):
         )
     # 查询菜单项并构建菜单映射
     else:
-        menu_list = Menu.objects.filter(group=user.group).order_by("category", "order")
+        menu_list = Menu.objects.filter(
+            id__in=UserPermissions.objects.filter(group=user.group,permission__gt=0).values("menu_id"),
+        ).order_by("category", "order")
     allmenu = []
     group = 0
     i = -1
@@ -167,7 +169,7 @@ class MuserCreateView(SaveControlView):
 class GroupListView(PageListView):
     model = UserGroup
     template_name = "wcom/group_list.html"
-    title_name = "群組六表"
+    title_name = "群組表"
     # context_object_name = "groups"
 
     def get_queryset(self):
@@ -189,37 +191,19 @@ def group_add(request):
     if request.method == "GET":
         context = {"title": "新增權限"}
         context["action"] = "/group/add/"
-        context["menus"] = Menu.objects.filter(group__isnull=True).order_by(
-            "category", "order"
-        )
-
-        context["menu_category"] = menu_category
 
         return render(request, "wcom/group_menu.html", context)
     else:
         group = UserGroup(name=request.POST.get("group_name"))
         group.save()
 
-        # Loop through the request.POST dictionary
-        for key, value in request.POST.items():
-            # Check if the key starts with "menu_" to identify menu checkboxes
-            if key.startswith("menu_"):
-                menu_id = key.split("_")[1]
-                try:
-                    menu_template = Menu.objects.get(id=menu_id)
-                except Menu.DoesNotExist:
-                    # 处理模板不存在的情况
-                    menu_template = None
+        for item in Menu.objects.all():
 
-                if menu_template:
-                    new_menu = Menu.objects.create(
-                        name=menu_template.name,
-                        url=menu_template.url,
-                        category=menu_template.category,
-                        order=menu_template.order,
-                        group=group,
-                    )
-                    new_menu.save()
+            UserPermissions.objects.update_or_create(
+                group=group,
+                menu=Menu.objects.get(id=item.id),
+                defaults={"permission": 0},
+            )
 
         response_data = {"success": True, "msg": "成功"}
         return JsonResponse(response_data)
@@ -230,14 +214,14 @@ def group_edit(request):
         context = {"title": "修改權限"}
         context["action"] = "/group/edit/"
         group = UserGroup.objects.filter(id=request.GET.get("id")).first()
-        context["menus"] = Menu.objects.filter(group__isnull=True).order_by(
-            "category", "order"
+        context["group"] = group
+
+        context["list"] = (
+            UserPermissions.objects.select_related("menu")
+            .filter(group=group)
+            .order_by("menu__category", "menu__order")
         )
-        context["menus_acvite"] = (
-            Menu.objects.filter(group=group)
-            .order_by("category", "order")
-            .values_list("name", flat=True)
-        )
+
         context["group"] = group
 
         return render(request, "wcom/group_menu.html", context)
@@ -252,21 +236,11 @@ def group_edit(request):
             # Check if the key starts with "menu_" to identify menu checkboxes
             if key.startswith("menu_"):
                 menu_id = key.split("_")[1]
-                try:
-                    menu_template = Menu.objects.get(id=menu_id)
-                except Menu.DoesNotExist:
-                    # 处理模板不存在的情况
-                    menu_template = None
-
-                if menu_template:
-                    new_menu = Menu.objects.create(
-                        name=menu_template.name,
-                        url=menu_template.url,
-                        category=menu_template.category,
-                        order=menu_template.order,
-                        group=group,
-                    )
-                    new_menu.save()
+                UserPermissions.objects.update_or_create(
+                    group=group,
+                    menu=Menu.objects.get(id=menu_id),
+                    defaults={"permission": value},
+                )
 
         response_data = {"success": True, "msg": "成功"}
         return JsonResponse(response_data)

@@ -82,6 +82,7 @@
                 {% endif %}
               </div>
             </div>
+            {% if list %}
             <table>
               <caption></caption>
               <thead>
@@ -89,21 +90,29 @@
                 <th>功能分類</th>
                 <th>啟用</th>
               </thead>
-              {% load strmap %} {% for menu in menus %}
+              {% load strmap %} {% for item in list %}
               <tr>
-                <td>{{ menu.name }}</td>
-                <td>{% get_category_name menu.category %}</td>
+                <td>{{ item.menu.name }}</td>
+                <td>{% get_category_name item.menu.category %}</td>
                 <td>
+                  <!--
                   <input
                     type="checkbox"
                     name="menu_{{ menu.id }}"
                     id="menu_{{ menu.id }}"
                     {% if  menu.name in menus_acvite  %}  checked {% endif %}
-                  />
+                  />-->
+                  <select              
+                    name="menu_{{ item.menu.id }}"
+                    id="menu_{{ item.menu.id }}">
+                  {% for key, value in item.permission_map.items %}
+                    <option value="{{key}}" {% if item.permission == key %} selected {% endif %}  >{{value }}</option>
+                  {% endfor %}
                 </td>
               </tr>
               {% endfor %}
             </table>
+            {% endif %}
           </form>
         </div>
       </div>

@@ -54,3 +54,27 @@ class SysInfo(models.Model):
             "name"
         ]
 
+
+class UserPermissions(models.Model):
+    permission_map={
+        0:"不啟用",
+        1:"查詢",
+        2:"新增修改",
+        3:"新增修改移除"
+    }
+
+    group = models.ForeignKey(
+        UserGroup, on_delete=models.SET_NULL, null=True, verbose_name="群組組"
+    )
+    permission=models.IntegerField(
+        default=0 , choices=permission_map, verbose_name="權限代號"
+    )
+    menu = models.ForeignKey(
+        Menu, on_delete=models.SET_NULL, null=True, verbose_name="清單"
+    )
+
+    def __str__(self):
+        return  self.name
+
+    class Meta:
+        verbose_name = "group"

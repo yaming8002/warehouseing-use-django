@@ -75,7 +75,7 @@
         {% if request.GET.isnotcount %}checked{% endif %} />-->
     </p>
     <input type="submit" value="查詢" />
-    {% if request.session.can_edit %}<button type="button" onclick="addMaterial(event)">新增</button>{% endif %}
+    {% if request.session.u_permission > 1 %}<button type="button" onclick="addMaterial(event)">新增</button>{% endif %}
     <!--<button type="button" onclick="upload(event)">上傳EXCEL</button>-->
   </form>
   <div id="modalContainer"></div>
@@ -90,7 +90,7 @@
       <th scope="col">公司</th>
       <th scope="col">噸數(備註)</th>
       <th scope="col">基本台金額</th>
-      {% if request.session.can_edit %}
+      {% if request.session.u_permission > 1 %}
         <th scope="col">編輯</th>
       {% endif %}
     </tr>
@@ -111,7 +111,7 @@
         <td>
           {% if item.value %}{{ item.value }}{% endif %}
         </td>
-        {% if request.session.can_edit %}
+        {% if request.session.u_permission > 1 %}
         <td>
           <a href="#" onclick="editRow({{ item.id }})">編輯</a>
         </td>

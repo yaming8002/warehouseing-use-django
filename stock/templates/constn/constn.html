@@ -79,7 +79,7 @@
       </select>
     </p>
     <input type="submit" value="查詢" />
-    {% if request.session.can_edit %}
+    {% if request.session.u_permission > 1 %}
     <td>
       <button type="button" onclick="constn_edit(null)">新增</button>
     </td>
@@ -100,7 +100,7 @@
       <th scope="col">鋼軌結算</th>
       <th scope="col">狀態</th>
       <th scope="col">結案日期</th>
-      {% if request.session.can_edit %}<th scope="col">編輯</th>{% endif %}
+      {% if request.session.u_permission > 1  %}<th scope="col">編輯</th>{% endif %}
     </tr>
   </thead>
   <tbody>
@@ -148,7 +148,7 @@
         <td>
           {% if item.done_date %}{{ item.done_date | date:'Y-m-d' }}{% endif %}
         </td>
-        {% if request.session.can_edit %}
+        {% if request.session.u_permission > 1  %}
         <td>
           <a href="#" onclick="constn_edit('{{ item.pk }}')">編輯</a>
         </td>

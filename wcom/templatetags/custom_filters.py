@@ -4,6 +4,11 @@ from django import template
 
 register = template.Library()
 
+@register.filter
+def dict_get_value(dct, key):
+    if key  in dct.keys() :
+        return dct[key]
+    return ''
 
 @register.filter
 def subtract(value1, value2):

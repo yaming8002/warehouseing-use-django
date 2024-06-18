@@ -86,7 +86,7 @@
     {% endif %}
     <th>現場人員</th>
     <th>備註</th>
-    {% if request.session.can_edit %}<th>編輯</th>{% endif %}
+    {% if request.session.u_permission > 1 %}<th>編輯</th>{% endif %}
   </tr>
   {% for item in list %}
     <tr>
@@ -113,7 +113,7 @@
       <td>
         {% if item.remark %}{{ item.remark }}{% endif %}
       </td>
-      {% if request.session.can_edit %}
+      {% if request.session.u_permission > 1 %}
       <td>
         <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>
       </td>
@@ -132,7 +132,7 @@
       <th></th>
       <th></th>
       <th></th>
-      {% if request.session.can_edit %}<th></th>{% endif %}
+      {% if request.session.u_permission > 1 %}<th></th>{% endif %}
     </tr>
   {% endif %}
   {% if lk_report %}
@@ -147,7 +147,7 @@
       <th></th>
       <th></th>
       <th></th>
-      {% if request.session.can_edit %}<th></th>{% endif %}
+      {% if request.session.u_permission > 1 %}<th></th>{% endif %}
     </tr>
   {% endif %}
   {% if warning_lk_report and request.GET.mat_code == '22' %}
@@ -160,7 +160,7 @@
       <th></th>
       <th></th>
       <th></th>
-      {% if request.session.can_edit %}<th></th>{% endif %}
+      {% if request.session.u_permission > 1 %}<th></th>{% endif %}
     </tr>
   {% endif %}
 {% endblock %}

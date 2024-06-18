@@ -135,7 +135,7 @@
     <th>千斤頂(個)</th>
     <th>土壓計(個)</th>
     <th colspan='6' rowspan='2'>差       異      數      說       明</th>
-    {% if request.session.can_edit %}
+    {% if request.session.u_permission > 1 %}
     <th rowspan='2'>編輯</th>
     {% endif %} 
   </tr>
@@ -184,7 +184,7 @@
       <td colspan='6' style="text-align:left" >{% if item.remark %}{{ item.remark |safe}}<br>{% endif %}
         {% if item.turn_site_id %}目的地:[{{item.turn_site.code}}]{{item.turn_site.owner}}{% endif %}
       </td>
-      {% if request.session.can_edit %}
+      {% if request.session.u_permission > 1 %}
       <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>{% if item.done_type > 2 %} <a href="#" onclick="rollback({{ item.id }})">退回</a>{% endif %}</td>
       {% endif %} 
     </tr>
@@ -204,7 +204,7 @@
     <th>{{ sum_report.m_12 |floatformat:"0" }}</th>
     <th>{{ sum_report.m_13 |floatformat:"0" }}</th>
     <th colspan='6'></th>
-    {% if request.session.can_edit %}
+    {% if request.session.u_permission > 1 %}
     <th></th>
     {% endif %} 
   </tr>
@@ -223,7 +223,7 @@
     <th>{{ total_report.m_12 |floatformat:"0" }}</th>
     <th>{{ total_report.m_13 |floatformat:"0" }}</th>
     <th colspan='6'></th>
-    {% if request.session.can_edit %}
+    {% if request.session.u_permission > 1 %}
     <th></th>
     {% endif %} 
   </tr>
@@ -239,7 +239,7 @@
       </th>
     {% endfor %}
     <th colspan='6'></th>
-    {% if request.session.can_edit %}
+    {% if request.session.u_permission > 1 %}
     <th></th>
     {% endif %} 
   </tr>
