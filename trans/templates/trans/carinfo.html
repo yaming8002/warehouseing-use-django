@@ -1,7 +1,7 @@
-{% extends 'base/base_table.html' %}{{ '' }} {% block title %}
-{{ title }} {{ '' }}
-{% endblock %}  {% block javascript %}
-<script>
+{% extends 'base/base_table.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}
+  <script>
   function addMaterial(event) {
     // 向後端發送 AJAX 請求
     $.ajax({
@@ -49,54 +49,74 @@
       }
     })
   }
-</script>
-{% endblock %} {% block form %}
-<!-- Corrected form tag and added trailing slash to action attribute -->
-<form id="search" action="/carinfo/list/" method="GET">
-  {% csrf_token %}
-  <p>
-    <label for="car_number">車牌號</label>
-    <input type="text" id="car_number" name="car_number" value="{{request.GET.car_number}}"/>
-    <label for="firm"> 公司</label>
-    <input type="text" id="firm" name="firm" value ="{{request.GET.firm}}"/>
-    <label for="group">車輛類型</label>
-    <select  id="group" name="group">
-      <option value="" {% if request.GET.group == ""%} selected{% endif %} >全部</option>
-      <option value="1" {% if request.GET.group == "1"%} selected{% endif %} >報價類</option>
-      <option value="0" {% if request.GET.group == "0"%} selected{% endif %} >非報價類</option>
-    </select>
-    <!-- <input type="checkbox" id="group" name="group" {% if request.GET.isnotcount %} checked{% endif %}/>-->
-
-</p>
-  <input type="submit" value="查詢" />
-  <button type="button" onclick="addMaterial(event)">新增</button>
-  <!--<button type="button" onclick="upload(event)" >上傳EXCEL</button>-->
-</form>
-<div id="modalContainer"></div>
-{% endblock %} {% block table %}
-<caption><h3>車輛清單</h3></caption>
-<thead>
-  <tr>
-    <th scope="col">車牌</th>
-    <th scope="col">公司</th>
-    <th scope="col">噸數(備註)</th>
-    <th scope="col">基本台金額</th>
-    <th scope="col">編輯</th>
-  </tr>
-</thead>
-<tbody>
-  <!-- Corrected the template variables with double curly braces -->
-  {% for item in pagelist %}
-  <tr>
-
-    <td><!--{{item.id}}-->{{ item.car_number }}</td>
-    <td>{% if item.firm %}{{ item.firm }} {%endif%}</td>
-    <td>{% if item.remark %} {{item.remark}} {%endif%}</td>
-    <td>{% if item.value %}{{item.value}} {%endif%}</td>
-    <td>
-      <a href="#" onclick="editRow({{ item.id }})">編輯</a>
-    </td>
-  </tr>
-  {% endfor %}
-</tbody>
+  </script>
+{% endblock %}
+{% block form %}
+  <!-- Corrected form tag and added trailing slash to action attribute -->
+  <form id="search" action="/carinfo/list/" method="GET">
+    {% csrf_token %}
+    <p>
+      <label for="car_number">車牌號</label>
+      <input type="text"
+             id="car_number"
+             name="car_number"
+             value="{{ request.GET.car_number }}" />
+      <label for="firm">公司</label>
+      <input type="text" id="firm" name="firm" value ="{{ request.GET.firm }}" />
+      <label for="group">車輛類型</label>
+      <select id="group" name="group">
+        <option value="" {% if request.GET.group == "" %}selected{% endif %}>全部</option>
+        <option value="1" {% if request.GET.group == "1" %}selected{% endif %}>報價類</option>
+        <option value="0" {% if request.GET.group == "0" %}selected{% endif %}>非報價類</option>
+      </select>
+      <!-- <input type="checkbox"
+        id="group"
+        name="group"
+        {% if request.GET.isnotcount %}checked{% endif %} />-->
+    </p>
+    <input type="submit" value="查詢" />
+    {% if request.session.can_edit %}<button type="button" onclick="addMaterial(event)">新增</button>{% endif %}
+    <!--<button type="button" onclick="upload(event)">上傳EXCEL</button>-->
+  </form>
+  <div id="modalContainer"></div>
+{% endblock %}
+{% block table %}
+  <caption>
+    <h3>車輛清單</h3>
+  </caption>
+  <thead>
+    <tr>
+      <th scope="col">車牌</th>
+      <th scope="col">公司</th>
+      <th scope="col">噸數(備註)</th>
+      <th scope="col">基本台金額</th>
+      {% if request.session.can_edit %}
+        <th scope="col">編輯</th>
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Corrected the template variables with double curly braces -->
+    {% for item in pagelist %}
+      <tr>
+        <td>
+          <!--{{item.id}}-->{{ item.car_number }}
+        </td>
+        <td>
+          {% if item.firm %}{{ item.firm }}{% endif %}
+        </td>
+        <td>
+          {% if item.remark %}{{ item.remark }}{% endif %}
+        </td>
+        <td>
+          {% if item.value %}{{ item.value }}{% endif %}
+        </td>
+        {% if request.session.can_edit %}
+        <td>
+          <a href="#" onclick="editRow({{ item.id }})">編輯</a>
+        </td>
+        {% endif %}
+     </tr>
+    {% endfor %}
+   </tbody>
 {% endblock %}

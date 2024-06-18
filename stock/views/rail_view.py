@@ -98,7 +98,7 @@ class RailDoneView(MonthListView):
     def get_queryset(self):
         year,month = self.get_year_month()
         query = (Q(year=year)&Q(month=month)&Q(siteinfo__id__gt=4) )
-        return RailReport.get_current_by_query(query,True)
+        return RailReport.get_current_by_query(query=query,is_done=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

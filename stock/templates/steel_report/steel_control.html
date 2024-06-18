@@ -92,7 +92,9 @@
     <th>覆工板</th>      
     <th>千斤頂(個)</th>
     <th>土壓計(個)</th>
+    {% if request.session.can_edit %}
     <th>結案</th>
+    {% endif %} 
   </tr>
 
   {% for item in list %}
@@ -113,7 +115,9 @@
     <td class="value">{% if item.m_92 != 0 %}{{ item.m_92 }}{% endif%}</td>
     <td class="value">{% if item.m_12 != 0 %}{{ item.m_12 |floatformat:"0"}}{% endif%}</td>
     <td class="value">{% if item.m_13 != 0 %}{{ item.m_13 |floatformat:"0"}}{% endif%}</td>
+    {% if request.session.can_edit %}
     <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a></td>
+    {% endif %} 
   </tr>
   {% endfor %}
   <tr class="table-warning">
@@ -130,7 +134,9 @@
     <th>{{ kh_report.m_92 }}</th>
     <th>{{ kh_report.m_12 |floatformat:"0"}}</th>
     <th>{{ kh_report.m_13 |floatformat:"0"}}</th>
+    {% if request.session.can_edit %}
     <th></th>
+    {% endif %} 
   </tr>
   <tr class="table-warning">
     <th colspan=4>林口倉庫</th>
@@ -146,7 +152,9 @@
     <th>{{ lk_report.m_92  }}</th>
     <th>{{ lk_report.m_12 |floatformat:"0"}}</th>
     <th>{{ lk_report.m_13 |floatformat:"0"}}</th>
+    {% if request.session.can_edit %}
     <th></th>
+    {% endif %} 
   </tr>
   <tr class="table-warning">
     <th colspan=4>總計({{yearMonth}})</th>
@@ -162,7 +170,9 @@
     <th>{{ total_report.m_92 }}</th>
     <th>{{ total_report.m_12 |floatformat:"0"}}</th>
     <th>{{ total_report.m_13 |floatformat:"0"}}</th>
+    {% if request.session.can_edit %}
     <th></th>
+    {% endif %} 
   </tr>
   <tr class="table-warning">
     <th colspan=4>上期之總計({{before_yearMonth}})</th>
@@ -178,7 +188,9 @@
     <th>{{ befote_total_report.m_92 }}</th>
     <th>{{ befote_total_report.m_12 |floatformat:"0"}}</th>
     <th>{{ befote_total_report.m_13 |floatformat:"0"}}</th>
+    {% if request.session.can_edit %}
     <th></th>
+    {% endif %} 
   </tr>
   <tr class="table-warning">
     <th colspan=4>本月與上期之差異(({{yearMonth}})-({{before_yearMonth}})=差異數)</th>
@@ -189,6 +201,8 @@
       <th>{{d |floatformat:"2"}}</th>
       {% endif %}
     {% endfor %}
+    {% if request.session.can_edit %}
     <th></th>
+    {% endif %} 
   </tr>
 {% endblock %}

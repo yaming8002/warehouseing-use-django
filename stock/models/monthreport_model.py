@@ -113,6 +113,8 @@ class MonthReport(MonthData):
 
     @classmethod
     def get_current_by_query(cls, query,final_query=None, is_done=False):
+        if final_query is None:
+            final_query = Q()  # 初始化为一个空的 Q 对象
         query_set = (
             cls.objects.annotate(
                 rank=Window(
@@ -128,10 +130,9 @@ class MonthReport(MonthData):
         )
 
         ids = [item["id"] for item in query_set]
-        if final_query:
-            final_query &=Q(id__in=ids) & Q(is_done=is_done)
-        else:
-            final_query =Q(id__in=ids) & Q(is_done=is_done)
+
+        final_query &= Q(id__in=ids) & Q(is_done=is_done)
+
 
         return (
             cls.objects.select_related("siteinfo")

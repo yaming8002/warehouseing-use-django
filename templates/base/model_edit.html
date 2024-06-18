@@ -51,6 +51,7 @@ th {
           data: form.serialize(), // 序列化表單數據
           success: function (response) {
             alert(response.msg)
+            console.info(response.msg)
             $('#createModal').modal('hide') // 隱藏模態框
             reLoadMainPage()
           },
@@ -63,7 +64,7 @@ th {
                 // 将每个字段的错误信息添加到 errorMessages 数组
                 JSON.parse(errors[field]).forEach(error => errorMessages.push(error.message));
             }
-    
+            console.info(errorMessages.join("; "))
             // 显示错误信息
             alert('Error: ' + errorMessages.join("; "));
           }
@@ -82,7 +83,6 @@ th {
 {% block javascript %}{% endblock %}
 </head>
 <body>
-
   <div class="modal fade"
        id="createModal"
        tabindex="-1"

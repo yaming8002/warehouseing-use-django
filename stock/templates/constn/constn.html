@@ -79,7 +79,11 @@
       </select>
     </p>
     <input type="submit" value="查詢" />
-    <button type="button" onclick="constn_edit(null)">新增</button>
+    {% if request.session.can_edit %}
+    <td>
+      <button type="button" onclick="constn_edit(null)">新增</button>
+    </td>
+    {% endif %}
     <!--<button type="button" onclick="upload(event)">上傳EXCEL</button>-->
   </form>
   <div id="modalContainer"></div>
@@ -96,7 +100,7 @@
       <th scope="col">鋼軌結算</th>
       <th scope="col">狀態</th>
       <th scope="col">結案日期</th>
-      <th scope="col">編輯</th>
+      {% if request.session.can_edit %}<th scope="col">編輯</th>{% endif %}
     </tr>
   </thead>
   <tbody>
@@ -144,9 +148,11 @@
         <td>
           {% if item.done_date %}{{ item.done_date | date:'Y-m-d' }}{% endif %}
         </td>
+        {% if request.session.can_edit %}
         <td>
           <a href="#" onclick="constn_edit('{{ item.pk }}')">編輯</a>
         </td>
+        {% endif %}
       </tr>
     {% endfor %}
   </tbody>

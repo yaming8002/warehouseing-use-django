@@ -46,7 +46,6 @@
   </script>
 {% endblock %}
 {% block form %}
-
   <form id="search" action="/rail_control/" method="GET">
     {% csrf_token %}
     <p>
@@ -75,8 +74,12 @@
     </th>
     <th class='table-danger' colspan='13'>出料</th>
     <th class='table-success' colspan='13'>入料</th>
-    <th rowspan='2'>廢料<br>(公斤)</th>
-    <th rowspan='2'>編輯</th>
+    <th rowspan='2'>
+      廢料
+      <br>
+      (公斤)
+    </th>
+    {% if request.session.can_edit %}<th rowspan='2'>編輯</th>{% endif %}
   </tr>
   <tr class="sticky-header">
     <th>項次</th>
@@ -196,9 +199,11 @@
       <td>
         {% if item.rail_ng != 0 %}{{ item.rail_ng |floatformat:"0" }}{% endif %}
       </td>
-      <td>
-        <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a>
-      </td>
+      {% if request.session.can_edit %}
+        <td>
+          <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a>
+        </td>
+      {% endif %}
     </tr>
   {% endfor %}
   <tr>
@@ -230,7 +235,9 @@
     <th class='table-success'>{{ summary.in_16  |floatformat:"0" }}</th>
     <th class='table-success'>{{ summary.in_total |floatformat:"0" }}</th>
     <th>{{ summary.rail_ng |floatformat:"0" }}</th>
+    {% if request.session.can_edit %}
     <th></th>
+    {% endif %} 
   </tr>
   <tr class="separator">
     <td colspan="18" class="separator"></td>

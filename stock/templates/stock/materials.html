@@ -1,6 +1,6 @@
-{% extends 'base/base_table.html' %}{{ '' }} {% block title %}
-  {{ title }} {{ '' }}
-{% endblock %} {% block javascript %}
+{% extends 'base/base_table.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}
   <script>
     function addMaterial(event) {
       // 向後端發送 AJAX 請求
@@ -54,39 +54,49 @@
       window.location.href = '/material/download/?id=' + id;
     }
   </script>
-{% endblock %} {% block form %}
+{% endblock %}
+{% block form %}
   <!-- Corrected form tag and added trailing slash to action attribute -->
   <form id="search" action="/material/list/" method="GET">
     {% csrf_token %}
     <p>
       <label for="mat_code">料號:</label>
-      <input type="text" id="mat_code" name="mat_code" value="{{ request.GET.mat_code }}" />
+      <input type="text"
+             id="mat_code"
+             name="mat_code"
+             value="{{ request.GET.mat_code }}" />
       <label for="name">料名:</label>
       <input type="text" id="name" name="name" value="{{ name }}" />
-
       <!--{{ request.GET.category_id  }} -->
       <label for="category_id">分類 :</label>
       <select id="category_id" name="category_id">
-        <option value> 全部 </option>
+        <option value>全部</option>
         {% for category in category_list %}
-
-          <option value="{{ category.id }}" {% if request.GET.category_id and request.GET.category_id == category.id|stringformat:"s" %} selected {% endif %}   >
-           
-            {{ category.name }}</option>
+          <option value="{{ category.id }}"
+                  {% if request.GET.category_id and request.GET.category_id == category.id|stringformat:"s" %}selected{% endif %}>
+            {{ category.name }}
+          </option>
         {% endfor %}
       </select>
       <label for="is_detail">包含規格類型</label>
-      <input type="checkbox" name="is_detail" id="is_detail" {% if request.GET.is_detail == "on" %}checked{% endif %}/>
-
+      <input type="checkbox"
+             name="is_detail"
+             id="is_detail"
+             {% if request.GET.is_detail == "on" %}checked{% endif %} />
     </p>
     <input type="submit" value="查詢" />
-    <button type="button" onclick="addMaterial(event)">新增</button>
-    <button type="button" onclick="upload(event)">上傳EXCEL</button>
+    {% if request.session.can_edit %}
+      <button type="button" onclick="addMaterial(event)">新增</button>
+      <button type="button" onclick="upload(event)">上傳EXCEL</button>
+    {% endif %}
     <button type="button" onclick="download()">匯出EXCEL</button>
   </form>
   <div id="modalContainer"></div>
-{% endblock %} {% block table %}
-  <caption><h3>物料清單</h3></caption>
+{% endblock %}
+{% block table %}
+  <caption>
+    <h3>物料清單</h3>
+  </caption>
   <thead>
     <tr>
       <!--<th scope="col">#</th>-->
@@ -99,7 +109,7 @@
       <th scope="col">是否為耗材</th>
       <th scope="col">是否可拆分</th>
       <th scope="col">拆分單位</th>
-      <th scope="col">編輯</th>
+      {% if request.session.can_edit %}<th scope="col">編輯</th>{% endif %}
     </tr>
   </thead>
   <tbody>
@@ -108,18 +118,24 @@
       <tr>
         <!-- <td>{{ mat.id }}</td>-->
         <td>{{ item.mat_code }}</td>
-        <td>{% if item.mat_code2 %} {{ item.mat_code2 }}{%endif%}</td>
-        <td>{% if item.mat_code3 %} {{ item.mat_code3 }}{%endif%}</td>
-        <td>{{ item.name }}</td>
-        <td>{{ item.category }}</td>
-        <td>{{ item.specification }}</td>
-        <td>{{ item.is_consumable|yesno:'是,否' }}</td>
-        <td>{{ item.is_divisible|yesno:'是,否' }}</td>
-        <td>{{ item.unit_of_division }}</td>
         <td>
-          <a href="#" onclick="editRow({{ item.id }})">編輯</a>
-        </td>
-      </tr>
-    {% endfor %}
-  </tbody>
-{% endblock %}
+          {% if item.mat_code2 %}{{ item.mat_code2 }}{% endif %}
+          </td>
+          <td>
+            {% if item.mat_code3 %}{{ item.mat_code3 }}{% endif %}
+            </td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.category }}</td>
+            <td>{{ item.specification }}</td>
+            <td>{{ item.is_consumable|yesno:'是,否' }}</td>
+            <td>{{ item.is_divisible|yesno:'是,否' }}</td>
+            <td>{{ item.unit_of_division }}</td>
+            {% if request.session.can_edit %}
+              <td>
+                <a href="#" onclick="editRow({{ item.id }})">編輯</a>
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    {% endblock %}

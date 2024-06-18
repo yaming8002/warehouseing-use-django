@@ -94,7 +94,9 @@
     <th>15M</th>
     <th>16M</th>
     <th>總支數</th>
+    {% if request.session.can_edit %}
     <th>編輯</th>
+    {% endif %} 
   </tr>
   {% for item in list %}
     <tr>
@@ -119,9 +121,11 @@
       <td>{{ item.out_15|floatformat:"0" }}</td>
       <td>{{ item.out_16|floatformat:"0" }}</td>
       <td>{{ item.out_total|floatformat:"0" }}</td>
+      {% if request.session.can_edit %}
       <td rowspan='3'>
         <a href="#" onclick="editRow({{item.id}},{{ item.siteinfo.id }})">退回</a>
       </td>
+      {% endif %} 
     </tr>
     <tr>
       <td rowspan='2'>結案說明</td>

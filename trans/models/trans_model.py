@@ -166,17 +166,13 @@ class TransLogDetail(models.Model):
             obj.save(update_fields=["quantity", "all_quantity", "all_unit", "remark"])
 
         is_stock_add = tran.transaction_type == "IN"
-        Stock.move_material(tran.constn_site, mat, quantity, all_unit, not is_stock_add)
         Stock.move_material(
             SiteInfo.get_site_by_code("0001"), mat, quantity, all_unit, is_stock_add
         )
-        # if DoneSteelReport.add_new_mat( tran.constn_site, tran.turn_site, tran.build_date, is_stock_add, mat, quantity, all_unit ,remark ):
-        #     """if this case not new material"""
-        #     Stock.move_material( tran.constn_site, mat, quantity, all_unit, not is_stock_add )
-        #     SteelReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity, all_unit )
+        if mat.mat_code == '999' and is_stock_add :
+            return 
+        Stock.move_material(tran.constn_site, mat, quantity, all_unit, not is_stock_add)
 
-        # RailReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity )
-        # BoardReport.add_report(tran.constn_site, remark, is_stock_add, mat, quantity)
 
     @classmethod
     def rollback(cls, tran: TransLog, detial_id=None):

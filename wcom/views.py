@@ -2,16 +2,14 @@ import logging
 import os
 
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.core import serializers
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
-from django.utils.translation import gettext_lazy as _
-from django.views.generic.edit import CreateView
-from django.views.generic.list import ListView
 
+from django.utils.translation import gettext_lazy as _
+
+from django.db.models import Q
 from wcom.forms.accountform import AddMuserForm, CustomPasswordChangeForm
 from wcom.models import Menu, Muser, UserGroup
 from wcom.models.menu import SysInfo
@@ -31,14 +29,15 @@ class AccountLogin(LoginView):
 
         account = authenticate(request, username=username, password=password)
 
-            
-        if account :
+        if account:
             login(request, account)  # 登錄用戶
             return redirect("home")
         elif Muser.objects.filter(username=username).exists():
-            return render(request, "login.html", {"success": False, "msg": "密碼錯誤"}) 
-        else :
-            return render(request, "login.html", {"success": False, "msg": "帳號不存在"}) 
+            return render(request, "login.html", {"success": False, "msg": "密碼錯誤"})
+        else:
+            return render(
+                request, "login.html", {"success": False, "msg": "帳號不存在"}
+            )
 
 
 class AccountLogout(LogoutView):
@@ -86,23 +85,21 @@ class MuserListView(PageListView):
     title_name = "帳號"
 
     def get_queryset(self):
-        result = Muser.objects
+        query = Q(is_superuser=False)
         username = self.request.GET.get("search_username")
-        if username:
-            result = result.filter(username__istartswith=username)
-
         username_zh = self.request.GET.get("search_username_zh")
-        if username_zh:
-            result = result.filter(username_zh__istartswith=username_zh)
-
         unit = self.request.GET.get("search_unit")
-        if unit:
-            result = result.filter(unit=unit)
-
         group = self.request.GET.get("search_group")
+        if username:
+            query &= Q(username__istartswith=username)
+        if username_zh:
+            query &= Q(username_zh__istartswith=username_zh)
+        if unit:
+            query &= Q(unit=unit)
         if group:
-            result = result.filter(group=group)
-        return result.all()
+            query &= Q(group=group)
+
+        return Muser.objects.filter(query).all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -227,6 +224,7 @@ def group_add(request):
         response_data = {"success": True, "msg": "成功"}
         return JsonResponse(response_data)
 
+
 def group_edit(request):
     if request.method == "GET":
         context = {"title": "修改權限"}
@@ -279,30 +277,29 @@ class CustomPasswordChangeView(SaveControlView):
     model = Muser
     form_class = CustomPasswordChangeForm
 
-    def get(self,request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         form = self.form_class(user=request.user)  # 向表单传递当前用户
         context = {
-            'title': "修改密碼",
-            'action':"/account/change-password/" ,  # 设置 action 为当前 URL
-            'form': form
+            "title": "修改密碼",
+            "action": "/account/change-password/",  # 设置 action 为当前 URL
+            "form": form,
         }
-        return render(request, 'base/model_edit.html', context)
-      
+        return render(request, "base/model_edit.html", context)
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(user=request.user, data=request.POST)  # 同样，向表单传递当前用户
+        form = self.form_class(
+            user=request.user, data=request.POST
+        )  # 同样，向表单传递当前用户
 
         if form.is_valid():
             form.save()
             # 处理保存后的逻辑，例如重定向到列表页面
             return JsonResponse({"success": True, "msg": "成功"})
-        
+
         errors = form.errors.as_json()
         return JsonResponse({"success": False, "msg": f"{errors}"})
 
+
 def about_sys_view(request):
     # 确定文件路径
-    return render(request, 'about_sys.html')
-
-
-    
+    return render(request, "about_sys.html")

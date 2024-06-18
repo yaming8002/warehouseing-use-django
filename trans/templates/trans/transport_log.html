@@ -143,7 +143,9 @@
       <th rowspan="2">施工層別</th>
       <th colspan="2">吊卡車公司</th>
       <th colspan="1">經手人</th>
+      {% if request.session.can_edit %}
       <th rowspan="2">編輯</th>
+      {% endif %} 
     </tr>
     <tr>
       <th>工地編號</th>
@@ -199,11 +201,13 @@
         <td>{{ item.translog.carinfo.car_number }}</td>
         <!--<td>{{ item.transportlog.member }}</td>-->
         <td>{{ item.translog.member }}</td>
+        {% if request.session.can_edit %}
         <td>
           {% if not item.is_rollback %}
             <a href="#" onclick="removeRow({{ item.id }})">作廢</a>
           {% endif %}
         </td>
+        {% endif %} 
       </tr>
     {% endfor %}
   </tbody>
