@@ -8,8 +8,7 @@ from stock.models.material_model import Materials
 from stock.models.site_model import SiteInfo
 from stock.models.stock_model import Stock
 from trans.models.car_model import CarInfo
-from wcom.utils.uitls import (excel_num_to_date, excel_value_to_str,
-                              get_month_range)
+from wcom.utils.uitls import excel_num_to_date, excel_value_to_str, get_month_range
 
 
 class TransLog(models.Model):
@@ -61,7 +60,7 @@ class TransLog(models.Model):
             & Q(build_date__lte=build_date_range[1])
             & Q(transaction_type=transaction_type)
         )
-        # print(cls.objects.filter(query).query)
+
         if cls.objects.filter(query).exists():
             return cls.objects.get(query)
 
@@ -134,45 +133,18 @@ class TransLogDetail(models.Model):
         mat = Materials.get_item_by_code(mat_code, remark, unit)
 
         all_unit = unit * quantity if unit else Decimal(0)
-        obj, created = cls.objects.get_or_create(
+        return cls(
             translog=tran,
             material=mat,
             level=level,
             unit=unit,
             is_rollback=False,
-            defaults={
-                "is_rent": is_rent,
-                "quantity": quantity,
-                "all_quantity": quantity,
-                "all_unit": all_unit,
-                "remark": remark,
-            },
+            is_rent=is_rent,
+            quantity=quantity,
+            all_quantity=quantity,
+            all_unit=all_unit,
+            remark=remark,
         )
-
-        if not created:
-            # 計算差異值
-            diff_quantity = quantity - obj.quantity
-            diff_all_unit = all_unit - obj.all_unit
-            if diff_quantity == 0 and diff_all_unit == 0:
-                return
-
-            obj.quantity = quantity
-            obj.all_quantity = quantity
-            obj.all_unit = all_unit
-            obj.remark = remark
-            quantity = diff_quantity
-            all_unit = diff_all_unit
-            # 保存更新
-            obj.save(update_fields=["quantity", "all_quantity", "all_unit", "remark"])
-
-        is_stock_add = tran.transaction_type == "IN"
-        Stock.move_material(
-            SiteInfo.get_site_by_code("0001"), mat, quantity, all_unit, is_stock_add
-        )
-        if mat.mat_code == '999' and is_stock_add :
-            return 
-        Stock.move_material(tran.constn_site, mat, quantity, all_unit, not is_stock_add)
-
 
     @classmethod
     def rollback(cls, tran: TransLog, detial_id=None):
@@ -180,7 +152,7 @@ class TransLogDetail(models.Model):
             detials = cls.objects.select_related("translog").filter(id=detial_id).all()
         else:
             detials = cls.objects.select_related("translog").filter(translog=tran).all()
-            
+
         for detail in detials:
             cls.objects.select_related("translog").filter(
                 translog__code=tran, material=detail.material
@@ -191,8 +163,7 @@ class TransLogDetail(models.Model):
             mat = detail.material
             quantity = detail.quantity
             all_unit = detail.all_unit
-            Stock.move_material( tran.constn_site,mat, quantity, all_unit, is_stock_add)
-
+            Stock.move_material(tran.constn_site, mat, quantity, all_unit, is_stock_add)
 
     class Meta:
         unique_together = [

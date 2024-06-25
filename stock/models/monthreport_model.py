@@ -149,8 +149,6 @@ class MonthReport(MonthData):
         before = cls.get_current_by_site(site,b_year,b_month)
         update_value =Decimal( getattr(before,column,0) )
         update_value += value if is_add else -value
-        if site.genre > 1 and update_value < 0:
-            return None
         setattr(now,column,update_value)
         now.save()
         return now

@@ -160,13 +160,19 @@ def get_edit_remark(request):
         report_id = request.POST.get('id')
         report = DoneSteelReport.objects.get(id=report_id)
         report.remark = request.POST.get('remark')
+        year_month = request.POST.get("yearMonth")
+        year_month =year_month if year_month else (datetime.now()).strftime('%Y-%m') 
+        split_year_month = [int(x) for x in year_month.split('-')]
+        old_year,old_month = report.year ,report.month 
+        report.year ,report.month = split_year_month[0],split_year_month[1]
         for mat_code in DoneSteelReport.static_column_code:
             column = f'm_{mat_code}'
             value_str = request.POST.get(column)
             value = Decimal(value_str) if value_str else Decimal(0)
             setattr(report,column,value)
         report.save()
-
+        update_total_by_month(old_year,old_month)
+        update_total_by_month(report.year,report.month)
         context = {'msg':"成功"}
         return JsonResponse(context)
 

@@ -20,6 +20,9 @@
       {% endfor %}
     
     </select>
+    &nbsp;&nbsp;
+    <label for="siteinfo"> 顯示細項:</label>
+    <input type="checkbox" id="is_detial" name="is_detial" {% if request.GET.is_detial %} checked {% endif %} >
   </p>
   <p>
         <label for="code">料號:</label>
@@ -39,7 +42,6 @@
   <input type="submit" value="查詢" />
 
 </form>
-<div id="modalContainer"></div>
 {% endblock %} {% block table %}
 <caption><h3>庫存</h3></caption>
 <thead>
@@ -64,7 +66,7 @@
     <td>{{ item.material.category.name }}</td>
     <td>{{ item.material.specification.name }}</td>
     <td>{{ item.quantity }}</td>
-    <td>{% if item.material.is_divisible %}{{ item.unit }}{% else %}---{% endif %}</td>
+    <td>{% if item.material.is_divisible %}{{ item.total_unit }}{% else %}---{% endif %}</td>
     <td>{% if item.material.is_divisible %}{{ item.material.unit_of_division }}{% else %}---{% endif %}</td>
   </tr>
   {% endfor %}

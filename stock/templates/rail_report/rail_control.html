@@ -7,6 +7,8 @@
   <script>
     $(document).ready(function () {
       hideEditRowIfEarlier();
+
+      
     });
 
     function hideEditRowIfEarlier() {
@@ -59,7 +61,7 @@
      <!-- <input type="button" onclick="searchThisMonth()"  value="本月" />-->
     <!-- <input type="button" id="exceloutput" value="匯出EXCEL" />-->
   </form>
-  <div id="modalContainer"></div>
+
 {% endblock %}
 {% block table %}
   <caption>
@@ -85,7 +87,7 @@
     <th>項次</th>
     <th>工地代號</th>
     <th>業主</th>
-    <th>名稱</th>
+    <th>名稱  <button id="hieddenConstnName" class="btn btn-sm btn-secondary ms-2">展開</button> </th>
     <th class='table-danger'>5M</th>
     <th class='table-danger'>6M</th>
     <th class='table-danger'>7M</th>
@@ -114,97 +116,97 @@
     <th class='table-success'>總支數</th>
   </tr>
   {% for item in list %}
-    <tr>
-      <td>{{ forloop.counter }}</td>
-      <td>{{ item.siteinfo.code }}</td>
-      <td>{{ item.siteinfo.owner }}</td>
-      <td>{{ item.siteinfo.name }}</td>
-      <td>
-        {% if item.done_type == 1 %}是{% endif %}
-      </td>
-      <td class='table-danger'>
-        {% if item.out_5 != 0 %}{{ item.out_5 |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-danger'>
-        {% if item.out_6 != 0 %}{{ item.out_6 |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-danger'>
-        {% if item.out_7 != 0 %}{{ item.out_7 |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-danger'>
-        {% if item.out_8 != 0 %}{{ item.out_8 |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-danger'>
-        {% if item.out_9 != 0 %}{{ item.out_9 |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-danger'>
-        {% if item.out_10 != 0 %}{{ item.out_10 |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-danger'>
-        {% if item.out_11 != 0 %}{{ item.out_11 |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-danger'>
-        {% if item.out_12 != 0 %}{{ item.out_12 |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-danger'>
-        {% if item.out_13 != 0 %}{{ item.out_13 |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-danger'>
-        {% if item.out_14 != 0 %}{{ item.out_14 |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-danger'>
-        {% if item.out_15 != 0 %}{{ item.out_15 |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-danger'>
-        {% if item.out_16 != 0 %}{{ item.out_16 |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-danger'>{{ item.out_total  |floatformat:"0" }}</td>
-      <td class='table-success'>
-        {% if item.in_5 != 0 %}{{ item.in_5  |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-success'>
-        {% if item.in_6 != 0 %}{{ item.in_6  |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-success'>
-        {% if item.in_7 != 0 %}{{ item.in_7  |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-success'>
-        {% if item.in_8 != 0 %}{{ item.in_8  |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-success'>
-        {% if item.in_9 != 0 %}{{ item.in_9  |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-success'>
-        {% if item.in_10 != 0 %}{{ item.in_10  |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-success'>
-        {% if item.in_11 != 0 %}{{ item.in_11  |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-success'>
-        {% if item.in_12 != 0 %}{{ item.in_12  |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-success'>
-        {% if item.in_13 != 0 %}{{ item.in_13  |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-success'>
-        {% if item.in_14 != 0 %}{{ item.in_14  |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-success'>
-        {% if item.in_15 != 0 %}{{ item.in_15  |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-success'>
-        {% if item.in_16 != 0 %}{{ item.in_16  |floatformat:"0" }}{% endif %}
-      </td>
-      <td class='table-success'>{{ item.in_total |floatformat:"0" }}</td>
-      <td>
-        {% if item.rail_ng != 0 %}{{ item.rail_ng |floatformat:"0" }}{% endif %}
-      </td>
-      {% if request.session.u_permission > 1  %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ item.siteinfo.code }}</td>
+        <td>{{ item.siteinfo.owner }}</td>
+        <td class='constn_name collapsed-content'>{{ item.siteinfo.name }}</td>
         <td>
-          <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a>
+          {% if item.done_type == 1 %}是{% endif %}
         </td>
-      {% endif %}
-    </tr>
+        <td class='table-danger'>
+          {% if item.out_5 != 0 %}{{ item.out_5 |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-danger'>
+          {% if item.out_6 != 0 %}{{ item.out_6 |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-danger'>
+          {% if item.out_7 != 0 %}{{ item.out_7 |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-danger'>
+          {% if item.out_8 != 0 %}{{ item.out_8 |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-danger'>
+          {% if item.out_9 != 0 %}{{ item.out_9 |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-danger'>
+          {% if item.out_10 != 0 %}{{ item.out_10 |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-danger'>
+          {% if item.out_11 != 0 %}{{ item.out_11 |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-danger'>
+          {% if item.out_12 != 0 %}{{ item.out_12 |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-danger'>
+          {% if item.out_13 != 0 %}{{ item.out_13 |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-danger'>
+          {% if item.out_14 != 0 %}{{ item.out_14 |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-danger'>
+          {% if item.out_15 != 0 %}{{ item.out_15 |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-danger'>
+          {% if item.out_16 != 0 %}{{ item.out_16 |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-danger'>{{ item.out_total  |floatformat:"0" }}</td>
+        <td class='table-success'>
+          {% if item.in_5 != 0 %}{{ item.in_5  |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-success'>
+          {% if item.in_6 != 0 %}{{ item.in_6  |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-success'>
+          {% if item.in_7 != 0 %}{{ item.in_7  |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-success'>
+          {% if item.in_8 != 0 %}{{ item.in_8  |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-success'>
+          {% if item.in_9 != 0 %}{{ item.in_9  |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-success'>
+          {% if item.in_10 != 0 %}{{ item.in_10  |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-success'>
+          {% if item.in_11 != 0 %}{{ item.in_11  |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-success'>
+          {% if item.in_12 != 0 %}{{ item.in_12  |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-success'>
+          {% if item.in_13 != 0 %}{{ item.in_13  |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-success'>
+          {% if item.in_14 != 0 %}{{ item.in_14  |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-success'>
+          {% if item.in_15 != 0 %}{{ item.in_15  |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-success'>
+          {% if item.in_16 != 0 %}{{ item.in_16  |floatformat:"0" }}{% endif %}
+        </td>
+        <td class='table-success'>{{ item.in_total |floatformat:"0" }}</td>
+        <td>
+          {% if item.rail_ng != 0 %}{{ item.rail_ng |floatformat:"0" }}{% endif %}
+        </td>
+        {% if request.session.u_permission > 1  %}
+          <td>
+            <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a>
+          </td>
+        {% endif %}
+      </tr>
   {% endfor %}
   <tr>
     <th colspan="5">工地出入總計</th>

@@ -5,6 +5,7 @@ import logging.config
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import connection
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
@@ -145,3 +146,30 @@ class ImportData2Generic(View):
         }
 
         return render(request, self.html_path, context)
+
+
+def execute_stored_procedure(sql_command, params=None):
+    """
+    Executes a stored procedure with given SQL command and parameters.
+    
+    Parameters:
+    - sql_command: str, SQL command for calling the stored procedure.
+    - params: list or tuple, parameters to be passed to the stored procedure.
+    
+    Returns:
+    - results: list, results fetched after executing the stored procedure.
+    """
+    with connection.cursor() as cursor:
+        try:
+            if params:
+                cursor.execute(sql_command, params)
+            else:
+                cursor.execute(sql_command)
+            
+            # If the stored procedure returns results, fetch them
+            results = cursor.fetchall()
+            return results
+        
+        except Exception as e:
+            print(f"Error executing stored procedure: {e}")
+            return None

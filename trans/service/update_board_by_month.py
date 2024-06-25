@@ -18,8 +18,7 @@ def conditional_sum(field_name):
         )
     )
 
-def update_board_by_month(build_date):
-    year, month = build_date.year, build_date.month
+def update_board_by_month(year, month , first_day_of_month,last_day_of_month ):
     first_day_of_month = datetime(year, month, 1)
     last_day_of_month = (
         first_day_of_month + relativedelta(months=1) - relativedelta(seconds=1)

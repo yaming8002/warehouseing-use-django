@@ -58,3 +58,10 @@ def kg_to_meter(mat_code,kg_value):
     }
 
     return f"{kg_value/dct.get(mat_code,1):.2f}"
+
+@register.filter
+def month_full(month):
+    if month > 9:
+        return f"{month}"
+
+    return f"0{month}"

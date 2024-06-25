@@ -19,7 +19,8 @@ class RailControlView(MonthListView):
 
     def get_queryset(self):
         year,month = self.get_year_month()
-        query =  (Q(siteinfo__id__gt=3) & (Q(year__lt=year) | Q(year=year, month__lte=month)) )
+        query =  Q(siteinfo__id__gt=3) & (Q(year__lt=year) | Q(year=year, month__lte=month))
+        query &= ~(Q(in_total = 0) & Q(out_total=0))
         return RailReport.get_current_by_query(query)
 
     def get_whse_martials(self,context ):

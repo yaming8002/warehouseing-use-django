@@ -2,18 +2,19 @@ import json
 import logging
 # # Create your models here.
 import logging.config
+import sys
 import traceback
 from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
-
+import re
 from stock.models.material_model import MatCat, Materials
 from stock.models.site_model import SiteInfo
 # from trans.forms import TransLogDetailForm
 from trans.models import TransLog, TransLogDetail
-from trans.service.update_report import count_all_report
+from trans.service.update_report import count_all_report, move_old_data_by_month
 from wcom.models.menu import SysInfo
 from wcom.utils.excel_tool import ImportData2Generic
 from wcom.utils.pagelist import PageListView
@@ -87,6 +88,19 @@ class TrandportView(PageListView):
 
         return context
 
+
+def move_old_data(request):
+    yearmonth_str = request.GET.get('yearmonth') 
+    yearmonth = yearmonth_str.split('-')
+    year = int(yearmonth[0])
+    month =  int(yearmonth[1])
+    print(year,month)
+    move_old_data_by_month(year,month)
+    response_data = {
+        "success": True,
+        "msg": "刪除成功",
+    }
+    return JsonResponse(response_data)
 
 class ImportTransportView(ImportData2Generic):
     title = "上傳EXCEL"
@@ -165,11 +179,13 @@ class ImportTransportView(ImportData2Generic):
         trans_end_date = SysInfo.get_value_by_name("trans_end_day")
         trans_end_date = datetime.strptime(trans_end_date, "%Y/%m/%d")
         self.end_date = trans_end_date
-        for item in data:
-            trancode = excel_value_to_str(item[6])
-            if trancode is None:
-                return
-            try:
+        trans_log_details = []
+        try:
+            for item in data:
+                trancode = excel_value_to_str(item[6])
+                if trancode is None:
+                    return
+
                 mat_code = excel_value_to_str(item[8])
                 edit_date = excel_num_to_date(item[27])
 
@@ -179,29 +195,26 @@ class ImportTransportView(ImportData2Generic):
                 remark = excel_value_to_str(item[20])
 
                 if remark is not None and "作廢" in remark:
-                    if TransLog.objects.filter(code=trancode).exists():
-                        tran = TransLog.objects.get(code=trancode)
-                        TransLogDetail.rollback(tran)
-                        
                     continue
 
-                tran = TransLog.create(code=trancode, item=item)
+                trans_log = TransLog.create(code=trancode, item=item)
 
                 if mat_code and mat_code != "":
-                    # print(item)
-                    TransLogDetail.create(tran, item, is_rent=False)
+                    detail = TransLogDetail.create(trans_log, item, is_rent=False)
+                    trans_log_details.append(detail)
+            TransLogDetail.objects.bulk_create(trans_log_details)
+        except Exception as e:
+            # 处理可能的异常情况
+            errordct = {"item": item, "e": str(e)}
+            self.error_list.append(errordct)
 
-            except Exception as e:
-                # 处理可能的异常情况
-                errordct = {"item": item, "e": str(e)}
-                self.error_list.append(errordct)
-
-                logger.info(
-                    {
-                        "item": item,
-                        "e": f"{str(e)}\n{type(e).__name__}\n{traceback.format_exc()}",
-                    }
-                )
+            logger.info(
+                {
+                    "item": item,
+                    "e": f"{str(e)}\n{type(e).__name__}\n{traceback.format_exc()}",
+                }
+            )
+            
 
     def insert_rent_DB(self, data):
         for item in data:

@@ -15,7 +15,6 @@ class AuthenticationMiddleware:
         # 检查用户是否已登录，如果未登录则重定向到登录页面
         if request.user.is_authenticated:
             meun_permissions = UserPermissions.objects.filter(group__id=request.user.group_id,menu__url = request.path )
-            print(meun_permissions.query)
             if request.user.is_superuser :
                 request.session['u_permission'] = 4
             elif meun_permissions.exists():

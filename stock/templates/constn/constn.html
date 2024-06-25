@@ -86,7 +86,7 @@
     {% endif %}
     <!--<button type="button" onclick="upload(event)">上傳EXCEL</button>-->
   </form>
-  <div id="modalContainer"></div>
+
 {% endblock %}
 {% block table %}
   <caption><h3>工地清單</h3></caption>
@@ -99,6 +99,7 @@
       <th scope="col">鋼樁結算</th>
       <th scope="col">鋼軌結算</th>
       <th scope="col">狀態</th>
+      <th scope="col">類別</th>
       <th scope="col">結案日期</th>
       {% if request.session.u_permission > 1  %}<th scope="col">編輯</th>{% endif %}
     </tr>
@@ -143,6 +144,13 @@
           {% for state in constn_state %}
             <!-- 迭代 constn_state 变量 -->
             {% if state.0|stringformat:"s" == item.state|stringformat:"s" %}{{ state.1 }}{% endif %}
+          {% endfor %}
+        </td>
+        <td>
+          {% get_site_genre as constn_genre %}
+          {% for genre in constn_genre %}
+            <!-- 迭代 constn_state 变量 -->
+            {% if genre.0|stringformat:"s" == item.genre|stringformat:"s" %}{{ genre.1 }}{% endif %}
           {% endfor %}
         </td>
         <td>

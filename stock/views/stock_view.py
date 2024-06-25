@@ -29,29 +29,39 @@ class StockView(PageListView):
     
     def get_queryset(self):
         stock_obj = Stock.objects
-        site_obj = SiteInfo.objects.filter(genre=0)
-        mat_obj = Materials.objects.select_related('category', 'specification').filter(~Q(specification=23))
+        site_obj = SiteInfo.objects.filter(code__in=['0001','0003'])
+        mat_obj = Materials.objects.select_related('category', 'specification')
         siteinfo = self.request.GET.get("siteinfo")
         code = self.request.GET.get("code")
         name = self.request.GET.get("name")
         category_id = self.request.GET.get("category_id")
+        is_detial = self.request.GET.get("is_detial")
+        # 使用 Q 对象构建查询条件
+
+        if is_detial is None :
+            mat_obj = mat_obj.filter(specification__in =range(23,25) ).exclude(mat_code__in=('2301','2302'))
+        query = Q(material__in=mat_obj) & Q(siteinfo__in=site_obj)
         
         if siteinfo:
-            site_obj = site_obj.filter(id=siteinfo)
+            query &= Q(siteinfo_id=siteinfo)
         if code:
-            mat_obj = mat_obj.filter(mat_code=code)
+            query &= Q(material__mat_code=code)
         if name:
-            mat_obj = mat_obj.filter(name__istartswith=name)
+            query &= Q(material__name__istartswith=name)
         if category_id:
-            mat_obj = mat_obj.filter(category=category_id)
-        stock_obj.filter(material__in=mat_obj,siteinfo__in=site_obj,quantity__lt=0).update(quantity=0)
-        result = stock_obj.filter(material__in=mat_obj,siteinfo__in=site_obj,quantity__gt=0) # inner join
+            query &= Q(material__category_id=category_id)
+        
+        # 更新负数量为0
+        stock_obj.filter(query & Q(quantity__lt=0)).update(quantity=0,total_unit=0)
+        
+        # 执行查询
+        result = stock_obj.filter(query & Q(quantity__gt=0)).order_by('material__mat_code','material__specification')
         return result.all()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["categorys"] = MatCat.objects.all()
-        context["siteInfos"] = SiteInfo.objects.filter(genre=0).all()
+        context["siteInfos"] = SiteInfo.objects.filter(code__in=['0001','0003']).all()
         return context
     
 def getMatrtialData(request):
@@ -93,6 +103,7 @@ class ConstnStockViewList(PageListView):
             query &= Q(material__mat_name=mat_name)
         if category_id:
             query &= Q(material__category_id=category_id)
+        query  &= ~(Q(quantity=0 ) & Q(total_unit=0 ))
         return Stock.objects.select_related("siteinfo","material").filter(query).all()
 
     def get_context_data(self, **kwargs):

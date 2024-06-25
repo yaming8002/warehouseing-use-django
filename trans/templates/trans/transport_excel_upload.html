@@ -31,13 +31,13 @@
     {% csrf_token %}
     <div>
     <input type="file" id="excelFile" name="excel_file" accept=".xlsx" />
+    <button type="button" id="upload_button">上傳</button>
     </div>
     <!-- 修改了按鈕的 ID 以防止與 form 的 ID 混淆 -->
-    <div>
+    <div hidden>
       <label for="is_all">全部上傳</label>
-      <input type='checkbox' id='is_all' name="is_all" />
+      <input type='checkbox' id='is_all' name="is_all" checked />
     </div>
-    <button type="button" id="upload_button">上傳</button>
   </form>
 {% endblock %}
 {% block table %}

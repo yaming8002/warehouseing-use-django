@@ -13,12 +13,8 @@ from collections import defaultdict
 from wcom.utils.uitls import get_before_year_month
 
 
-def update_rail_by_month(build_date):
-    year, month = build_date.year, build_date.month
-    first_day_of_month = datetime(year, month, 1)
-    last_day_of_month = (
-        first_day_of_month + relativedelta(months=1) - relativedelta(seconds=1)
-    )
+def update_rail_by_month(year, month,first_day_of_month,last_day_of_month):
+
     query = (
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
         & (

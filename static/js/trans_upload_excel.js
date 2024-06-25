@@ -6,6 +6,26 @@ async function totalUpload(file) {
         // 顯示載入指示器
         $("#base_table tbody").empty();
         showSpinner();
+
+        $('#update_text').text("移除舊資料....");
+        var filename=file.name ;
+        var pattern = /(\d+)年(\d+)月/;  // 正規表達式模式
+        console.log(filename)
+        // 使用正規表達式進行匹配
+        var match = filename.match(pattern);
+
+        if (match) {
+            var yearChinese = parseInt(match[1]);
+            var month = parseInt(match[2]);
+
+            // 轉換年份，中華民國年轉換為西元年
+            var yearAD = 1911 + yearChinese;
+            await $.ajax({
+                url: '/transport_log/move_old_data/',
+                data:{"yearmonth":yearAD+'-'+month},
+                method: 'GET'
+            });
+        }
         $('#update_text').text("EXCEL 分析中....");
         handleFileProcessing(file);
     } else {
@@ -87,7 +107,7 @@ async function handleFileProcessing(file) {
         }));
 
         await $.ajax({
-            url: '/carinfo/uploadexcelByTotal/',  // 替換為你的後台地址
+            url: '/carinfo/uploadexcelByTotal/',  
             type: 'POST',
             contentType: 'application/json',
             headers: { 'X-CSRFToken': csrftoken },
@@ -154,7 +174,7 @@ async function handleFileProcessing(file) {
 
 
 async function processAndUploadData( count_date , rows, is_rent,csrftoken) {
-    const batchSize = 50;
+    const batchSize = 300;
     let batchData = [];
     let is_all=$('#is_all').is(':checked') ;
     for (let i = 0; i < rows.length; i++) {

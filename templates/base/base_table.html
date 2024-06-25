@@ -60,123 +60,144 @@
           $('#base_table').css('max-height', desiredHeight + 'px'); // 设置最大高度
       }
 
+
+      $('#hieddenConstnName').click('click', function() {
+        const toggleContents = document.querySelectorAll('.constn_name');
+        const button = this;
+        
+        toggleContents.forEach(content => {
+          content.classList.toggle('collapsed-content');
+          content.classList.toggle('expanded-content');
+        });
+    
+        button.textContent = button.textContent === '縮小' ? '展開' : '縮小';
       });
+      });
+
     </script>
     {% block javascript %}<script></script>{% endblock %}
     <style>
-      .formStyle {
+   .collapsed-content {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 8em;
+       /* 约等于6个中文字的宽度 */
+
+   }
+    .expanded-content {
+        white-space: normal;
+   }
+
+    .formStyle {
         background-color: burlywood;
-        padding: 15px; /* 添加内边距 */
-      }
-
-      .modal-body > form > div {
-        margin-bottom: 15px;  
-      }
-
-      caption {
+        padding: 15px;
+       /* 添加内边距 */
+   }
+    .modal-body > form > div {
+        margin-bottom: 15px;
+   }
+    caption {
         position: static;
         caption-side: top;
-    }
-
+   }
     .tableStyle {
-      height: 100%; /* 减去表单和其他元素的高度 */
-      overflow-y: auto;/*  添加垂直滚动 */
-     }
-
-  .table {
-    width: 100%;
-   /* overflow-y: auto;*/
-    margin-bottom: 0; /* 减少或去除底部的外边距，如果有的话 */
-}
-  /* CSS for freezing table rows or cells */
-  .sticky-header,
-  .sticky-header th,
-  .sticky-header td {
-      position: sticky;
-      text-align: center;
-      white-space: nowrap; /* 防止内容换行 */
-      vertical-align: middle;
-      top: 0 !important;
-      z-index: 0  !important;
-      border: 1px solid black; /* 为表头的顶部加粗 */
-  }
-
-  .sticky-header:nth-child(1) {
-    position: sticky;
-    top: 0;
-    /* 其他样式 */
-}
-
-  .sticky-header:nth-child(2) {
-      position: sticky;
-      top: 50px; /* 第一行高度 */
-      /* 其他样式 */
-  }
-
-  .tableStyle table tr:not(.sticky-header) th:not(.sticky-header) {
-    font-size:18px;
-    font-weight:bolder ;
-    white-space: nowrap; /* 防止内容换行 */
-    border: 1px solid black;
-    text-align: center;
-    vertical-align: middle;
-  }
-
+        height: 100%;
+       /* 减去表单和其他元素的高度 */
+        overflow-y: auto;
+       /* 添加垂直滚动 */
+   }
+    .table {
+        width: 100%;
+       /* overflow-y: auto;
+       */
+        margin-bottom: 0;
+       /* 减少或去除底部的外边距，如果有的话 */
+   }
+   /* CSS for freezing table rows or cells */
+    .sticky-header, .sticky-header th, .sticky-header td {
+        position: sticky;
+        text-align: center;
+        white-space: nowrap;
+       /* 防止内容换行 */
+        vertical-align: middle;
+        top: 0 !important;
+        z-index: 0 !important;
+        border: 1px solid black;
+       /* 为表头的顶部加粗 */
+   }
+    .sticky-header:nth-child(1) {
+        position: sticky;
+        top: 0;
+       /* 其他样式 */
+   }
+    .sticky-header:nth-child(2) {
+        position: sticky;
+        top: 50px;
+       /* 第一行高度 */
+       /* 其他样式 */
+   }
+    .tableStyle table tr:not(.sticky-header) th:not(.sticky-header) {
+        font-size:18px;
+        font-weight:bolder ;
+        white-space: nowrap;
+       /* 防止内容换行 */
+        border: 1px solid black;
+        text-align: center;
+        vertical-align: middle;
+   }
     .tableStyle table{
-      table-layout: auto;
-      min-width: 100%;  /* 可以根据需要调整 */
-      min-height: 100% ;
-      width: auto;      /* 允许表格根据内容自动调整宽度 */
-    }  
-  
-
-  
+        table-layout: auto;
+        min-width: 100%;
+       /* 可以根据需要调整 */
+        min-height: 100% ;
+        width: auto;
+       /* 允许表格根据内容自动调整宽度 */
+   }
     .tableStyle table td{
-      white-space: nowrap; /* 防止内容换行 */
-      border: 1px solid black;
-      text-align: center;
-      vertical-align: middle;
-    }  
-
-
+        white-space: nowrap;
+       /* 防止内容换行 */
+        border: 1px solid black;
+        text-align: center;
+        vertical-align: middle;
+   }
     .negative-value {
-      color: red !important;
-  }
-  
+        color: red !important;
+   }
     .separator {
-      height: 20px !important;
-      background-color: #fff !important;
-      border-left: none !important;
-      border-right: none !important;
-      --bs-table-color-type: : none !important;
-      --bs-table-bg-type: none !important;
-  }
-  .noshow{
-    display: none;
-  }
-
-  .truncate {
-    white-space: nowrap; /* 防止文本换行 */
-    overflow: hidden; /* 隐藏超出元素宽度的内容 */
-    text-overflow: ellipsis; /* 超出部分显示省略号 */
-    text-align: left !important;
- }
-
- .hidden {
-  display: none;
-}
-
+        height: 20px !important;
+        background-color: #fff !important;
+        border-left: none !important;
+        border-right: none !important;
+        --bs-table-color-type: : none !important;
+        --bs-table-bg-type: none !important;
+   }
+    .noshow{
+        display: none;
+   }
+    .truncate {
+        white-space: nowrap;
+       /* 防止文本换行 */
+        overflow: hidden;
+       /* 隐藏超出元素宽度的内容 */
+        text-overflow: ellipsis;
+       /* 超出部分显示省略号 */
+        text-align: left !important;
+   }
+    .hidden {
+        display: none;
+   }
+    
   {% block styles %}
 
   {% endblock %}
-  </style>
+    </style>
   </head>
   <body>
     <div class="m-3 p-3">
       <div class="formStyle p-3 rounded">
         {% block form %}<!-- 放置對應的表單-->{% endblock %}
       </div>
-      <div id="modalContainer"></div>
       <br />
       <div class="tableStyle">
         <table id="base_table" class="table table-primary table-striped rounded">

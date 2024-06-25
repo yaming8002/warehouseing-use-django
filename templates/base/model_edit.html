@@ -9,6 +9,18 @@
 
     <title>{% block title %}model_edit{% endblock %}</title>
   <style>
+
+.modal-dialog {
+  position: fixed;
+  margin: auto;
+  width: 320px;
+  height: 100%;
+  left: 80px;
+}
+.modal.left .modal-content {
+  height: 100%;
+  border: 0;
+}
 .hide-this{
   display: none;
 }
@@ -89,7 +101,7 @@ th {
        role="dialog"
        aria-labelledby="createModalLabel"
        aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="createModalLabel">{{ title }}</h5>

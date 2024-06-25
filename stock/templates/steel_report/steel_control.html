@@ -70,7 +70,7 @@
     <th>項次</th>
     <th>工地代號</th>
     <th>業主</th>
-    <th>名稱</th>
+    <th>名稱  <button id="hieddenConstnName" class="btn btn-sm btn-secondary ms-2">展開</button> </th>
     <th>H300 <br>
       支撐(m)</th>
     <th>H300 <br>
@@ -102,7 +102,7 @@
     <td>{{ forloop.counter }}</td>
     <td>{{ item.siteinfo.code }}</td>
     <td class="truncate">{{ item.siteinfo.owner }}</td>
-    <td class="truncate" >{{ item.siteinfo.name }}</td>
+    <td class="truncate constn_name collapsed-content" >{{ item.siteinfo.name }}</td>
     <td class="value">{% if item.m_300 != 0 %}{{ item.m_300 }}{% endif%}</td>
     <td class="value">{% if item.m_301 != 0 %}{{ item.m_301 }}{% endif%}</td>
     <td class="value">{% if item.m_350 != 0 %}{{ item.m_350 }}{% endif%}</td>

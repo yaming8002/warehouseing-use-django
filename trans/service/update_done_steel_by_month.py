@@ -6,6 +6,7 @@ from stock.models.done_steel_model import DoneSteelReport
 from stock.models.material_model import Materials
 from stock.models.site_model import SiteInfo
 from stock.models.steel_model import SteelReport
+from stock.models.stock_model import Stock
 from trans.models.trans_model import TransLogDetail
 from dateutil.relativedelta import relativedelta
 from django.db.models import Q, F, Sum  # Ensure Sum is also imported
@@ -14,13 +15,8 @@ from collections import defaultdict
 from trans.service.update_board_by_month import conditional_sum
 
 
-def reomve_total_steel(build_date):
+def reomve_total_steel(year, month,first_day_of_month,last_day_of_month):
     """倉庫物料轉廢料"""
-    year, month = build_date.year, build_date.month
-    first_day_of_month = datetime(year, month, 1)
-    last_day_of_month = (
-        first_day_of_month + relativedelta(months=1) - relativedelta(seconds=1)
-    )
     query = (
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
         & Q(translog__transaction_type="OUT")
@@ -52,17 +48,11 @@ def reomve_total_steel(build_date):
         )
 
 
-def update_done_steel_by_month(build_date):
+def update_done_steel_by_month(year, month,first_day_of_month,last_day_of_month):
     # 直接添加
-    year, month = build_date.year, build_date.month
-    first_day_of_month = datetime(year, month, 1)
-    last_day_of_month = (
-        first_day_of_month + relativedelta(months=1) - relativedelta(seconds=1)
-    )
 
     query = (
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
-        & Q(translog__constn_site__genre__gt=1)
         & Q(material__mat_code__in=SteelReport.static_column_code.keys())
         & Q(translog__transaction_type='IN')
         & Q(remark__contains="#")
@@ -138,13 +128,8 @@ mat_list = [
 ]
 
 
-def update_done_steel_by_month_only_F(build_date):
+def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of_month):
     # 針對皓民的代號處理
-    year, month = build_date.year, build_date.month
-    first_day_of_month = datetime(year, month, 1)
-    last_day_of_month = (
-        first_day_of_month + relativedelta(months=1) - relativedelta(seconds=1)
-    )
 
     query = (
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
@@ -167,7 +152,7 @@ def update_done_steel_by_month_only_F(build_date):
             all_unit_sum=conditional_sum("all_unit"),
         )
     )
-
+    print(update_list.query)
     f002_dct = defaultdict(lambda: Decimal(0))
 
     for detial in update_list:
@@ -194,8 +179,9 @@ def update_done_steel_by_month_only_F(build_date):
             )
             setattr(donesteel, f"m_{detial['mat_code']}", value)
             donesteel.save()
-        elif detial["mat_code"] in ["2301", "2302"] and detial["all_unit_sum"] > 0:
+        elif detial["mat_code"] in ["2301", "2302"] and detial["quantity"] > 0:
             """斜撐"""
+            print()
             column = f"m_{'300' if detial['mat_code']=='2301' else '350' }"
             all_unit = detial["quantity"] * (
                 Decimal("1.25") if detial["mat_code"] == "2301" else Decimal(1.2)
@@ -267,11 +253,43 @@ def update_done_steel_by_month_only_F(build_date):
             )
             donesteel.mat_code = detial["mat_code"]
             donesteel.save()
+        else:
+            """正常的進出"""
+            siteinfo = SiteInfo.get_site_by_code('F002')
+            column = f"m_{detial['mat_code']}"
+            value = (
+                detial["quantity"]
+                if detial["mat_code"] in ["92", "12", "13"]
+                else detial["all_unit_sum"]
+            )
+            SteelReport.update_column_value_by_before(
+                siteinfo, year, month, False, column, value
+            )
 
     stock_f002 = SiteInfo.get_site_by_code("F002")
     # print(f002_dct)
     for k, v in f002_dct.items():
         SteelReport.update_column_value_by_before(stock_f002, year, month, True, k, v)
+
+    site_f002 = SiteInfo.get_site_by_code("F002")
+    wh = SteelReport.get_current_by_site(
+        site_f002, first_day_of_month.year, first_day_of_month.month
+    )
+
+    for x in SteelReport.static_column_code.keys():
+        value = getattr(wh, f"m_{x}")
+        print(x , value )
+        if x in ["92", "12", "13"]:
+            x_queryset = Materials.objects.filter(mat_code=x)
+            Stock.objects.filter(siteinfo=site_f002, material__in=x_queryset).update(
+                quantity=value
+            )
+        else:
+            x_queryset = Materials.objects.filter(mat_code=x, specification_id=23)
+            Stock.objects.filter(siteinfo=site_f002, material__in=x_queryset).update(
+                total_unit=value
+            )
+
 
 
 def update_total_by_month(year, month):
@@ -313,3 +331,5 @@ def update_total_by_month(year, month):
             column,
             v,
         )
+
+
