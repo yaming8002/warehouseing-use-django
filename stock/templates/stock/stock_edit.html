@@ -1,0 +1,82 @@
+{% extends 'base/model_edit.html' %}
+{% block javascript %}
+  <script>
+$(document).ready(function () {
+  // 選擇所有具有id="report"的表格，位於class="col-md-9 m-0"的div內
+  $(".col-md-9.m-0 table").not('.emptytable').each(function () {
+    // 添加所需的CSS類
+    $(this).addClass("table table-primary table-striped");
+  });
+
+  $("#base_table td").each(function () {
+    var value = parseFloat($(this).text()); // 尝试将内容转换为浮点数
+    if (!isNaN(value) && value < 0) { // 检查是否为负数
+        $(this).addClass("negative-value"); // 添加类以改变文本颜色
+    }
+
+  });
+
+  $("#base_table th").each(function () {
+    var value = parseFloat($(this).text()); // 尝试将内容转换为浮点数
+    if (!isNaN(value) && value < 0) { // 检查是否为负数
+        $(this).addClass("negative-value"); // 添加类以改变文本颜色
+    }
+
+  });
+
+  
+  $('#exceloutput').click(function() {
+    var fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
+    $('#base_table').tableExport({
+      type: 'excel',
+      mso: {
+        fileFormat: 'xlsx',
+      },
+      fileName: fileName // Using the captured file name
+    });
+  });
+
+setMaxHeight();
+$(window).resize(setMaxHeight);
+
+function setMaxHeight() {
+    var windowHeight = $(window).height(); // 获取视窗的总高度
+    var barHeight = $('body > div.p-0.h-100.d-flex.flex-row > div.m-0.flex-shrink-0.p-2').outerHeight();
+    var formHeight = $('.formStyle').outerHeight(); // 获取表单的高度
+    var headerHight = $('header').outerHeight(); // 获取表单的高度
+    var desiredHeight = windowHeight - formHeight -headerHight - 20; // 分配剩余空间，这里的20可能是其他间隙或边距
+    var desiredHeight = barHeight - formHeight- 100;
+    $('.tableStyle').css('max-height', desiredHeight + 'px'); // 设置最大高度
+    $('#base_table').css('max-height', desiredHeight + 'px'); // 设置最大高度
+}
+
+});
+  </script>
+{% endblock %}
+{% block form %}
+  <!-- 修改了 form 的 id 以便直接选中 -->
+  <form style="with:100%" method="post" action="/stock/edit/">
+    {% csrf_token %}
+    <input type='hidden' name="id" value="{{ report.id }}">
+    <div>工地編號 : {{ report.siteinfo.code }}</div>
+    <div>工地 : {{ report.siteinfo.name }}</div>
+    <div>業主 : {{ report.siteinfo.owner }}</div>
+    <div>物料代號 : {{ report.material.mat_code }}</div>
+    <div>物料名稱 : {{ report.material.name }}</div>
+    <div>物料規格 : {{report.material.specification}}</div>
+    <div>數量 : 
+    <input type="text"
+           id="quantity"
+           name="quantity"
+           value="{% if report.quantity %}{{ report.quantity }}{% endif %}">
+  </div>
+  {% if report.material.unit_of_division and report.material.unit_of_division != '無' %}
+    <div>單位量({{ report.material.unit_of_division }}) : 
+    <input type="text"
+          id="total_unit"
+          name="total_unit"
+          value="{% if report.total_unit %}{{ report.total_unit }}{% endif %}">
+  </div>
+  {% endif %}
+</form>
+{% endblock %}

@@ -45,14 +45,12 @@
       var currentGroupId = groupCell.attr('data-group-id')
       var select = $('<select id="edit-group-' + id + '" class="form-control"></select>')
       $.each(group_list, function (index, group) {
-        console.info(group)
         var option = $('<option></option>').attr('value', group.pk).text(group.fields.name)
         if (group.pk == currentGroupId) {
           option.attr('selected', 'selected')
         }
         select.append(option)
       })
-      console.info(select)
       groupCell.html(select)
     
       // 更新編輯鏈接以保存變更

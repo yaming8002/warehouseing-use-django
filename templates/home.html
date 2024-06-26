@@ -86,8 +86,6 @@
       }
       
       function reLoadMainPage(toUrl) {
-        console.info(mainUrl);
-        
         // 检查是否存在带有 id="search" 的 form 元素
         if ($('#search').length > 0) {
           // 存在则重新提交该表单
@@ -98,7 +96,6 @@
             url: toUrl ? toUrl : mainUrl,
             method: 'GET',
             success: function (data) {
-              // console.log(data);
               $('#main').html(data); // 将加载的内容放入 main 区块
             }
           });
@@ -107,13 +104,11 @@
       
       function changePage(event, pageNum) {
         event.preventDefault() // 防止點擊 a 標籤時執行默認行為
-        console.log(mainUrl) ;
 
         if (mainUrl.indexOf("?") === -1) 
           pageUrl = mainUrl + "?page=" + pageNum
         else
           pageUrl = mainUrl + "&page=" + pageNum
-        console.log(mainUrl) ;
         var form = $('#search') // 使用 jQuery 选择器获取表单
 
         $.ajax({
@@ -121,7 +116,7 @@
           method: 'GET',
           data: form.serialize(), // 使用 serialize() 方法自动序列化表单数据
           success: function (data) {
-            // console.log(data);
+    
             $('#main').html(data) // 将加载的内容放入main区块
           }
         })

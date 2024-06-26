@@ -2,6 +2,21 @@
 {{ title }} {{ '' }}
 {% endblock %} {% block javascript %}
 <script>
+  function editRow(id) {
+    // 結案選單
+    $.ajax({
+      url: '/stock/edit/',
+      method: 'GET',
+      data: { 'id': id },
+      success: function (data) {
+        $('#modalContainer').html(data)
+        $('#createModal').modal('show')
+      },
+      error: function (error) {
+        console.error('Error loading modal content: ', error)
+      }
+    })
+  }
 </script>
 {% endblock %} {% block form %}
 <!-- Corrected form tag and added trailing slash to action attribute -->
@@ -54,6 +69,9 @@
     <th scope="col">數量</th>
     <th scope="col">單位量</th>
     <th scope="col">單位</th>
+    {% if request.session.u_permission > 1 %}
+      <th>編輯</th>
+    {% endif %} 
   </tr>
 </thead>
 <tbody>
@@ -68,6 +86,10 @@
     <td>{{ item.quantity }}</td>
     <td>{% if item.material.is_divisible %}{{ item.total_unit }}{% else %}---{% endif %}</td>
     <td>{% if item.material.is_divisible %}{{ item.material.unit_of_division }}{% else %}---{% endif %}</td>
+
+    {% if request.session.u_permission > 1 %}
+    <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a></td>
+    {% endif %} 
   </tr>
   {% endfor %}
 </tbody>

@@ -24,7 +24,7 @@ from stock.views.constn_view import component_view, constn_diff_view
 from stock.views.materials_view import DownloadMaterialView
 from stock.views.site_view import ConstnSeveView, ImportSiteInfoByTotalView
 from stock.views.steel_view import get_edit_remark
-from stock.views.stock_view import ConstnStockViewList
+from stock.views.stock_view import ConstnStockViewList, stock_edit
 
 urlpatterns = [
     path("material/list/", MaterialsView.as_view(), name="material"),
@@ -41,6 +41,7 @@ urlpatterns = [
     path("material/save/", MaterialSeveView.as_view(), name="material_sabe"),
     path("getMatrtialData/", getMatrtialData, name="carinfo"),
     path("stock/list/", StockView.as_view(), name="stock"),
+    path("stock/edit/", stock_edit, name="stock"),
     path("constn_stock/list/", ConstnStockViewList.as_view(), name="constn"),
     path("constn/list/", SiteViewList.as_view(), name="constn"),
     path("constn/edit/", ConstnSeveView.as_view(), name="construction_update"),

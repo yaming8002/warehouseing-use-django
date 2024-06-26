@@ -13,7 +13,6 @@
         $('#createModal').on('click', '.btn-primary', function(event) {
             event.preventDefault();
             var fileInput = document.getElementById('excelFile');
-            console.log(fileInput)
             var file = fileInput.files[0];
 
             if (file) {
@@ -32,7 +31,6 @@
 
     $('#createModal').on('click', '.btn-secondary', function(event) {
         // TODO: 添加取消按鈕的額外邏輯
-        console.log('取消操作')
 
         // 關閉模態框，這行代碼是可選的，因為 `data-dismiss="modal"` 已經處理了關閉行為
         $('#createModal').modal('hide')
@@ -48,12 +46,10 @@
 
             const worksheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[worksheetName];
-            console.info(worksheetName)
             // 转换工作表数据为JSON
             const rows = XLSX.utils.sheet_to_json(worksheet, {
                 header: 1
             });
-            console.info(rows.length);
             if (rows.length > 0) {
                 // 验证列名
                 if (checkColumns(rows[0])) {
@@ -94,7 +90,6 @@
         // 假设每批上传10行数据
         let uploadPromises = [];
         const batchSize = 10;
-        console.info(rows.length);
         for (let i = 0; i < rows.length; i += batchSize) {
             const batchData = rows.slice(i, i + batchSize);
             if (batchData[0].length < 2 || typeof batchData[0][0] === 'undefined') {
@@ -109,7 +104,7 @@
             $('#createModal').modal('hide');
             $('#loadingSpinner').hide(); // 确保加载指示器被隐藏
         }).catch(error => {
-            console.error('上传中出现错误:', error);
+            console.error('錯誤:', error);
         });
     }
 
@@ -135,11 +130,9 @@
                 return response.json(); // 解析 JSON 数据并返回
             })
             .then(data => {
-                console.log(data); // 打印数据用于调试
                 return data; // 将数据传递给下一个 then，或标记 Promise 为 resolved
             })
             .catch(error => {
-                console.error('错误：', error);
                 throw error; // 重新抛出错误，确保能够被 Promise.all 捕获
             });
     }
