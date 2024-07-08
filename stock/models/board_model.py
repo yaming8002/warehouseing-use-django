@@ -104,7 +104,9 @@ class BoardReport(MonthReport):
         return report
 
     @classmethod
-    def get_current_by_query(cls, query, is_done=False):
+    def get_current_by_query(cls, query, final_query=None, is_done=False):
+        if final_query is None:
+            final_query = Q()  # 初始化为一个空的 Q 对象
         query_set = (
             cls.objects.annotate(
                 rank=Window(
@@ -121,12 +123,11 @@ class BoardReport(MonthReport):
         # print(query_set.query)
         ids = [item["id"] for item in query_set]
 
+        final_query &= Q(id__in=ids) & Q(is_done=is_done) & Q(close=False)
+
         return (
             cls.objects.select_related("siteinfo")
-            .filter(id__in=ids)
-            .filter(is_done=is_done)
-            .filter(close=False)
-            .filter( ~( Q(quantity=0) & Q(quantity2=0)) )
+            .filter(final_query)
             .order_by("done_type", "siteinfo__code", "siteinfo__genre")
             .all()
         )
@@ -151,7 +152,7 @@ class BoardReport(MonthReport):
         if column in ["22", "2205"]:
             now.mat_code2 = "2205"
 
-        new_value = getattr(before,target_field) 
+        new_value = getattr(before,target_field)
         new_value += value if is_add else -value
         setattr(now, target_field, new_value)
 

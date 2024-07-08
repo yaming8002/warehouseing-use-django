@@ -14,7 +14,7 @@
       var yearMonthInput = $('#yearMonthInput').val(); // 從輸入欄位獲得年月值
       var currentDate = new Date();
       var currentYearMonth = currentDate.toISOString().slice(0, 7); // 獲取當前年月
-  
+
       if (yearMonthInput < currentYearMonth) {
         // 如果輸入的年月早於當前年月，尋找並隱藏結案連結
         $('.editRow_select').hide(); // 隱藏包含結案連結的<td>元素
@@ -120,6 +120,21 @@
       {% endif %}
     </tr>
   {% endfor %}
+  {% if hui_huang and request.GET.mat_code == '22' %}
+    <tr class="table-warning">
+      <th colspan="4">{{ hui_huang.siteinfo.name }}</th>
+      <th>{{ hui_huang.quantity | floatformat:"0" }}</th>
+      {% if request.GET.mat_code == '22' %}
+        <th>{{ hui_huang.quantity2 | floatformat:"0" }}</th>
+        <th>{{ hui_huang.quantity|add:hui_huang.quantity2 | floatformat:"0" }}</th>
+        <th></th>
+      {% endif %}
+      <th></th>
+      <th></th>
+      <th></th>
+      {% if request.session.u_permission > 1 %}<th></th>{% endif %}
+    </tr>
+  {% endif %}
   {% if kh_report %}
     <tr class="table-warning">
       <th colspan="4">{{ kh_report.siteinfo.name }}</th>
@@ -135,6 +150,19 @@
       {% if request.session.u_permission > 1 %}<th></th>{% endif %}
     </tr>
   {% endif %}
+  {% if warning_lk_report and request.GET.mat_code == '22' %}
+  <tr class="table-warning">
+    <th colspan="4">{{ warning_lk_report.siteinfo.name }} 整片不堪使用</th>
+    <th>{{ warning_lk_report.quantity | floatformat:"0" }}</th>
+    <th>{{ warning_lk_report.quantity2 | floatformat:"0" }}</th>
+    <th>{{ warning_lk_report.quantity|add:warning_lk_report.quantity2 | floatformat:"0" }}</th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    {% if request.session.u_permission > 1 %}<th></th>{% endif %}
+  </tr>
+{% endif %}
   {% if lk_report %}
     <tr class="table-warning">
       <th colspan="4">{{ lk_report.siteinfo.name }}</th>
@@ -144,19 +172,6 @@
         <th>{{ lk_report.quantity|add:lk_report.quantity2 | floatformat:"0" }}</th>
         <th></th>
       {% endif %}
-      <th></th>
-      <th></th>
-      <th></th>
-      {% if request.session.u_permission > 1 %}<th></th>{% endif %}
-    </tr>
-  {% endif %}
-  {% if warning_lk_report and request.GET.mat_code == '22' %}
-    <tr class="table-warning">
-      <th colspan="4">{{ warning_lk_report.siteinfo.name }} 整片不堪使用</th>
-      <th>{{ warning_lk_report.quantity | floatformat:"0" }}</th>
-      <th>{{ warning_lk_report.quantity2 | floatformat:"0" }}</th>
-      <th>{{ warning_lk_report.quantity|add:warning_lk_report.quantity2 | floatformat:"0" }}</th>
-      <th></th>
       <th></th>
       <th></th>
       <th></th>
