@@ -123,7 +123,7 @@ class BoardReport(MonthReport):
         # print(query_set.query)
         ids = [item["id"] for item in query_set]
 
-        final_query &= Q(id__in=ids) & Q(is_done=is_done) & Q(close=False)
+        final_query &= Q(id__in=ids) & Q(is_done=is_done)
 
         return (
             cls.objects.select_related("siteinfo")

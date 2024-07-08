@@ -20,14 +20,15 @@ class BoardControlView(MonthListView):
     def get_queryset(self):
         year,month = self.get_year_month()
         mat_code =self.request.GET.get("mat_code")
+        is_close = self.request.GET.get("is_close" ) != None and self.request.GET.get("is_close" )=='on'
         if mat_code is None:
             return None
         is_lost = "-" in mat_code
         mat_code = '22' if '22' in mat_code  else mat_code
         query =  Q(siteinfo_id__gt=4) & (Q(year__lt=year) | Q(year=year, month__lte=month))
         query &= Q(mat_code=mat_code) & Q(is_lost=is_lost) & ~Q(siteinfo__code = '------')
-        final_query = ~( Q(quantity=0) & Q(quantity2=0))
-        return BoardReport.get_current_by_query(query=query ,final_query=final_query)
+        final_query = ~( Q(quantity=0) & Q(quantity2=0)) & Q(close=is_close)
+        return BoardReport.get_current_by_query(query=query ,final_query=final_query )
 
     def get_whse_martials(self, context):
         year,month = self.get_year_month()

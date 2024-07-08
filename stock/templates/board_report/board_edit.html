@@ -49,8 +49,10 @@
           type="checkbox"
           role="switch"
           id="is_close"
-          name="is_close">
+          name="is_close"
+          {% if report.close %}checked{% endif %}>
    </div>
+   {% if  report.mat_code == '22' %}
     <div>
       <label for="is_lost">遺失</label>
         <input class="form-check-input"
@@ -60,6 +62,7 @@
         name="is_lost"
         {% if report.is_lost %}checked{% endif %}>
     </div>
+    {% endif %}
     <div>
       <label for="board_stuts">狀態</label>
       <select id="board_stuts" name="board_stuts">
