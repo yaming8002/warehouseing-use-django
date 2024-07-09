@@ -20,8 +20,8 @@ class RailControlView(MonthListView):
     def get_queryset(self):
         year,month = self.get_year_month()
         query =  Q(siteinfo__id__gt=3) & (Q(year__lt=year) | Q(year=year, month__lte=month))
-        query &= ~(Q(in_total = 0) & Q(out_total=0))
-        return RailReport.get_current_by_query(query)
+        final_query = ~(Q(in_total = 0) & Q(out_total=0))
+        return RailReport.get_current_by_query(query,final_query)
 
     def get_whse_martials(self,context ):
         year,month = self.get_year_month()
@@ -44,14 +44,14 @@ class RailControlView(MonthListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         self.get_whse_martials(context)
-        
+
         return context
 
 
 
 def get_rail_edit_done(request):
     if request.method == 'GET':
-        report_id = request.GET.get('id') 
+        report_id = request.GET.get('id')
         report = RailReport.objects.get(id=report_id)
         values= report.__dict__
         sum={}
@@ -73,15 +73,15 @@ def get_rail_edit_done(request):
         report = RailReport.get_current_by_site(SiteInfo.objects.get(id=site_id), year,month)
         report.done_type = 1 if selled is not None and selled == 'on' else 0
 
-        report.remark = remark 
-        report.is_done =  isdone is not None and isdone == 'on' 
+        report.remark = remark
+        report.is_done =  isdone is not None and isdone == 'on'
         report.siteinfo.is_rail_done = report.is_done
         report.siteinfo.save()
         if f'{report.year}{report.month}' < f'{year}{month}' :
-            report.pk = None  
+            report.pk = None
             report.year = year
             report.month = month
-        
+
         report.save()
 
         q = Q(siteinfo=report.siteinfo) & ((Q(year=report.year, month__gt=report.month) | Q(year__gt=report.year)))
@@ -103,15 +103,15 @@ class RailDoneView(MonthListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-    
+
         return context
-    
+
 
 
 def rail_done_withdraw(request):
     if request.method == 'GET':
-        # site_id = request.GET.get('site_id') 
-        id = request.GET.get('id') 
+        # site_id = request.GET.get('site_id')
+        id = request.GET.get('id')
         report = RailReport.objects.get(id=id)
         report.is_done = False
         report.siteinfo.is_rail_done = False
@@ -125,7 +125,7 @@ def rail_done_withdraw(request):
 def rail_update__total(report:RailReport,is_withdraw: bool , year,month):
     if report.siteinfo.id < 3:
         return
-    
+
     total_list = RailReport.objects.filter(siteinfo =SiteInfo.get_site_by_code('0000'),year__gte=year,month__gte=month).all()
     for total in total_list :
         for i in range(5, 17):
@@ -136,4 +136,4 @@ def rail_update__total(report:RailReport,is_withdraw: bool , year,month):
         report_total =  report.out_total -report.in_total
         report_total = report_total if is_withdraw  else -1*report_total
         total.in_total += report_total
-        total.save() 
+        total.save()
