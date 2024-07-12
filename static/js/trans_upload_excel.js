@@ -98,7 +98,7 @@ async function handleFileProcessing(file) {
         const index_rows = XLSX.utils.sheet_to_json(workbook.Sheets["Index"], {
             header: 1
         });
-        
+
         var carbcData = index_rows.slice(1, 2000).map(row => ({
             car_number: row[19],  // U 列
             car_firm: row[20],   // V 列
@@ -107,7 +107,7 @@ async function handleFileProcessing(file) {
         }));
 
         await $.ajax({
-            url: '/carinfo/uploadexcelByTotal/',  
+            url: '/carinfo/uploadexcelByTotal/',
             type: 'POST',
             contentType: 'application/json',
             headers: { 'X-CSRFToken': csrftoken },
@@ -174,7 +174,7 @@ async function handleFileProcessing(file) {
 
 
 async function processAndUploadData( count_date , rows, is_rent,csrftoken) {
-    const batchSize = 300;
+    const batchSize = 100;
     let batchData = [];
     let is_all=$('#is_all').is(':checked') ;
     for (let i = 0; i < rows.length; i++) {
@@ -241,7 +241,7 @@ async function processAndUploadData( count_date , rows, is_rent,csrftoken) {
 
 function excelDateToJSDate(excelDate) {
     const date = new Date(1899, 11, 30); // 月份从 0 开始，11 代表 12 月
-    date.setDate(date.getDate() + excelDate ); 
+    date.setDate(date.getDate() + excelDate );
     return date;
   }
 

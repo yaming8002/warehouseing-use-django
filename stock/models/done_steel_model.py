@@ -153,8 +153,8 @@ class DoneSteelReport(BaseSteelReport):
 
         for k, _ in done_report.static_column_code.items():
             value = request.POST.get(f"{case_name}.m_{k}")
-            # print(f'check>{value}<')
-            value = - Decimal(value)  if value else Decimal(0)
+            # print(f'check>{value}<')s
+            value = Decimal(value)  if value else Decimal(0)
             setattr(done_report, f"m_{k}", value)
 
         done_report.save()

@@ -5,7 +5,7 @@ import logging.config
 import sys
 import traceback
 from datetime import datetime, timedelta
-
+from django.db import transaction
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -77,7 +77,7 @@ class TrandportView(PageListView):
         detail = detail.filter(
             is_rent=False, material__in=material.all(), translog__in=log.all()
         ).order_by("id")
-
+        print(detail.query)
         return detail.all()
 
     def get_context_data(self, **kwargs):
@@ -90,7 +90,7 @@ class TrandportView(PageListView):
 
 
 def move_old_data(request):
-    yearmonth_str = request.GET.get('yearmonth') 
+    yearmonth_str = request.GET.get('yearmonth')
     yearmonth = yearmonth_str.split('-')
     year = int(yearmonth[0])
     month =  int(yearmonth[1])
@@ -201,8 +201,8 @@ class ImportTransportView(ImportData2Generic):
 
                 if mat_code and mat_code != "":
                     detail = TransLogDetail.create(trans_log, item, is_rent=False)
-                    trans_log_details.append(detail)
-            TransLogDetail.objects.bulk_create(trans_log_details)
+                    detail.save()
+
         except Exception as e:
             # 处理可能的异常情况
             errordct = {"item": item, "e": str(e)}
@@ -214,7 +214,7 @@ class ImportTransportView(ImportData2Generic):
                     "e": f"{str(e)}\n{type(e).__name__}\n{traceback.format_exc()}",
                 }
             )
-            
+
 
     def insert_rent_DB(self, data):
         for item in data:
@@ -355,7 +355,7 @@ def update_end_date(request):
             count_date = latest_date
     except (ValueError, TypeError):
         count_date = datetime.now()  # 使用當前日期
-        
+
     count_all_report(count_date)
     response_data = {
         "success": True,

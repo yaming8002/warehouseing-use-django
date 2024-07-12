@@ -10,10 +10,10 @@
     });
 
   });
-  
+
   function editRow(id) {
     // 轉換姓名欄位
-  
+
     $.ajax({
       url: '/transport_log/edit/',
       method: 'GET',
@@ -29,7 +29,7 @@
   }
   function removeRow(id) {
     // 轉換姓名欄位
-  
+
     $.ajax({
       url: '/transport_log/remove/',
       method: 'GET',
@@ -56,11 +56,11 @@
     table-layout: auto;
     min-width: 100%;  /* 可以根据需要调整 */
     width: auto;      /* 允许表格根据内容自动调整宽度 */
-  }  
+  }
 
   .tableStyle table td{
     white-space: nowrap; /* 防止内容换行 */
-  }  
+  }
   </style>
 {% endblock %}
 {% block form %}
@@ -125,7 +125,6 @@
       </select>
     </p>
     <input type="submit" value="查詢" />
-    <button type="button" onclick="upload(event)">上傳EXCEL</button>
   </form>
 
 {% endblock %}
@@ -145,7 +144,7 @@
       <th colspan="1">經手人</th>
       {% if request.session.u_permission > 1 %}
       <th rowspan="2">編輯</th>
-      {% endif %} 
+      {% endif %}
     </tr>
     <tr>
       <th>工地編號</th>
@@ -207,7 +206,7 @@
             <a href="#" onclick="removeRow({{ item.id }})">作廢</a>
           {% endif %}
         </td>
-        {% endif %} 
+        {% endif %}
       </tr>
     {% endfor %}
   </tbody>
