@@ -41,7 +41,7 @@ class SteelControlView(MonthListView):
         for x in static_column_code:
             exclude_query  |= ~Q(**{f'm_{x}': 0})
         return SteelReport.get_current_by_query(query,final_query=exclude_query)
-            
+
     def get_whse_martials(self,context ):
         year,month = self.get_year_month()
 
@@ -67,7 +67,7 @@ class SteelControlView(MonthListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         self.get_whse_martials(context)
-   
+
         return context
 
 
@@ -78,7 +78,7 @@ class SteelDoneView(MonthListView):
         year,month = self.get_year_month()
         query =  ( (Q(year=year) & Q( month=month)) )
         return DoneSteelReport.objects.filter(query).all()
-    
+
     def get_whse_martials(self,context ):
         year,month = self.get_year_month()
         sum_report = self.get_queryset()
@@ -90,7 +90,7 @@ class SteelDoneView(MonthListView):
             column = f"m_{code}"
             for item in sum_report :
                 setattr(context['sum_report'],column,getattr(context['sum_report'],column)+getattr(item,column))
-            
+
         context['diff'] = self.get_diff_value(context['total_report'],context['sum_report'])
         context['before_yearMonth'] = f'{before_year}-{before_month:02d}'
 
@@ -98,7 +98,7 @@ class SteelDoneView(MonthListView):
         context = super().get_context_data(**kwargs)
         self.get_whse_martials(context)
         return context
-    
+
     def get_diff_value(self,current,before):
         diff = []
         if current and before:
@@ -106,20 +106,20 @@ class SteelDoneView(MonthListView):
             before = model_to_dict(before)
             diff = [(current[f'm_{key}'] - before[f'm_{key}']) for key in static_column_code ]
         return diff
-    
+
 def get_steel_edit_done(request):
     if request.method == 'GET':
-        report_id = request.GET.get('id') 
+        report_id = request.GET.get('id')
         report = SteelReport.objects.get(id=report_id)
 
         context = {'report':report}
-        year_month =(datetime.now()).strftime('%Y-%m') 
+        year_month =(datetime.now()).strftime('%Y-%m')
         split_year_month = [int(x) for x in year_month.split('-')]
         context['year'] = split_year_month[0]
         context['month'] = split_year_month[1]
         context['title'] = '結案編輯'
         context['yearMonth'] = f'{report.year}-{report.month:02d}'
-        
+
         return render(request,'steel_report/steel_edit.html',context)
     else :
         report_id = request.POST.get('id')
@@ -128,7 +128,7 @@ def get_steel_edit_done(request):
         y, m = get_year_month(request.POST.get('yearMonth'))
         # report = SteelReport.objects.select_related('siteinfo').get(id=report_id)
         report = SteelReport.get_current_by_site(SiteInfo.get_site_by_code(site_code),y, m )
-        report.is_done =  isdone is not None and isdone == 'on' 
+        report.is_done =  isdone is not None and isdone == 'on'
         report.save()
         if report.is_done :
             DoneSteelReport.add_done_item('cut',request)
@@ -136,10 +136,10 @@ def get_steel_edit_done(request):
         update_total_by_month( y, m)
         context = {'msg':"成功"}
         return JsonResponse(context)
-    
+
 def steel_done_withdraw(request):
     if request.method == 'GET':
-        report_id = request.GET.get('id') 
+        report_id = request.GET.get('id')
         # print(report_id)
         report = DoneSteelReport.objects.select_related('siteinfo').get(id=report_id)
         site= report.siteinfo
@@ -151,7 +151,7 @@ def steel_done_withdraw(request):
 
 def get_edit_remark(request):
     if request.method == 'GET':
-        report_id = request.GET.get('id') 
+        report_id = request.GET.get('id')
         report = DoneSteelReport.objects.get(id=report_id)
         context = {'report':report}
 
@@ -161,15 +161,14 @@ def get_edit_remark(request):
         report = DoneSteelReport.objects.get(id=report_id)
         report.remark = request.POST.get('remark')
         year_month = request.POST.get("yearMonth")
-        year_month =year_month if year_month else (datetime.now()).strftime('%Y-%m') 
-        split_year_month = [int(x) for x in year_month.split('-')]
-        old_year,old_month = report.year ,report.month 
-        report.year ,report.month = split_year_month[0],split_year_month[1]
+        year_month =year_month if year_month else (datetime.now()).strftime('%Y-%m')
+        old_year,old_month = report.year ,report.month
         for mat_code in DoneSteelReport.static_column_code:
             column = f'm_{mat_code}'
             value_str = request.POST.get(column)
             value = Decimal(value_str) if value_str else Decimal(0)
             setattr(report,column,value)
+        print(model_to_dict(report))
         report.save()
         update_total_by_month(old_year,old_month)
         update_total_by_month(report.year,report.month)
@@ -183,8 +182,8 @@ def get_edit_remark(request):
 #     total= rail_objects.filter(siteinfo__code='0000').first()
 
 #     values= constn.__dict__
-    
+
 #     for code in static_column_code:
 #         setattr(total, f'm_{code}', getattr(total, f'm_{code}') + (values.get(f'm_{code}', 0)  if is_withdraw else -values.get(f'm_{code}', 0) ))
 
-#     total.save() 
+#     total.save()

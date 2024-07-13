@@ -152,7 +152,7 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             all_unit_sum=conditional_sum("all_unit"),
         )
     )
-    print(update_list.query)
+
     f002_dct = defaultdict(lambda: Decimal(0))
 
     for detial in update_list:
@@ -198,7 +198,7 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
                 is_done=True,
                 remark="轉斜撐",
             )
-            setattr(donesteel, column, all_unit)
+            setattr(donesteel, column,- all_unit)
             donesteel.save()
         elif detial["mat_code"] in ["10", "4144"] and detial["quantity"] > 0:
             """短接"""
@@ -255,19 +255,17 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             donesteel.save()
         else:
             """正常的進出"""
-            siteinfo = SiteInfo.get_site_by_code('F002')
             column = f"m_{detial['mat_code']}"
             value = (
                 detial["quantity"]
                 if detial["mat_code"] in ["92", "12", "13"]
                 else detial["all_unit_sum"]
             )
-            SteelReport.update_column_value_by_before(
-                siteinfo, year, month, False, column, value
-            )
+            f002_dct[column] -= value
 
     stock_f002 = SiteInfo.get_site_by_code("F002")
-    # print(f002_dct)
+
+    print("f002_dct" ,f002_dct)
     for k, v in f002_dct.items():
         SteelReport.update_column_value_by_before(stock_f002, year, month, True, k, v)
 
@@ -331,5 +329,3 @@ def update_total_by_month(year, month):
             column,
             v,
         )
-
-
