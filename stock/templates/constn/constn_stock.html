@@ -84,7 +84,9 @@
       <th scope="col">單位量</th>
       <th scope="col">單位y總量</th>
       <th scope="col">單位</th>
-     <!-- <th scope="col">編輯</th>-->
+      {% if request.session.u_permission > 1 %}
+      <th>編輯</th>
+    {% endif %} 
     </tr>
   </thead>
   <tbody>
@@ -115,11 +117,9 @@
             {{ item.material.unit_of_division }}
           {% endif %}
         </td>
-        <!--
-        <td>
-          {% if item.material.is_divisible %}<a href="#" onclick="material_split('{{ item.pk }}')">拆分</a>{% endif %}
-        </td>
-      -->
+        {% if request.session.u_permission > 1 %}
+        <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a></td>
+        {% endif %} 
       </tr>
     {% endfor %}
   </tbody>

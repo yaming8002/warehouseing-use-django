@@ -9,18 +9,6 @@
 
     <title>{% block title %}model_edit{% endblock %}</title>
   <style>
-
-.modal-dialog {
-  position: fixed;
-  margin: auto;
-  width: 320px;
-  height: 100%;
-  left: 80px;
-}
-.modal.left .modal-content {
-  height: 100%;
-  border: 0;
-}
 .hide-this{
   display: none;
 }
@@ -63,7 +51,6 @@ th {
           data: form.serialize(), // 序列化表單數據
           success: function (response) {
             alert(response.msg)
-            console.info(response.msg)
             $('#createModal').modal('hide') // 隱藏模態框
             reLoadMainPage()
           },
@@ -84,8 +71,6 @@ th {
       })
     
       $('#createModal').on('click', '.btn-secondary', function (event) {
-        // TODO: 添加取消按鈕的額外邏輯
-        console.log('取消操作')
     
         // 關閉模態框，這行代碼是可選的，因為 `data-dismiss="modal"` 已經處理了關閉行為
         $('#createModal').modal('hide')
