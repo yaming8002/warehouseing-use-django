@@ -141,13 +141,13 @@ class ImportSiteInfoByTotalView(ImportData2Generic):
     def get_site_genre(self,code:str) -> int:
         genre_mapping = {
             'A': 1,
-            'B': 2, 'C': 2, 'D': 2,
-            'E': 3, 'F': 3,
-            'G': 4,
-            'H': 5
+            'B': 3, 'C': 3, 'D': 3,
+            'E': 4, 'F': 4,
+            'G': 5,
+            'H': 6
         }
 
         if code.isdigit():
             return 1
 
-        return genre_mapping.get(str(code[0]), 6)
+        return genre_mapping.get(str(code[0]), 2)

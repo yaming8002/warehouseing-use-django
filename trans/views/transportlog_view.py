@@ -2,14 +2,11 @@ import json
 import logging
 # # Create your models here.
 import logging.config
-import sys
 import traceback
 from datetime import datetime, timedelta
-from django.db import transaction
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
-import re
 from stock.models.material_model import MatCat, Materials
 from stock.models.site_model import SiteInfo
 # from trans.forms import TransLogDetailForm
