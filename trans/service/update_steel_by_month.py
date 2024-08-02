@@ -1,13 +1,10 @@
-from datetime import datetime
 
-from django.forms import model_to_dict
 from stock.models.material_model import Materials
 from stock.models.site_model import SiteInfo
 from stock.models.steel_model import SteelReport
 from stock.models.stock_model import Stock
 from trans.models.trans_model import TransLogDetail
 from django.db.models import F
-from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 
 
@@ -93,7 +90,7 @@ def update_steel_whse_by_month(first_day_of_month, last_day_of_month):
 
     for x in SteelReport.static_column_code.keys():
         value = getattr(wh, f"m_{x}")
-        print(x , value )
+        # print(x , value )
         if x in ["92", "12", "13"]:
             x_queryset = Materials.objects.filter(mat_code=x)
             Stock.objects.filter(siteinfo=site_whse, material__in=x_queryset).update(
@@ -104,4 +101,3 @@ def update_steel_whse_by_month(first_day_of_month, last_day_of_month):
             Stock.objects.filter(siteinfo=site_whse, material__in=x_queryset).update(
                 total_unit=value
             )
-

@@ -2,13 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, height=device-height, initial-scale=1.0"
-    />
-
-    <title>{% block title %}model_edit{% endblock %}</title>
-  <style>
+    <meta name="viewport"
+          content="width=device-width, height=device-height, initial-scale=1.0" />
+    <title>
+      {% block title %}model_edit{% endblock %}
+    </title>
+    <style>
 .hide-this{
   display: none;
 }
@@ -32,18 +31,23 @@ th, td {
 th {
   background-color: #f2f2f2; /* 設置表頭背景顏色 */
 }
-</style>
-{% block styles %}
-{% endblock %}
-
-  <script>
+    </style>
+    {% block styles %}{% endblock %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css">
+    <script>
     $(document).ready(function () {
+      {% block js_document %}{% endblock %}
       // 綁定保存按鈕的點擊事件
       $('#createModal').on('click', '.btn-primary', function (event) {
         event.preventDefault()
         var form = $('#createModal form')
         // TODO: 添加表單驗證邏輯
-    
+
         // 提交表單
         $.ajax({
           url: form.attr('action'), // 或者指定提交到的 URL
@@ -57,7 +61,7 @@ th {
           error: function (response) {
             let errors = JSON.parse(xhr.responseText).errors;
             let errorMessages = [];
-    
+
             // 遍历所有错误字段
             for (let field in errors) {
                 // 将每个字段的错误信息添加到 errorMessages 数组
@@ -69,44 +73,47 @@ th {
           }
         })
       })
-    
+
       $('#createModal').on('click', '.btn-secondary', function (event) {
-    
         // 關閉模態框，這行代碼是可選的，因為 `data-dismiss="modal"` 已經處理了關閉行為
-        $('#createModal').modal('hide')
+        console.info('check close')
+        $('#createModal').modal('hide');
       })
+
+
+
     })
-  </script>
-{% block javascript %}{% endblock %}
-</head>
-<body>
-  <div class="modal fade"
-       id="createModal"
-       tabindex="-1"
-       role="dialog"
-       aria-labelledby="createModalLabel"
-       aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="createModalLabel">{{ title }}</h5>
-        </div>
-        <div class="modal-body">
-          <!-- 表單內容將會透過 jQuery 載入 -->
-          {% load crispy_forms_tags %}
-          <div class="modal-body" width="300px">
-            {% block form %}
-              <form action="{{ action }}" method="post">
-                {% csrf_token %} {{ form_control.as_div }}
-              </form>
-            {% endblock %}
+    </script>
+    {% block javascript %}{% endblock %}
+  </head>
+  <body>
+    <div class="modal fade"
+         id="createModal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="createModalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="createModalLabel">{{ title }}</h5>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
-          <button type="submit" class="btn btn-primary">儲存</button>
+          <div class="modal-body">
+            <!-- 表單內容將會透過 jQuery 載入 -->
+            {% load crispy_forms_tags %}
+            <div class="modal-body" width="300px">
+              {% block form %}
+                <form action="{{ action }}" method="post">
+                  {% csrf_token %} {{ form_control.as_div }}
+                </form>
+              {% endblock %}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+            <button type="submit" class="btn btn-primary">儲存</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</body>
+  </body>

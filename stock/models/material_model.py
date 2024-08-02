@@ -1,4 +1,4 @@
-from decimal import Decimal
+
 import math
 from django.db import models
 from django.db.models import Q
@@ -45,17 +45,17 @@ class Materials(models.Model):
 
     @classmethod
     def get_item_by_code(cls,code:str,remark:str,unit):
-        
+
         quest =(   Q(mat_code=code)
                         | Q(mat_code2=code)
                         | Q(mat_code3=code)
         )
-  
+
         if code=='999' :
             if remark is None or "出售" in remark or remark not in ng_spec_name :
                 remark = "無"
             spec = MatSpec.objects.get(name=remark)
-            quest &= Q(specification=spec)  
+            quest &= Q(specification=spec)
         elif unit is None and cls.objects.filter(quest).count() >1  :
             spec = MatSpec.objects.get(id=23)
             quest &= Q(specification=spec)

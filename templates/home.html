@@ -9,6 +9,10 @@
     <title>
       {% block title %}Home Page{% endblock %}
     </title>
+    <link rel="icon"
+          type="image/png"
+          href="{% static 'images/E25E_color.png' %}"
+          sizes="32x32">
     <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
           rel="stylesheet"
@@ -56,22 +60,22 @@
           // 對於每個有 'collapse-content' 類的 div，運行以下函數
           var hasItems = $(this).find('li').length > 0
           // 如果這個 div 內沒有 li 元素，則隱藏這個 div
-  
+
           if (!hasItems) {
             $(this).hide()
             $(this).prev('.collapse-btn').hide()
           }
         })
       })
-      
+
       $(document).on('submit', '#search', submitForm)
       function submitForm(event) {
         event.preventDefault() // 阻止表单的默认提交行为
-      
+
         var form = $('#search') // 使用 jQuery 选择器获取表单
         var type = form.attr('method') // 获取表单的 method 属性
         var url = form.attr('action') // 获取表单的 action 属性
-      
+
         $.ajax({
           url: url,
           type: type,
@@ -84,7 +88,7 @@
           }
         })
       }
-      
+
       function reLoadMainPage(toUrl) {
         // 检查是否存在带有 id="search" 的 form 元素
         if ($('#search').length > 0) {
@@ -101,11 +105,11 @@
           });
         }
       }
-      
+
       function changePage(event, pageNum) {
         event.preventDefault() // 防止點擊 a 標籤時執行默認行為
 
-        if (mainUrl.indexOf("?") === -1) 
+        if (mainUrl.indexOf("?") === -1)
           pageUrl = mainUrl + "?page=" + pageNum
         else
           pageUrl = mainUrl + "&page=" + pageNum
@@ -116,14 +120,14 @@
           method: 'GET',
           data: form.serialize(), // 使用 serialize() 方法自动序列化表单数据
           success: function (data) {
-    
+
             $('#main').html(data) // 将加载的内容放入main区块
           }
         })
       }
       function editPassWord(id) {
         // 轉換姓名欄位
-      
+
         $.ajax({
           url: '/account/change-password/',
           method: 'GET',
@@ -140,7 +144,7 @@
       function showSpinner() {
         $('#loadingSpinner').modal('show') ;
       }
-      
+
       function hideSpinner() {
         $('#loadingSpinner').modal('hide') ;
       }
@@ -165,7 +169,7 @@
         padding: 0;
         margin: 0;
       }
-      
+
       /* 自定义样式 */
       header {
         background-color: red;
@@ -173,11 +177,11 @@
         padding: 10px;
         text-align: center;
       }
-      
+
       caption {
         overflow: hidden;
       }
-      
+
       .btn-toggle {
         padding: 0.25rem 0.5rem;
         font-weight: 600;
@@ -189,7 +193,7 @@
         color: rgba(var(--bs-emphasis-color-rgb), 0.85);
         background-color: var(--bs-tertiary-bg);
       }
-      
+
       .btn-toggle::before {
         width: 1.25em;
         line-height: 0;
@@ -197,11 +201,11 @@
         transition: transform 0.35s ease;
         transform-origin: 0.5em 50%;
       }
-      
+
       [data-bs-theme='dark'] .btn-toggle::before {
         content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%28255,255,255,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
       }
-      
+
       .btn-toggle[aria-expanded='true'] {
         color: rgba(var(--bs-emphasis-color-rgb), 0.85);
       }
@@ -245,14 +249,14 @@
         background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
         z-index: 9999; /* 高层次以确保在其他内容上方 */
       }
-      
+
       .spinner-container {
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100%;
       }
-      
+
       .spinner-border {
         width: 80px;
         height: 80px;
@@ -323,11 +327,9 @@
           </ul>
         </div>
         <!-- 主要工作區 -->
-        <div id="main" class="flex-grow-1 m-0 p-0">
-        </div>
+        <div id="main" class="flex-grow-1 m-0 p-0"></div>
       </div>
       <div id="modalContainer"></div>
-      
       <!-- Loading Modal -->
       <div class="modal fade"
            id="loadingSpinner"

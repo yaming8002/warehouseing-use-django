@@ -9,6 +9,15 @@
     <title>
       {% block title %}base table{% endblock %}
     </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
     <script>
       $(document).ready(function () {
         // 選擇所有具有id="report"的表格，位於class="col-md-9 m-0"的div內
@@ -33,7 +42,7 @@
 
         });
 
-        
+
         $('#exceloutput').click(function() {
           var fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
           $('#base_table').tableExport({
@@ -47,7 +56,7 @@
 
       setMaxHeight();
       $(window).resize(setMaxHeight);
-  
+
       function setMaxHeight() {
           var windowHeight = $(window).height(); // 获取视窗的总高度
           var barHeight = $('body > div.p-0.h-100.d-flex.flex-row > div.m-0.flex-shrink-0.p-2').outerHeight();
@@ -63,12 +72,12 @@
       $('#hieddenConstnName').click('click', function() {
         const toggleContents = document.querySelectorAll('.constn_name');
         const button = this;
-        
+
         toggleContents.forEach(content => {
           content.classList.toggle('collapsed-content');
           content.classList.toggle('expanded-content');
         });
-    
+
         button.textContent = button.textContent === '縮小' ? '展開' : '縮小';
       });
       });
@@ -186,7 +195,7 @@
     .hidden {
         display: none;
    }
-    
+
   {% block styles %}
 
   {% endblock %}

@@ -1,25 +1,14 @@
 import logging
-from datetime import datetime, timedelta
 
 from django.core import serializers
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
-from django.forms.models import model_to_dict
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
-from django.utils import timezone
-from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic.list import ListView
+from django.shortcuts import render
 
-from stock.froms.material import MaterialsForm
-from stock.froms.stock import StockForm
 from stock.models.material_model import MatCat, Materials, MatSpec
 from stock.models.site_model import SiteInfo
 from stock.models.stock_model import Stock
-from wcom.templatetags import constn_state
-from wcom.utils import ImportDataGeneric
 from wcom.utils import PageListView
-from wcom.utils.save_control import SaveControlView
 
 logger = logging.getLogger(__name__)
 
@@ -143,7 +132,7 @@ def stock_edit(request):
         print("rrrrrrrrrr")
         report_id = request.POST.get("id")
         quantity = request.POST.get("quantity")
-        total_unit = request.POST.get("total_unit",0)
+        total_unit = request.POST.get("total_unit", 0)
         Stock.objects.filter(id=report_id).update(
             quantity=quantity, total_unit=total_unit
         )

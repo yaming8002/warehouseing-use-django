@@ -1,5 +1,6 @@
-from datetime import datetime
 from decimal import Decimal
+
+from django.forms import model_to_dict
 
 
 from stock.models.done_steel_model import DoneSteelReport
@@ -8,7 +9,6 @@ from stock.models.site_model import SiteInfo
 from stock.models.steel_model import SteelReport
 from stock.models.stock_model import Stock
 from trans.models.trans_model import TransLogDetail
-from dateutil.relativedelta import relativedelta
 from django.db.models import Q, F, Sum  # Ensure Sum is also imported
 from collections import defaultdict
 
@@ -152,7 +152,7 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             all_unit_sum=conditional_sum("all_unit"),
         )
     )
-
+    print(update_list.query)
     f002_dct = defaultdict(lambda: Decimal(0))
 
     for detial in update_list:
@@ -181,7 +181,6 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             donesteel.save()
         elif detial["mat_code"] in ["2301", "2302"] and detial["quantity"] > 0:
             """斜撐"""
-            print()
             column = f"m_{'300' if detial['mat_code']=='2301' else '350' }"
             all_unit = detial["quantity"] * (
                 Decimal("1.25") if detial["mat_code"] == "2301" else Decimal(1.2)
@@ -263,30 +262,13 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             )
             f002_dct[column] -= value
 
-    stock_f002 = SiteInfo.get_site_by_code("F002")
-
-    print("f002_dct" ,f002_dct)
-    for k, v in f002_dct.items():
-        SteelReport.update_column_value_by_before(stock_f002, year, month, True, k, v)
 
     site_f002 = SiteInfo.get_site_by_code("F002")
-    wh = SteelReport.get_current_by_site(
-        site_f002, first_day_of_month.year, first_day_of_month.month
-    )
-
-    for x in SteelReport.static_column_code.keys():
-        value = getattr(wh, f"m_{x}")
-        print(x , value )
-        if x in ["92", "12", "13"]:
-            x_queryset = Materials.objects.filter(mat_code=x)
-            Stock.objects.filter(siteinfo=site_f002, material__in=x_queryset).update(
-                quantity=value
-            )
-        else:
-            x_queryset = Materials.objects.filter(mat_code=x, specification_id=23)
-            Stock.objects.filter(siteinfo=site_f002, material__in=x_queryset).update(
-                total_unit=value
-            )
+    site_wh = SiteInfo.get_site_by_code("0001")
+    # print("f002_dct" ,f002_dct)
+    for k, v in f002_dct.items():
+        SteelReport.update_column_value_by_before(site_f002, year, month, True, k, v)
+        SteelReport.update_column_value_by_before(site_wh, year, month, False, k, v)
 
 
 

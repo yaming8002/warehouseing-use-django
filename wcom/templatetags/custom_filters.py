@@ -1,14 +1,36 @@
 from decimal import Decimal
 from typing import List
 from django import template
-
+from django.db import models
 register = template.Library()
 
 @register.filter
 def dict_get_value(dct, key):
-    if key  in dct.keys() :
-        return dct[key]
+    # 检查键是否存在于字典中
+    if key in dct:
+        val = dct[key]
+        # 检查值是否为 None 或 'None'
+        if val is None or val == 'None':
+            return ''
+        # 检查值是否为 int 或 Decimal，并且值是否为 0
+        if isinstance(val, (int, Decimal)) and val == 0:
+            return ''
+        return val
     return ''
+
+@register.filter
+def steel_model_get_value(dct, key):
+    key = f'm_{key}'
+    if key in dct:
+        val = dct[key]
+        # 检查值是否为 None 或 'None'
+        if val is None or val == 'None':
+            return ''
+        # 检查值是否为 int 或 Decimal，并且值是否为 0
+        if isinstance(val, (int, Decimal)) and val == 0:
+            return 0
+        return val
+    return 0
 
 @register.filter
 def subtract(value1, value2):

@@ -10,7 +10,6 @@ from django.conf import settings
 from django.db import models
 from django.db.models import F, Q, Window
 from django.db.models.functions import Rank
-from django.forms.models import model_to_dict
 
 
 from stock.models.site_model import SiteInfo

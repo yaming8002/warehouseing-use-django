@@ -1,12 +1,10 @@
-from datetime import datetime
+
 from decimal import Decimal
 
-from django.forms import model_to_dict
 from stock.models.rail_model import RailReport
 from stock.models.site_model import SiteInfo
 from trans.models.trans_model import TransLogDetail
-from django.db.models import Case, When, Value, Sum, DecimalField, F
-from dateutil.relativedelta import relativedelta
+from django.db.models import    Sum,  F
 from django.db.models import Q
 from collections import defaultdict
 
@@ -46,7 +44,7 @@ def update_rail_by_month(year, month,first_day_of_month,last_day_of_month):
         siteinfo = SiteInfo.get_site_by_code(x["site_code"])
         spec_id = x["spec_id"]
         if not (spec_id < 23 or spec_id == 25) :
-            continue 
+            continue
         column = f"in_{spec_id}" if is_in else f"out_{spec_id}"
         column = "rail_ng" if "25" in column else column
         if x["site_genre"] == 1:

@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 from django.db import models
-from stock.models.material_model import Materials
+
 from stock.models.site_model import SiteInfo
 from stock.models.steel_model import BaseSteelReport, SteelReport
 from wcom.utils.uitls import get_year_month
@@ -18,8 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 class DoneSteelReport(BaseSteelReport):
-
-    mat_code = models.CharField(max_length=20, default=None,null=True, verbose_name="物料編號")
+    mat_code = models.CharField(
+        max_length=20, default=None, null=True, verbose_name="物料編號"
+    )
     """主要是針對皓民的物料資料進行分割"""
     turn_site = models.ForeignKey(
         SiteInfo,
@@ -66,7 +67,7 @@ class DoneSteelReport(BaseSteelReport):
             month=month,
             done_type=2,
             is_done=True,
-            remark='林口倉報廢'
+            remark="林口倉報廢",
         )
         setattr(donesteel, column, 0 - value)
         donesteel.save()
@@ -91,9 +92,7 @@ class DoneSteelReport(BaseSteelReport):
             month=month,
             done_type=2,
             is_done=True,
-            defaults={
-                'remark': remark if remark else ''
-            }
+            defaults={"remark": remark if remark else ""},
         )
 
         value = all_quantity if mat_code in ["92", "12", "13"] else all_unit
@@ -153,8 +152,7 @@ class DoneSteelReport(BaseSteelReport):
 
         for k, _ in done_report.static_column_code.items():
             value = request.POST.get(f"{case_name}.m_{k}")
-            # print(f'check>{value}<')s
-            value = Decimal(value)  if value else Decimal(0)
+            value = Decimal(value) if value else Decimal(0)
             setattr(done_report, f"m_{k}", value)
 
         done_report.save()

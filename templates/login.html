@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
+    <link rel="icon"
+          type="image/png"
+          href="{% static 'my_app/images/favicon.png' %}"
+          sizes="32x32">
     <style>
   body, html {
     height: 100%;
@@ -46,11 +50,9 @@
     border: none;
     border-radius: 3px;
     cursor: pointer;
-  } 
+  }
     </style>
-
     <script>
-      
       $(document).ready(function () {
         // 检查页面是否存在 <h1>My Website</h1>
         if ($('.bi-person-circle').length > 0) {
@@ -62,12 +64,12 @@
       function validateForm() {
         var username = document.getElementById("username").value;
         var password = document.getElementById("password").value;
-        
+
         // 检查用户名和密码是否为空
         if (username.trim() === "" || password.trim() === "") {
           alert("帳號和密碼不能為空");
           return false; // 阻止表单提交
-        
+
         return true; // 允许表单提交
       }
     }

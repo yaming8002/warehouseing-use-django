@@ -11,7 +11,6 @@ import copy
 from stock.models import SteelReport
 from stock.models.done_steel_model import DoneSteelReport
 from stock.models.site_model import SiteInfo
-from stock.models.steel_pillar import SteelPillar
 from trans.service.update_done_steel_by_month import update_total_by_month
 from wcom.utils import MonthListView
 from wcom.utils.uitls import get_year_month
@@ -77,7 +76,10 @@ class SteelDoneView(MonthListView):
     def get_queryset(self):
         year,month = self.get_year_month()
         query =  ( (Q(year=year) & Q( month=month)) )
-        return DoneSteelReport.objects.filter(query).all()
+        exclude_query = Q()
+        for x in static_column_code:
+            exclude_query  |= ~Q(**{f'm_{x}': 0})
+        return DoneSteelReport.objects.filter(query & exclude_query).all()
 
     def get_whse_martials(self,context ):
         year,month = self.get_year_month()

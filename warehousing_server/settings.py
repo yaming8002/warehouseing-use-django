@@ -49,12 +49,12 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 INSTALLED_APPS = [
-    "import_export",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "import_export",
     "crispy_forms",
     "crispy_bootstrap4",
     "wcom",
@@ -207,7 +207,7 @@ LOGGING = {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
             "formatter": "detailed",
-        },        
+        },
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
