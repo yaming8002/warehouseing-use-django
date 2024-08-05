@@ -72,24 +72,24 @@ class SteelReport(BaseSteelReport) :
 
 
 
-class SteelItem(MonthReport):
-    steel = models.ForeignKey(
-        SteelReport,
-        on_delete=models.SET_NULL,
-        null=True,
-        default=None,
-        verbose_name="地點",
-    )
+# class SteelItem(MonthReport):
+#     steel = models.ForeignKey(
+#         SteelReport,
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         default=None,
+#         verbose_name="地點",
+#     )
 
-    year = models.IntegerField(default=2010, verbose_name="年")
-    month = models.IntegerField(default=1, verbose_name="月份")
+#     year = models.IntegerField(default=2010, verbose_name="年")
+#     month = models.IntegerField(default=1, verbose_name="月份")
 
-    material = models.ForeignKey(
-        Materials, on_delete=models.CASCADE, verbose_name="物料"
-    )
+#     material = models.ForeignKey(
+#         Materials, on_delete=models.CASCADE, verbose_name="物料"
+#     )
 
-    all_quantity = models.IntegerField(default=0, verbose_name="總數量")
+#     all_quantity = models.IntegerField(default=0, verbose_name="總數量")
 
-    class Meta:
-        unique_together = ["steel", "material", "all_quantity"]
-        ordering = ["id"]  # 按照 id 升序排序
+#     class Meta:
+#         unique_together = ["steel", "material", "all_quantity"]
+#         ordering = ["id"]  # 按照 id 升序排序

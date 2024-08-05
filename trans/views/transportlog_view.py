@@ -2,11 +2,14 @@ import json
 import logging
 # # Create your models here.
 import logging.config
+import sys
 import traceback
 from datetime import datetime, timedelta
+
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
+import re
 from stock.models.material_model import MatCat, Materials
 from stock.models.site_model import SiteInfo
 # from trans.forms import TransLogDetailForm
@@ -75,6 +78,7 @@ class TrandportView(PageListView):
             is_rent=False, material__in=material.all(), translog__in=log.all()
         ).order_by("id")
         print(detail.query)
+
         return detail.all()
 
     def get_context_data(self, **kwargs):
@@ -198,8 +202,8 @@ class ImportTransportView(ImportData2Generic):
 
                 if mat_code and mat_code != "":
                     detail = TransLogDetail.create(trans_log, item, is_rent=False)
-                    detail.save()
-
+                    trans_log_details.append(detail)
+            TransLogDetail.objects.bulk_create(trans_log_details)
         except Exception as e:
             # 处理可能的异常情况
             errordct = {"item": item, "e": str(e)}

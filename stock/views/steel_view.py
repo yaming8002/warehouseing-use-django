@@ -76,10 +76,7 @@ class SteelDoneView(MonthListView):
     def get_queryset(self):
         year,month = self.get_year_month()
         query =  ( (Q(year=year) & Q( month=month)) )
-        exclude_query = Q()
-        for x in static_column_code:
-            exclude_query  |= ~Q(**{f'm_{x}': 0})
-        return DoneSteelReport.objects.filter(query & exclude_query).all()
+        return DoneSteelReport.objects.filter(query).all()
 
     def get_whse_martials(self,context ):
         year,month = self.get_year_month()
@@ -164,13 +161,14 @@ def get_edit_remark(request):
         report.remark = request.POST.get('remark')
         year_month = request.POST.get("yearMonth")
         year_month =year_month if year_month else (datetime.now()).strftime('%Y-%m')
+        split_year_month = [int(x) for x in year_month.split('-')]
         old_year,old_month = report.year ,report.month
+        report.year ,report.month = split_year_month[0],split_year_month[1]
         for mat_code in DoneSteelReport.static_column_code:
             column = f'm_{mat_code}'
             value_str = request.POST.get(column)
             value = Decimal(value_str) if value_str else Decimal(0)
             setattr(report,column,value)
-        print(model_to_dict(report))
         report.save()
         update_total_by_month(old_year,old_month)
         update_total_by_month(report.year,report.month)

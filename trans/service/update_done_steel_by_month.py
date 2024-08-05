@@ -1,6 +1,5 @@
+from datetime import datetime
 from decimal import Decimal
-
-from django.forms import model_to_dict
 
 
 from stock.models.done_steel_model import DoneSteelReport
@@ -9,6 +8,7 @@ from stock.models.site_model import SiteInfo
 from stock.models.steel_model import SteelReport
 from stock.models.stock_model import Stock
 from trans.models.trans_model import TransLogDetail
+from dateutil.relativedelta import relativedelta
 from django.db.models import Q, F, Sum  # Ensure Sum is also imported
 from collections import defaultdict
 
@@ -152,7 +152,7 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             all_unit_sum=conditional_sum("all_unit"),
         )
     )
-    print(update_list.query)
+    # print(update_list.query)
     f002_dct = defaultdict(lambda: Decimal(0))
 
     for detial in update_list:
@@ -186,6 +186,9 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
                 Decimal("1.25") if detial["mat_code"] == "2301" else Decimal(1.2)
             )
             # setattr(steel_f,column,getattr(steel_f,column) - all_unit)
+            if "舊" in detial["log_remark"]:
+                continue
+
             f002_dct[column] -= all_unit
             donesteel, _ = DoneSteelReport.objects.get_or_create(
                 siteinfo=SiteInfo.get_site_by_code("F003"),
@@ -197,7 +200,7 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
                 is_done=True,
                 remark="轉斜撐",
             )
-            setattr(donesteel, column,- all_unit)
+            setattr(donesteel, column, all_unit)
             donesteel.save()
         elif detial["mat_code"] in ["10", "4144"] and detial["quantity"] > 0:
             """短接"""
@@ -212,6 +215,8 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             elif detial["mat_code"] =='4144'  :
                 column ='m_414'
 
+            if "舊" in detial["log_remark"]:
+                continue
             donesteel, _ = DoneSteelReport.objects.get_or_create(
                 siteinfo=SiteInfo.get_site_by_code("F003"),
                 turn_site=trun_site,
@@ -254,21 +259,40 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             donesteel.save()
         else:
             """正常的進出"""
+            siteinfo = SiteInfo.get_site_by_code('F002')
             column = f"m_{detial['mat_code']}"
             value = (
                 detial["quantity"]
                 if detial["mat_code"] in ["92", "12", "13"]
                 else detial["all_unit_sum"]
             )
-            f002_dct[column] -= value
+            SteelReport.update_column_value_by_before(
+                siteinfo, year, month, False, column, value
+            )
 
+    stock_f002 = SiteInfo.get_site_by_code("F002")
+    # print(f002_dct)
+    for k, v in f002_dct.items():
+        SteelReport.update_column_value_by_before(stock_f002, year, month, True, k, v)
 
     site_f002 = SiteInfo.get_site_by_code("F002")
-    site_wh = SiteInfo.get_site_by_code("0001")
-    # print("f002_dct" ,f002_dct)
-    for k, v in f002_dct.items():
-        SteelReport.update_column_value_by_before(site_f002, year, month, True, k, v)
-        SteelReport.update_column_value_by_before(site_wh, year, month, False, k, v)
+    wh = SteelReport.get_current_by_site(
+        site_f002, first_day_of_month.year, first_day_of_month.month
+    )
+
+    for x in SteelReport.static_column_code.keys():
+        value = getattr(wh, f"m_{x}")
+        print(x , value )
+        if x in ["92", "12", "13"]:
+            x_queryset = Materials.objects.filter(mat_code=x)
+            Stock.objects.filter(siteinfo=site_f002, material__in=x_queryset).update(
+                quantity=value
+            )
+        else:
+            x_queryset = Materials.objects.filter(mat_code=x, specification_id=23)
+            Stock.objects.filter(siteinfo=site_f002, material__in=x_queryset).update(
+                total_unit=value
+            )
 
 
 
