@@ -32,11 +32,13 @@ class SiteInfo(models.Model):
     @classmethod
     def get_warehouse(cls):
         return cls.objects.get(code='0001')
-    
+
     @classmethod
     def get_site_by_code(cls,code:str):
-        return cls.objects.get(code=code)
-    
+        if cls.objects.filter(code=code ).exists():
+            return cls.objects.get(code=code)
+        return None
+
     @classmethod
     def get_obj_by_value(cls, code=None, owner=None, name=None,genre=None):
         query = Q()
@@ -48,7 +50,7 @@ class SiteInfo(models.Model):
             query &= Q(owner=owner)
         if name:
             query &= Q(name=name)
-    
+
         return cls.objects.filter(query)
 
 
@@ -57,5 +59,4 @@ class SiteInfo(models.Model):
         ordering = ["code"]  # 按照 id 升序排序
 
     def __str__(self):
-        return f"{self.owner},{self.name}" 
-    
+        return f"{self.owner},{self.name}"

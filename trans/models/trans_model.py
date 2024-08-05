@@ -43,7 +43,7 @@ class TransLog(models.Model):
         turn_site = excel_value_to_str(item[3], 4)
 
         consite = SiteInfo.get_site_by_code(consite)
-        if turn_site is not None and turn_site.strip() != '':
+        if turn_site is not None :
             turn_site = SiteInfo.get_site_by_code(turn_site)
 
         transaction_type = "IN" if item[15] is not None and item[15] > 0 else "OUT"
