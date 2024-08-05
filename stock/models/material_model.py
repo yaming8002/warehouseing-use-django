@@ -52,7 +52,7 @@ class Materials(models.Model):
         )
 
         if code=='999' :
-            if remark is None or "出售" in remark or remark not in ng_spec_name :
+            if remark is None or "出售" in remark or remark not in ng_spec_name or remark=='廢鐵' :
                 remark = "無"
             spec = MatSpec.objects.get(name=remark)
             quest &= Q(specification=spec)

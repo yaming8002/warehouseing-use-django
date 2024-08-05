@@ -39,7 +39,7 @@ def update_rail_by_month(year, month,first_day_of_month,last_day_of_month):
         .annotate(quantity=Sum("quantity"), unit_sum=Sum("unit"))
     )
 
-    print(update_list.query)
+    print('rail query',update_list.query)
     whse_dct = defaultdict(lambda: Decimal(0))
     total_dct = defaultdict(lambda: Decimal(0))
     for x in update_list:
