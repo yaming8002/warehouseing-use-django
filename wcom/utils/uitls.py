@@ -2,10 +2,10 @@ from datetime import datetime, timedelta
 import re
 
 def excel_value_to_str(code,desired_length=None):
-    if code is None or code.strip() != '' :
+    if code is None :
         return  None
     if isinstance(code, str):
-        return str(code)
+        return None if code.strip() == '' else str(code).strip()
     elif desired_length :
         return "{:.0f}".format(code).zfill(desired_length)
     else :

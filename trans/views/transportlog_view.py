@@ -78,7 +78,6 @@ class TrandportView(PageListView):
             is_rent=False, material__in=material.all(), translog__in=log.all()
         ).order_by("id")
         print(detail.query)
-
         return detail.all()
 
     def get_context_data(self, **kwargs):
