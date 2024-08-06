@@ -141,8 +141,14 @@ DATABASES = {
         "HOST": db_host,
         "PORT": db_port,
         "OPTIONS": {
+            'charset': 'utf8mb4',
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
         },
+        # 'TEST': {
+        #     'CHARSET': 'utf8mb4',
+        #     'COLLATION': 'utf8mb4_general_ci',
+        #     'MIRROR': 'default',
+        # },
     }
 }
 
