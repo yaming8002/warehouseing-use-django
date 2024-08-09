@@ -4,6 +4,7 @@ from django.http import Http404
 from django.views.generic.list import ListView
 from datetime import datetime, timedelta
 
+from wcom.models.menu import SysInfo
 from wcom.utils.uitls import get_year_month
 
 class PageListView(ListView):
@@ -70,7 +71,9 @@ class MonthListView(ListView):
 
     def get_year_month(self): 
         year_month = self.request.GET.get("yearMonth")
-        year_month =year_month if year_month else (datetime.now()).strftime('%Y-%m') 
+        y_m_str = SysInfo.objects.get(name='trans_end_day').value
+        
+        year_month =year_month if year_month else datetime.strptime(y_m_str  ,'%Y/%m/%d').strftime('%Y-%m')
         split_year_month = [int(x) for x in year_month.split('-')]
         return split_year_month[0],split_year_month[1]
 
