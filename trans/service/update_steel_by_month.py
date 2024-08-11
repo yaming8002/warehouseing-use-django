@@ -43,7 +43,7 @@ def update_steel_by_month(year, month, first_day_of_month, last_day_of_month):
         value = (
             x["quantity"] if x["mat_code"] in ["92", "12", "13"] else x["all_unit_sum"]
         )
-        if siteinfo.genre != 5:
+        if siteinfo.genre != 6:
             SteelReport.update_column_value_by_before(
                 siteinfo, year, month, False, column, value
             )

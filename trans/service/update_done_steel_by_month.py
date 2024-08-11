@@ -91,15 +91,17 @@ def update_done_steel_by_month(year, month,first_day_of_month,last_day_of_month)
             setattr(report, column,getattr(report, column) +value)
 
 
+
         donesteel, _ = DoneSteelReport.objects.get_or_create(
             siteinfo=site,
             turn_site=trun_site,
             year=year,
             month=month,
             done_type=2,
-            mat_code=detial["mat_code"],
-            is_done=True,
-            remark="採購",
+            defaults={
+            'mat_code':detial["mat_code"],
+            'is_done':True,
+            'remark':"採購",}
         )
         setattr(donesteel, column, value)
         donesteel.save()

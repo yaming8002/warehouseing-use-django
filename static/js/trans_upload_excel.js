@@ -128,7 +128,7 @@ async function handleFileProcessing(file) {
 
         let i = 0
         for (; i < siteinfo.length; i += 100) {
-            var bcData = siteinfo.slice(i, i + 200);
+            var bcData = siteinfo.slice(i, i + 100);
             $.ajax({
                 url: '/constn/uploadexcelByTotal/',
                 type: 'POST',

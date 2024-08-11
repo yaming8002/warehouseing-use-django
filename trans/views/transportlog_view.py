@@ -5,8 +5,9 @@ import logging.config
 import sys
 import traceback
 from datetime import datetime, timedelta
-
+from django.db import transaction
 from django.conf import settings
+from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 import re
@@ -179,7 +180,6 @@ class ImportTransportView(ImportData2Generic):
         trans_end_date = SysInfo.get_value_by_name("trans_end_day")
         trans_end_date = datetime.strptime(trans_end_date, "%Y/%m/%d")
         self.end_date = trans_end_date
-        trans_log_details = []
         try:
             for item in data:
                 trancode = excel_value_to_str(item[6])
@@ -198,11 +198,10 @@ class ImportTransportView(ImportData2Generic):
                     continue
 
                 trans_log = TransLog.create(code=trancode, item=item)
-
                 if mat_code and mat_code != "":
                     detail = TransLogDetail.create(trans_log, item, is_rent=False)
-                    trans_log_details.append(detail)
-            TransLogDetail.objects.bulk_create(trans_log_details)
+                    detail.save()
+
         except Exception as e:
             # 处理可能的异常情况
             errordct = {"item": item, "e": str(e)}
@@ -224,8 +223,9 @@ class ImportTransportView(ImportData2Generic):
                 break
             try:
                 tran = TransLog.create(code=trancode, item=item)
-                if mat_code is not None:
-                    TransLogDetail.create(tran, item, is_rent=True)
+                if mat_code and mat_code != "":
+                   detail =  TransLogDetail.create(tran, item, is_rent=True)
+                   detail.save()
 
             except Exception as e:
                 # 处理可能的异常情况

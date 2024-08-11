@@ -1,12 +1,9 @@
-from datetime import datetime
 from decimal import Decimal
 
-from django.forms import model_to_dict
 from stock.models.rail_model import RailReport
 from stock.models.site_model import SiteInfo
 from trans.models.trans_model import TransLogDetail
-from django.db.models import Case, When, Value, Sum, DecimalField, F
-from dateutil.relativedelta import relativedelta
+from django.db.models import Sum, F
 from django.db.models import Q
 from collections import defaultdict
 

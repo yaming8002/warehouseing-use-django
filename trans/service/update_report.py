@@ -1,5 +1,6 @@
 from datetime import datetime
 import pdb
+from stock.models.done_steel_model import DoneSteelReport
 from stock.models.steel_model import SteelReport
 from trans.models.trans_model import TransLog, TransLogDetail
 from trans.service.update_board_by_month import update_board_by_month
@@ -56,6 +57,9 @@ def move_old_data_by_month(year, month):
             details.delete()
         if logs.exists():
             logs.delete()
-    report = SteelReport.objects.filter(year=year,month=month)
+    report = SteelReport.objects.filter(year=year,month=month,done_type=0)
     if report.exists():
         report.delete()
+    report = DoneSteelReport.objects.filter(year=year,month=month,done_type=2)
+    if report.exists():
+        report.delete()   

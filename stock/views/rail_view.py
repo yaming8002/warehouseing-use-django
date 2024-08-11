@@ -1,10 +1,7 @@
 # Create your views here.
-from datetime import datetime
 from decimal import Decimal
-from typing import Dict, List
 
 from django.db.models import Q
-from django.forms import ValidationError, model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -44,7 +41,6 @@ class RailControlView(MonthListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         self.get_whse_martials(context)
-
         return context
 
 
