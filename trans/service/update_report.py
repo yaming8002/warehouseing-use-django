@@ -62,4 +62,4 @@ def move_old_data_by_month(year, month):
         report.delete()
     report = DoneSteelReport.objects.filter(year=year,month=month,done_type=2)
     if report.exists():
-        report.delete()   
+        report.delete()

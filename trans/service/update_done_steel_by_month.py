@@ -91,17 +91,14 @@ def update_done_steel_by_month(year, month,first_day_of_month,last_day_of_month)
             setattr(report, column,getattr(report, column) +value)
 
 
-
         donesteel, _ = DoneSteelReport.objects.get_or_create(
             siteinfo=site,
             turn_site=trun_site,
             year=year,
             month=month,
             done_type=2,
-            defaults={
-            'mat_code':detial["mat_code"],
-            'is_done':True,
-            'remark':"採購",}
+            is_done=True,
+            remark="採購"
         )
         setattr(donesteel, column, value)
         donesteel.save()
@@ -175,12 +172,11 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
                 year=year,
                 month=month,
                 done_type=2,
-                mat_code=detial["mat_code"],
                 is_done=True,
                 remark="採購",
             )
-            setattr(donesteel, f"m_{detial['mat_code']}", value)
-            donesteel.save()
+            DoneSteelReport.update_column_value(donesteel.id,True,f"m_{detial['mat_code']}",value)
+            # setattr(donesteel, f"m_{detial['mat_code']}", value)
         elif detial["mat_code"] in ["2301", "2302"] and detial["quantity"] > 0:
             """斜撐"""
             column = f"m_{'300' if detial['mat_code']=='2301' else '350' }"
@@ -190,7 +186,6 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             # setattr(steel_f,column,getattr(steel_f,column) - all_unit)
             if "舊" in detial["log_remark"]:
                 continue
-
             f002_dct[column] -= all_unit
             donesteel, _ = DoneSteelReport.objects.get_or_create(
                 siteinfo=SiteInfo.get_site_by_code("F003"),
@@ -202,8 +197,9 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
                 is_done=True,
                 remark="轉斜撐",
             )
-            setattr(donesteel, column, all_unit)
-            donesteel.save()
+            DoneSteelReport.update_column_value(donesteel.id,True,column,all_unit)
+            # setattr(donesteel, column, all_unit)
+            # donesteel.save()
         elif detial["mat_code"] in ["10", "4144"] and detial["quantity"] > 0:
             """短接"""
             if '300' in detial['log_remark'] and detial["mat_code"] =='10'  :
@@ -230,8 +226,7 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
                 remark="轉短接 [米數需要調整]",
             )
             # setattr(steel_f, column, Decimal(getattr(steel_f, column)) - all_unit)
-            setattr(donesteel, column, -detial["quantity"])
-            donesteel.save()
+            DoneSteelReport.update_column_value(donesteel.id,False,column,detial["quantity"])
         elif detial["mat_code"] in change_mapping.keys() and detial["all_unit_sum"] > 0:
             """轉中柱"""
             donesteel, _ = DoneSteelReport.objects.get_or_create(
@@ -261,16 +256,14 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             donesteel.save()
         else:
             """正常的進出"""
-            siteinfo = SiteInfo.get_site_by_code('F002')
             column = f"m_{detial['mat_code']}"
             value = (
                 detial["quantity"]
                 if detial["mat_code"] in ["92", "12", "13"]
                 else detial["all_unit_sum"]
             )
-            SteelReport.update_column_value_by_before(
-                siteinfo, year, month, False, column, value
-            )
+            f002_dct[column] -=value
+
 
     stock_f002 = SiteInfo.get_site_by_code("F002")
     # print(f002_dct)
@@ -284,7 +277,6 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
 
     for x in SteelReport.static_column_code.keys():
         value = getattr(wh, f"m_{x}")
-        print(x , value )
         if x in ["92", "12", "13"]:
             x_queryset = Materials.objects.filter(mat_code=x)
             Stock.objects.filter(siteinfo=site_f002, material__in=x_queryset).update(

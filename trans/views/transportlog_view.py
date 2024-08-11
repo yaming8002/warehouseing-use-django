@@ -78,7 +78,7 @@ class TrandportView(PageListView):
         detail = detail.filter(
             is_rent=False, material__in=material.all(), translog__in=log.all()
         ).order_by("id")
-        print(detail.query)
+        # print(detail.query)
         return detail.all()
 
     def get_context_data(self, **kwargs):
@@ -95,7 +95,7 @@ def move_old_data(request):
     yearmonth = yearmonth_str.split('-')
     year = int(yearmonth[0])
     month =  int(yearmonth[1])
-    print(year,month)
+    # print(year,month)
     move_old_data_by_month(year,month)
     response_data = {
         "success": True,

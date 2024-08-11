@@ -39,7 +39,6 @@ class DoneSteelReport(BaseSteelReport):
                 "month",
                 "done_type",
                 "is_done",
-                "mat_code",
             )
         ]
         verbose_name = "變動資訊"

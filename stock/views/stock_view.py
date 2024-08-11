@@ -129,7 +129,6 @@ def stock_edit(request):
 
         return render(request, "stock/stock_edit.html", context)
     else:
-        print("rrrrrrrrrr")
         report_id = request.POST.get("id")
         quantity = request.POST.get("quantity")
         total_unit = request.POST.get("total_unit", 0)
