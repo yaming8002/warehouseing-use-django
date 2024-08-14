@@ -129,7 +129,7 @@ BEGIN
 	    SUM(st.total_unit) AS total_unit
 	FROM stock_stock AS st
     INNER JOIN stock_siteinfo AS info ON st.siteinfo_id = info.id
-    where info.`code` like 'F%'
+    where info.`code` in ('F002','F003')
 	GROUP BY st.material_id
 	ON DUPLICATE KEY UPDATE
 	    stock_stock.quantity = VALUES(quantity),

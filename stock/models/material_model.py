@@ -6,7 +6,7 @@ from django.db.models import Q
 
 
 ng_spec_name =['鋼軌','中H300','中H350','中H400']
-
+mat_genre = [(0, "無"), (1, "主要"),(2,"工具"),(3,"其他")]
 # 物料分類
 class MatCat(models.Model):
     cat_id = models.CharField(max_length=12, verbose_name="物料編號")
@@ -29,6 +29,7 @@ class MatSpec(models.Model):
 
 # 物料清單
 class Materials(models.Model):
+
     mat_code = models.CharField(max_length=12, verbose_name="物料編號")
     mat_code2 = models.CharField(max_length=12, verbose_name="入料編號", null=True)
     mat_code3 = models.CharField(max_length=12, verbose_name="出料編號" , null=True)
@@ -42,6 +43,9 @@ class Materials(models.Model):
     unit_of_division = models.CharField(
         max_length=5, blank=True, verbose_name="拆分單位"
     )
+    mat_genre = [(0, "無"), (1, "主要"),(2,"工具"),(3,"其他")]
+    genre = models.IntegerField(default=0, choices=mat_genre)
+
 
     @classmethod
     def get_item_by_code(cls,code:str,remark:str,unit):

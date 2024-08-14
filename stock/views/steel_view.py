@@ -1,5 +1,6 @@
 
 # Create your views here.
+from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal
 
@@ -132,6 +133,10 @@ def get_steel_edit_done(request):
         if report.is_done :
             DoneSteelReport.add_done_item('cut',request)
             DoneSteelReport.add_done_item('change',request)
+            query = Q(siteinfo=SiteInfo.get_site_by_code(site_code)) & (
+                Q(year=y, month__gt=m) | Q(year__gt=y)
+            )
+            SteelReport.objects.filter(query).delete()
         update_total_by_month( y, m)
         context = {'msg':"成功"}
         return JsonResponse(context)
@@ -159,19 +164,24 @@ def get_edit_remark(request):
         report_id = request.POST.get('id')
         report = DoneSteelReport.objects.get(id=report_id)
         report.remark = request.POST.get('remark')
-        year_month = request.POST.get("yearMonth")
-        year_month =year_month if year_month else (datetime.now()).strftime('%Y-%m')
-        split_year_month = [int(x) for x in year_month.split('-')]
-        old_year,old_month = report.year ,report.month
-        report.year ,report.month = split_year_month[0],split_year_month[1]
+        diff_dct = defaultdict(lambda: Decimal(0))
         for mat_code in DoneSteelReport.static_column_code:
             column = f'm_{mat_code}'
             value_str = request.POST.get(column)
             value = Decimal(value_str) if value_str else Decimal(0)
+            diff_dct[column] = getattr(report,column) - value
             setattr(report,column,value)
+
         report.save()
-        update_total_by_month(old_year,old_month)
         update_total_by_month(report.year,report.month)
+        from_report = SteelReport.get_current_by_site(report.siteinfo,report.year,report.month)
+        trun_reprot = SteelReport.get_current_by_site(report.turn_site if report.turn_site else SiteInfo.get_warehouse(),report.year,report.month)
+        for k,v in diff_dct:
+            setattr(from_report,k,getattr(from_report,k) + v)
+            setattr(trun_reprot,k,getattr(trun_reprot,k) - v)
+        from_report.save()
+        trun_reprot.save()
+
         context = {'msg':"成功"}
         return JsonResponse(context)
 

@@ -1,5 +1,6 @@
 from django.shortcuts import render
 
+from stock.models.material_model import Materials
 from stock.util.steel_brace import build_steel_brace_table
 from stock.util.steel_diff_summary import build_constn_diff_view
 from stock.util.steel_pile import build_steel_ng_table, build_steel_pile_table
@@ -11,7 +12,7 @@ from wcom.templatetags.strmap import get_level
 
 
 def steel_brace_view(request):
-    # 鋼樁 
+    # 鋼樁
     context = {}
     table_level = 7
     if request.method == "POST":
@@ -87,6 +88,7 @@ def component_view(request):
         constn_obj = SiteInfo.get_obj_by_value(
             genre=1, owner=owner, code=code, name=name
         )
+
         # print(constn_obj.query)
         get_level_val = request.POST.get("level")
         table_level = int(get_level_val) if get_level_val else table_level

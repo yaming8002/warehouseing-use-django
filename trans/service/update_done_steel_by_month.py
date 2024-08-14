@@ -126,6 +126,21 @@ mat_list = [
     "4144",
 ]
 
+steel_list = [
+    "300",
+    "301",
+    "350",
+    "351",
+    "390",
+    "400",
+    "401",
+    "408",
+    "414",
+    "4141",
+    "92",
+    "12",
+    "13",
+]
 
 def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of_month):
     # 針對皓民的代號處理
@@ -133,7 +148,7 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
     query = (
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
         & Q(material__mat_code__in=mat_list)
-        & Q(translog__constn_site__code__startswith="F")
+        & Q(translog__constn_site__code__in=['F002','F003'])
         & Q(is_rollback=False)
     )
 
@@ -160,7 +175,7 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             if detial["turn_code"]
             else None
         )
-        if "#" in detial["log_remark"]:
+        if "#" in detial["log_remark"] and detial["mat_code"] in steel_list :
             value = (
                 detial["quantity"]
                 if detial["mat_code"] in ["92", "12", "13"]
@@ -177,7 +192,7 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             )
             DoneSteelReport.update_column_value(donesteel.id,True,f"m_{detial['mat_code']}",value)
             # setattr(donesteel, f"m_{detial['mat_code']}", value)
-        elif detial["mat_code"] in ["2301", "2302"] and detial["quantity"] > 0:
+        elif detial["mat_code"] in ["2301", "2302"] and detial["quantity"] > 0 and "#" in detial["log_remark"] :
             """斜撐"""
             column = f"m_{'300' if detial['mat_code']=='2301' else '350' }"
             all_unit = detial["quantity"] * (
@@ -200,7 +215,7 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             DoneSteelReport.update_column_value(donesteel.id,True,column,all_unit)
             # setattr(donesteel, column, all_unit)
             # donesteel.save()
-        elif detial["mat_code"] in ["10", "4144"] and detial["quantity"] > 0:
+        elif detial["mat_code"] in ["10", "4144"] and detial["quantity"] > 0 and "#" in detial["log_remark"] :
             """短接"""
             if '300' in detial['log_remark'] and detial["mat_code"] =='10'  :
                 column ='m_300'
