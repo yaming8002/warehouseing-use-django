@@ -33,19 +33,19 @@
 
     $(document).ready(function () {
       $("#check_all").change(function () {
-        var isChecked = $(this).prop('checked'); 
+        var isChecked = $(this).prop('checked');
         $('.box_items').prop('checked', isChecked);
       });
       $("#group_main").change(function () {
-        var isChecked = $(this).prop('checked'); 
+        var isChecked = $(this).prop('checked');
         $('.class_main').prop('checked', isChecked);
       });
       $("#group_tool").change(function () {
-        var isChecked = $(this).prop('checked'); 
+        var isChecked = $(this).prop('checked');
         $('.class_tool').prop('checked', isChecked);
       });
       $("#group_other").change(function () {
-        var isChecked = $(this).prop('checked'); 
+        var isChecked = $(this).prop('checked');
         $('.class_other').prop('checked', isChecked);
       });
     });
@@ -107,7 +107,6 @@
                   {% if table_level == level.0 %}selected{% endif %}>{{ level.1 }}</option>
         {% endfor %}
       </select>
-
       <input type="checkbox"
              class="form-check-input"
              id="check_all"
@@ -159,7 +158,7 @@
   </form>
 {% endblock %}
 {% block table %}
-{% load custom_filters %}
+  {% load custom_filters %}
   <caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}-配件</caption>
   {% for key, tran_map in steel_pile_table.items %}
     {% if tran_map.max_length > 1 %}
@@ -221,7 +220,18 @@
                       {{ tran_map.level_summary|list_index_value:forloop.counter }}
                     </td>
                   {% endif %}
-                  <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.remake }}</td>
+                  <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
+                    {% if item.turn_site|is_not_none %}
+                      {% if forloop.counter|divisibleby:2 %}
+                        轉
+                      {% else %}
+                        入
+                      {% endif %}
+                      {{ item.turn_site }}
+                      <br>
+                    {% endif %}
+                    {% if item.d_remark|is_not_none %}{{ item.d_remark }}{% endif %}
+                  </td>
                 {% else %}
                   <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
                   <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>

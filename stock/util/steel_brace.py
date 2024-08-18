@@ -1,11 +1,8 @@
-import decimal
-import math
 from decimal import Decimal
 from typing import Dict, List, Any
 
 from django.db.models import F, Sum
-from django.shortcuts import render
-from django.db.models import Q, F
+from django.db.models import Q
 
 from stock.models.material_model import Materials
 from trans.models import TransLogDetail, TransLog
@@ -14,12 +11,15 @@ support_list = {"300": "H300", "350": "H350", "400": "H400", "408": "H408"}
 values_dict = {
     "code": F("translog__code"),
     "build_date": F("translog__build_date"),
+    "turn_site": F("translog__turn_site__code"),
     "transaction_type": F("translog__transaction_type"),
     "name": F("material__name"),
     "level_annotation": F("level"),
+    "d_remark": F("remark"),
 }
 
-def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
+
+def build_steel_brace_table(constn, level) -> Dict[str, Dict[str, any]]:
     translog = TransLog.objects.filter(constn_site=constn)
     mats = Materials.objects.filter(specification__lt=23)
     transdefaullog = TransLogDetail.objects.filter(
@@ -27,11 +27,11 @@ def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
     )
 
     steel_map = dict()
-    level +=1
+    level += 1
     for mat_code, name in support_list.items():
         # name = f"m_{mat_code}"
         steel_map[name] = {}
-        tr_list: List[List[Any]] = [[] for _ in range(level*2)]
+        tr_list: List[List[Any]] = [[] for _ in range(level * 2)]
         max_length = 0
         summary = {
             "count_in": Decimal(0),
@@ -41,32 +41,28 @@ def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
         }
 
         for seat in range(level):
-            query= Q(material__mat_code=mat_code)
-            if seat==0:
-                query &= (Q(level = seat) | Q(level__isnull=True) )
+            query = Q(material__mat_code=mat_code)
+            if seat == 0:
+                query &= Q(level=seat) | Q(level__isnull=True)
             else:
-                query &= Q(level = seat) 
-
+                query &= Q(level=seat)
 
             total_quantity_and_unit = (
                 transdefaullog.filter(query)
-                .values(
-                    code=F("translog__code"),  # 将物流编号包含在结果中
-                    build_date=F("translog__build_date"),  # 将物流建立日期包含在结果中
-                    transaction_type=F(
-                        "translog__transaction_type"
-                    ),  # 将物流交易类型包含在结果中
-                    name=F("material__name"),  # 将物流交易类型包含在结果中
-                    level_annotation=F("level"),
-                )
+                .values(**values_dict)
                 .annotate(
                     total_quantity=Sum("quantity"),
                     total_unit=Sum("all_unit"),
-                ).order_by("translog__build_date")
+                )
+                .order_by("translog__build_date")
             )
 
-            site_in = (seat * 2) + 1
-            site_out = seat * 2
+            if seat == 0:
+                site_in = len(tr_list) - 1
+                site_out = len(tr_list) - 2
+            else:
+                site_in = (seat * 2) - 1
+                site_out = (seat * 2) - 2
             for item in total_quantity_and_unit:
                 # print(item['level_annotation'])
                 if item["transaction_type"] == "IN":
@@ -78,7 +74,6 @@ def build_steel_brace_table(constn,level) -> Dict[str, Dict[str, any]]:
                     summary["count_out"] += Decimal(item["total_quantity"])
                     summary["unit_out"] += Decimal(item["total_unit"])
             max_length = max(max_length, len(tr_list[site_in]), len(tr_list[site_out]))
-
 
         summary["diff_count"] = summary["count_in"] - summary["count_out"]
         summary["diff_unit"] = summary["unit_in"] - summary["unit_out"]

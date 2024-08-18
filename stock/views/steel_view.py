@@ -176,7 +176,8 @@ def get_edit_remark(request):
         update_total_by_month(report.year,report.month)
         from_report = SteelReport.get_current_by_site(report.siteinfo,report.year,report.month)
         trun_reprot = SteelReport.get_current_by_site(report.turn_site if report.turn_site else SiteInfo.get_warehouse(),report.year,report.month)
-        for k,v in diff_dct:
+        print(diff_dct)
+        for k,v in diff_dct.items():
             setattr(from_report,k,getattr(from_report,k) + v)
             setattr(trun_reprot,k,getattr(trun_reprot,k) - v)
         from_report.save()

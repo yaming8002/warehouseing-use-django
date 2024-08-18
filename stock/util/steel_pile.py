@@ -20,8 +20,10 @@ values_dict = {
     "code": F("translog__code"),
     "build_date": F("translog__build_date"),
     "transaction_type": F("translog__transaction_type"),
+    "turn_site": F("translog__turn_site__code"),
     "name": F("material__name"),
     "level_annotation": F("level"),
+    "d_remark": F("remark"),
 }
 
 
@@ -37,7 +39,7 @@ def build_steel_pile_table(constn) -> Dict[str, Dict[str, any]]:
         # name = f"m_{mat_code}"
         mat_code = key.split("-")[0]
         construct_case = key.split("-")[1] == "1"
-        
+
         steel_map[name] = {}
         tr_list: List[List[Any]] = [[] for _ in range(2)]
         max_length = 0

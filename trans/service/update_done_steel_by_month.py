@@ -175,73 +175,69 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             if detial["turn_code"]
             else None
         )
-        if "#" in detial["log_remark"] and detial["mat_code"] in steel_list :
-            value = (
-                detial["quantity"]
-                if detial["mat_code"] in ["92", "12", "13"]
-                else detial["all_unit_sum"]
-            )
-            donesteel, _ = DoneSteelReport.objects.get_or_create(
-                siteinfo=SiteInfo.get_site_by_code("F001"),
-                turn_site=trun_site,
-                year=year,
-                month=month,
-                done_type=2,
-                is_done=True,
-                remark="採購",
-            )
-            DoneSteelReport.update_column_value(donesteel.id,True,f"m_{detial['mat_code']}",value)
-            # setattr(donesteel, f"m_{detial['mat_code']}", value)
-        elif detial["mat_code"] in ["2301", "2302"] and detial["quantity"] > 0 and "#" in detial["log_remark"] :
-            """斜撐"""
-            column = f"m_{'300' if detial['mat_code']=='2301' else '350' }"
-            all_unit = detial["quantity"] * (
-                Decimal("1.25") if detial["mat_code"] == "2301" else Decimal(1.2)
-            )
-            # setattr(steel_f,column,getattr(steel_f,column) - all_unit)
-            if "舊" in detial["log_remark"]:
-                continue
-            f002_dct[column] -= all_unit
-            donesteel, _ = DoneSteelReport.objects.get_or_create(
-                siteinfo=SiteInfo.get_site_by_code("F003"),
-                turn_site=trun_site,
-                year=year,
-                month=month,
-                done_type=2,
-                mat_code=detial["mat_code"],
-                is_done=True,
-                remark="轉斜撐",
-            )
-            DoneSteelReport.update_column_value(donesteel.id,True,column,all_unit)
-            # setattr(donesteel, column, all_unit)
-            # donesteel.save()
-        elif detial["mat_code"] in ["10", "4144"] and detial["quantity"] > 0 and "#" in detial["log_remark"] :
-            """短接"""
-            if '300' in detial['log_remark'] and detial["mat_code"] =='10'  :
-                column ='m_300'
-            elif '350' in detial['log_remark'] and detial["mat_code"] =='10'  :
-                column ='m_350'
-            elif '400' in detial['log_remark'] and detial["mat_code"] =='10'  :
-                column ='m_400'
-            elif '408' in detial['log_remark'] and detial["mat_code"] =='10'  :
-                column ='m_408'
-            elif detial["mat_code"] =='4144'  :
-                column ='m_414'
+        if "#" in detial["log_remark"] :
+            if detial["mat_code"] in ["10", "4144"] and detial["quantity"] > 0 :
+                """短接"""
+                if '300' in detial['log_remark'] and detial["mat_code"] =='10'  :
+                    column ='m_300'
+                elif '350' in detial['log_remark'] and detial["mat_code"] =='10'  :
+                    column ='m_350'
+                elif '400' in detial['log_remark'] and detial["mat_code"] =='10'  :
+                    column ='m_400'
+                elif '408' in detial['log_remark'] and detial["mat_code"] =='10'  :
+                    column ='m_408'
+                elif detial["mat_code"] =='4144'  :
+                    column ='m_414'
 
-            if "舊" in detial["log_remark"]:
-                continue
-            donesteel, _ = DoneSteelReport.objects.get_or_create(
-                siteinfo=SiteInfo.get_site_by_code("F003"),
-                turn_site=trun_site,
-                year=year,
-                month=month,
-                done_type=2,
-                mat_code=detial["mat_code"],
-                is_done=True,
-                remark="轉短接 [米數需要調整]",
-            )
-            # setattr(steel_f, column, Decimal(getattr(steel_f, column)) - all_unit)
-            DoneSteelReport.update_column_value(donesteel.id,False,column,detial["quantity"])
+                donesteel, _ = DoneSteelReport.objects.get_or_create(
+                    siteinfo=SiteInfo.get_site_by_code("F003"),
+                    turn_site=trun_site,
+                    year=year,
+                    month=month,
+                    done_type=2,
+                    mat_code=detial["mat_code"],
+                    is_done=True,
+                    remark="轉短接 [米數需要調整]",
+                )
+                # setattr(steel_f, column, Decimal(getattr(steel_f, column)) - all_unit)
+                DoneSteelReport.update_column_value(donesteel.id,False,column,detial["quantity"])
+            elif detial["mat_code"] in ["2301", "2302"] and detial["quantity"] > 0 :
+                """斜撐"""
+                column = f"m_{'300' if detial['mat_code']=='2301' else '350' }"
+                all_unit = detial["quantity"] * (
+                    Decimal("1.25") if detial["mat_code"] == "2301" else Decimal(1.2)
+                )
+                # setattr(steel_f,column,getattr(steel_f,column) - all_unit)
+
+                f002_dct[column] -= all_unit
+                donesteel, _ = DoneSteelReport.objects.get_or_create(
+                    siteinfo=SiteInfo.get_site_by_code("F003"),
+                    turn_site=trun_site,
+                    year=year,
+                    month=month,
+                    done_type=2,
+                    mat_code=detial["mat_code"],
+                    is_done=True,
+                    remark="轉斜撐",
+                )
+                DoneSteelReport.update_column_value(donesteel.id,True,column,all_unit)
+            elif detial["quantity"] > 0 :
+                value = (
+                    detial["quantity"]
+                    if detial["mat_code"] in ["92", "12", "13"]
+                    else detial["all_unit_sum"]
+                )
+                donesteel, _ = DoneSteelReport.objects.get_or_create(
+                    siteinfo=SiteInfo.get_site_by_code("F001"),
+                    turn_site=trun_site,
+                    year=year,
+                    month=month,
+                    done_type=2,
+                    is_done=True,
+                    remark="採購",
+                )
+                DoneSteelReport.update_column_value(donesteel.id,True,f"m_{detial['mat_code']}",value)
+            # setattr(donesteel, f"m_{detial['mat_code']}", value)
         elif detial["mat_code"] in change_mapping.keys() and detial["all_unit_sum"] > 0:
             """轉中柱"""
             donesteel, _ = DoneSteelReport.objects.get_or_create(

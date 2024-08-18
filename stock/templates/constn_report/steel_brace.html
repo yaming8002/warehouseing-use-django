@@ -55,9 +55,7 @@
 {% block form %}
   {% load strmap %}
   <!-- Corrected form tag and added trailing slash to action attribute -->
-  <form id="search"
-        action="/constn/brace/"
-        method="POST">
+  <form id="search" action="/constn/brace/" method="POST">
     {% csrf_token %}
     <p>
       <label for="code">工地編號</label>
@@ -82,6 +80,7 @@
   </form>
 {% endblock %}
 {% block table %}
+  {% load custom_filters %}
   <caption>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}-支撐</caption>
   {% for key, tran_map in steel_pile_table.items %}
     {% if tran_map.max_length > 1 %}
@@ -148,7 +147,7 @@
             {% for item in row %}
               {% if item %}
                 <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
-                  <!--{{ item }}-->{{ item.build_date | date:"Y/m/d" }}
+                  {{ item.build_date | date:"Y/m/d" }}
                 </td>
                 <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
                   {{ item.total_quantity |floatformat:"0" }}
@@ -157,7 +156,14 @@
                   {{ item.total_unit|floatformat:"2" }}
                 </td>
                 <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.code }}</td>
-                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.remake }}</td>
+                <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
+                  {% if item.turn_site|is_not_none %}
+                    {% if forloop.counter|divisibleby:2 %}轉{% else %}入{% endif %}
+                    {{ item.turn_site }}
+                    <br>
+                  {% endif %}
+                  {% if item.d_remark|is_not_none %}{{ item.d_remark }}{% endif %}
+                </td>
               {% else %}
                 <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
                 <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
@@ -176,11 +182,10 @@
             {% endif %}
           </tr>
         {% endfor %}
-        <tr style="height: 20px" >
+        <tr style="height: 20px">
           {% for row in tran_map.level_summary %}
             <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"
-                style="border-left: 1px solid black"
-                >總計:</td>
+                style="border-left: 1px solid black">總計:</td>
             <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
               {{ row.count |floatformat:"0" }}
             </td>

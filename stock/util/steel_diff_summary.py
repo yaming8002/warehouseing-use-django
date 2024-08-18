@@ -48,6 +48,7 @@ values_dict = {
     "transaction_type": F("translog__transaction_type"),
     "name": F("material__name"),
     "level_annotation": F("level"),
+    "d_remark": F("remark"),
 }
 
 def build_constn_diff_view(constn) :
@@ -79,8 +80,8 @@ def build_constn_diff_view(constn) :
 
         for item in total_quantity_and_unit:
             update_items(item_d,item,item["transaction_type"] == "IN",True)
-        
-    components = copy.deepcopy(component_list) 
+
+    components = copy.deepcopy(component_list)
     for item_d in components:
         mat_code = item_d['code']
 
@@ -91,9 +92,9 @@ def build_constn_diff_view(constn) :
         for item in total_quantity_and_unit:
             update_items(item_d,item,item["transaction_type"] == "IN",False)
 
-    
+
     return steel_table,components
-    
+
 def update_items(dct,item, transaction_type ,has_unit ):
     if transaction_type:
         dct['input']["quantity"] += float(item["total_quantity"])
@@ -101,4 +102,3 @@ def update_items(dct,item, transaction_type ,has_unit ):
     else:
         dct['output']["quantity"] += float(item["total_quantity"])
         dct['output']["unit"] += float(item["total_unit"]) if has_unit  else  float(0)
-
