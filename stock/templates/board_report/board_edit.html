@@ -44,34 +44,41 @@
            id="siteinfo_id"
            value="{{ report.siteinfo.id }}">
     <div>
-        <label for="is_lost">關閉</label>
-          <input class="form-check-input"
-          type="checkbox"
-          role="switch"
-          id="is_close"
-          name="is_close"
-          {% if report.close %}checked{% endif %}>
-   </div>
-   {% if  report.mat_code == '22' %}
-    <div>
-      <label for="is_lost">遺失</label>
-        <input class="form-check-input"
-        type="checkbox"
-        role="switch"
-        id="is_lost"
-        name="is_lost"
-        {% if report.is_lost %}checked{% endif %}>
+      <label for="is_lost">關閉</label>
+      <input class="form-check-input"
+             type="checkbox"
+             role="switch"
+             id="is_close"
+             name="is_close"
+             {% if report.close %}checked{% endif %}>
     </div>
+    {% if  report.mat_code == '22' %}
+      <div>
+        <label for="is_lost">遺失</label>
+        <input class="form-check-input"
+               type="checkbox"
+               role="switch"
+               id="is_lost"
+               name="is_lost"
+               {% if report.is_lost %}checked{% endif %}>
+      </div>
     {% endif %}
     <div>
       <label for="board_stuts">狀態</label>
       <select id="board_stuts" name="board_stuts">
-        <option value='0' >無</option>
-        <option value='1'>{% if report.mat_code == '22' %}完成支撐{% else %} 完工{% endif %} </option>
-        {% if report.mat_code == '22' %}<option value='2'>簽單<option>{% endif %}
+        <option value='0' {% if report.done_type == 0 %}selected{% endif %}>無</option>
+        <option value='1' {% if report.done_type == 1 %}selected{% endif %}>
+          {% if report.mat_code == '22' %}
+            完成支撐
+          {% else %}
+            完工
+          {% endif %}
+        </option>
+        {% if report.mat_code == '22' %}
+          <option value='2' {% if report.done_type == 2 %}selected{% endif %}>簽單</option>
+        {% endif %}
       </select>
     </div>
-
     <div>
       <table>
         {% if report.mat_code == '22' %}
@@ -94,16 +101,14 @@
       </tr>
       <tr>
         <td>{{ report.quantity|floatformat:"0" }}</td>
-        {% if report.mat_code == '22' %}
-          <td>{{ report.quantity2|floatformat:"0" }}</td>
-        {% endif %}
+        {% if report.mat_code == '22' %}<td>{{ report.quantity2|floatformat:"0" }}</td>{% endif %}
         <td>
           <input type="text"
                  name="member"
                  value="{% if report.siteinfo.member %} {{ report.siteinfo.member }}{% endif %}">
         </td>
         <td>
-          <textarea style="with:100%" id="remark" name="remark" row="5" >{% if report.remark %}{{report.remark}}{% endif %}</textarea>
+          <textarea style="with:100%" id="remark" name="remark" row="5">{% if report.remark %}{{report.remark}}{% endif %}</textarea>
         </td>
       </tr>
     </table>
