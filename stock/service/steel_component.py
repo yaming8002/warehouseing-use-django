@@ -155,7 +155,6 @@ mat_tree = [
             {"key": "24", "value": "牛頭粒"},
             {"key": "81", "value": "牛擔頭"},
             {"key": "25", "value": "活動頭"},
-
             {"key": "78", "value": "獅子頭"},
             {"key": "79", "value": "老虎頭"},
             {"key": "80", "value": "鯊魚頭"},
@@ -214,7 +213,9 @@ def build_component_table(constn, level, map_list) -> Dict[str, Dict[str, any]]:
 
     steel_map = dict()
     level +=1
-    for mat_code, name in map_list.items():
+    for map in map_list:
+        id = map['id']
+        name = map['name']
         steel_map[name] = {}
         tr_list: List[List[Any]] = [[] for _ in range(level * 2)]
         max_length = 0
@@ -226,7 +227,7 @@ def build_component_table(constn, level, map_list) -> Dict[str, Dict[str, any]]:
         }
 
         for seat in range(level):
-            query= Q(material__mat_code=mat_code)
+            query= Q(material__id=id)
             if seat==0:
                 query &= (Q(level = seat) | Q(level__isnull=True) )
             else:

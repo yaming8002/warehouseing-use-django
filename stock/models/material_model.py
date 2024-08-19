@@ -6,7 +6,6 @@ from django.db.models import Q
 
 
 ng_spec_name =['鋼軌','中H300','中H350','中H400']
-mat_genre = [(0, "無"), (1, "主要"),(2,"工具"),(3,"其他")]
 # 物料分類
 class MatCat(models.Model):
     cat_id = models.CharField(max_length=12, verbose_name="物料編號")
@@ -33,7 +32,8 @@ class Materials(models.Model):
     mat_code = models.CharField(max_length=12, verbose_name="物料編號")
     mat_code2 = models.CharField(max_length=12, verbose_name="入料編號", null=True)
     mat_code3 = models.CharField(max_length=12, verbose_name="出料編號" , null=True)
-    name = models.CharField(max_length=100, verbose_name="料名")
+    name = models.CharField(max_length=100, default='',verbose_name="料名")
+    html_name = models.CharField(max_length=100,default='', verbose_name="名稱")
     category = models.ForeignKey(MatCat, on_delete=models.CASCADE, verbose_name="分類")
     specification = models.ForeignKey(
         MatSpec, on_delete=models.CASCADE, verbose_name="規格", null=True
@@ -43,8 +43,12 @@ class Materials(models.Model):
     unit_of_division = models.CharField(
         max_length=5, blank=True, verbose_name="拆分單位"
     )
-    mat_genre = [(0, "無"), (1, "主要"),(2,"工具"),(3,"其他")]
-    genre = models.IntegerField(default=0, choices=mat_genre)
+    steel_report = models.BooleanField(default=False, verbose_name="鋼樁報表")
+    component_genre = [(0, "無"), (1, "主要"),(3,"其他")]
+    component = models.IntegerField(default=0, choices=component_genre)
+    tool_report = models.BooleanField(default=False, verbose_name="工具表")
+    diff_report = models.BooleanField(default=False, verbose_name="差異表")
+
 
 
     @classmethod

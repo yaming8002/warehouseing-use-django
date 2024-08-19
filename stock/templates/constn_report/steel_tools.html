@@ -30,25 +30,12 @@
     });
 
     });
-
     $(document).ready(function () {
       $("#check_all").change(function () {
         var isChecked = $(this).prop('checked');
         $('.box_items').prop('checked', isChecked);
       });
-      $("#group_1").change(function () {
-        console.log('test') ;
-        var isChecked = $(this).prop('checked');
-        $('.class_1').prop('checked', isChecked);
-      });
-      $("#group_2").change(function () {
-        var isChecked = $(this).prop('checked');
-        $('.class_2').prop('checked', isChecked);
-      });
-
     });
-
-
     // Setting up the click event for the button with id 'exceloutput'
     $('#exceloutput').click(function () {
       var fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
@@ -86,7 +73,7 @@
 {% block form %}
   {% load strmap %}
   <!-- Corrected form tag and added trailing slash to action attribute -->
-  <form id="search" action="/constn/component/" method="POST">
+  <form id="search" action="/constn/tools/" method="POST">
     {% csrf_token %}
     <p>
       <label for="code">工地編號</label>
@@ -110,48 +97,29 @@
              id="check_all"
              name="is_all"
              {% if request.POST.is_all or request.method == 'GET' %}checked{% endif %}>
-      <label for="check_all">所有配件</label>
+      <label for="check_all">所有工具</label>
       <input type="button" id="control_list" value="展开">
     </p>
     <p>
       <div id="check_list" style="display:none;">
         <table>
-          {% for cla in com_cla %}
-            <tr>
+          <tr>
+            {% for item in tool_list %}
               <td>
+                {{ request.POST.selected_items }}
                 <input type="checkbox"
-                       class="form-check-input box_items "
-                       id="group_{{ cla.id }}"
-                       value="{{ cla.id }}"
-                       name="{{ cla.id }}"
-                       {% if cla.id in request.POST or request.method == 'GET' %}checked{% endif %}>
-                <label class="form-check-label" for="{{ item.key }}">{{ cla.name }}</label>
+                       class="form-check-input box_items class_{{ mat.topic }} "
+                       name="selected_items"
+                       value="{{ item.id }}"
+                       {% if item.id in request.POST.selected_items or request.method == 'GET' %}checked{% endif %}>
+                <label class="form-check-label" for="{{ item.key }}">{{ item.name }}</label>
               </td>
-            </tr>
-            {% for mat in component_list %}
-              {% if forloop.counter == 1 %}
-                <tr>
-                  <td></td>
-                {% endif %}
-                {% if mat.component ==  cla.id %}
-                  <td>
-                    <input type="checkbox"
-                           class="form-check-input box_items class_{{ cla.id }} "
-                           id="{{ mat.id }}"
-                           name="selected_items"
-                           value="{{ mat.id }}"
-                           {% if item.key in selected_items or request.method == 'GET' %}checked{% endif %}>
-                    <label class="form-check-label" for="{{ item.key }}">{{ mat.name }}</label>
-                  </td>
-                  {% if forloop.counter|divisibleby:8 and not forloop.last %}
-                  </tr>
-                  <tr>
-                    <td></td>
-                  {% endif %}
-                {% endif %}
-              {% endfor %}
-            </tr>
-          {% endfor %}
+              {% if forloop.counter|divisibleby:8 and not forloop.last %}
+              </tr>
+              <tr>
+              {% endif %}
+            {% endfor %}
+          </tr>
         </table>
       </div>
     </p>
