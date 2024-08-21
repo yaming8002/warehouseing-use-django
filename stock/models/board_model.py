@@ -23,18 +23,18 @@ logger = logging.getLogger(__name__)
 
 class BoardReport(MonthReport):
     static_column_code = {
-        "22": "鋪路鐵板 全",
-        "2205": "鋪路鐵板 半",
-        "92": "簍空覆工板",
-        "95": "洗車板",
+        "28": "鋪路鐵板 全",
+        "29": "鋪路鐵板 半",
+        "102": "簍空覆工板",
+        "105": "洗車板",
     }
 
     is_lost = models.BooleanField(default=False, verbose_name="是否遺失")
 
-    mat_code = models.CharField(
-        max_length=5, default="22", verbose_name="物料(預設鐵板 全)"
+    mat_id = models.CharField(
+        max_length=5, default="28", verbose_name="物料(預設鐵板 全)"
     )
-    mat_code2 = models.CharField(
+    mat_id2 = models.CharField(
         max_length=5, null=True, verbose_name="物料(預設鐵板半)"
     )
 
@@ -55,14 +55,14 @@ class BoardReport(MonthReport):
             "month",
             "done_type",
             "is_done",
-            "mat_code",
+            "mat_id",
         )
 
     @classmethod
     def get_site_matial(
         cls,
         site: SiteInfo,
-        mat_code: str,
+        mat_id: str,
         year: Optional[int] = None,
         month: Optional[int] = None,
         is_done: bool = False,
@@ -74,7 +74,7 @@ class BoardReport(MonthReport):
 
         # 构建查询条件
 
-        query = Q(mat_code=mat_code) & Q(siteinfo=site) & Q(is_done=is_done)  & (Q(year__lt=year) | Q(year=year, month__lte=month))
+        query = Q(mat_id=mat_id) & Q(siteinfo=site) & Q(is_done=is_done)  & (Q(year__lt=year) | Q(year=year, month__lte=month))
         # 尝试查找当前年份和月份的记录
         report = cls.objects.filter(query).order_by("-year", "-month").first()
 
@@ -91,12 +91,12 @@ class BoardReport(MonthReport):
                 siteinfo=site,
                 year=year,
                 month=month,
-                mat_code=mat_code,
+                mat_id=mat_id,
                 is_done=is_done
             )
 
-              # 设置 mat_code2 的值
-        report.mat_code2 = '2205' if mat_code == '22' else None
+              # 设置 mat_id2 的值
+        report.mat_id2 = '29' if mat_id == '28' else None
         report.save()
         return report
 
@@ -115,7 +115,7 @@ class BoardReport(MonthReport):
             .filter(rank=1)
             .filter(query)
             .order_by("-year", "-month")
-            .values("id", "siteinfo__id")
+            .values("id", "siteinfo__code")
         )
         # print(query_set.query)
         ids = [item["id"] for item in query_set]
@@ -136,18 +136,18 @@ class BoardReport(MonthReport):
         year: int,
         month: int,
         is_add: bool,
-        column: str,
+        column: int,
         value: Decimal,
     ):
-        find_code = "22" if column == "2205" else column
-        target_field = "quantity2" if column == "2205" else "quantity"
+        find_code = '28' if column == '29' else column
+        target_field = "quantity2" if column == '29' else "quantity"
 
         now = cls.get_site_matial(site, find_code, year, month)
         b_year, b_month = get_before_year_month(year, month)
         before = cls.get_site_matial(site, find_code, b_year, b_month)
 
-        if column in ["22", "2205"]:
-            now.mat_code2 = "2205"
+        if column in ['28', '29']:
+            now.mat_id2 = '29'
 
         new_value = getattr(before,target_field)
         new_value += value if is_add else -value

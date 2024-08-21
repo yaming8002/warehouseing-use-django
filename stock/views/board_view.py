@@ -19,29 +19,29 @@ class BoardControlView(MonthListView):
 
     def get_queryset(self):
         year,month = self.get_year_month()
-        mat_code =self.request.GET.get("mat_code")
+        mat_id =self.request.GET.get("mat_id")
         is_close = self.request.GET.get("is_close" ) != None and self.request.GET.get("is_close" )=='on'
-        if mat_code is None:
+        if mat_id is None:
             return None
-        is_lost = "-" in mat_code
-        mat_code = '22' if '22' in mat_code  else mat_code
+        is_lost = "-" in mat_id
+        mat_id = '28' if '28' in mat_id  else mat_id
         query =  Q(siteinfo_id__gt=4) & (Q(year__lt=year) | Q(year=year, month__lte=month))
-        query &= Q(mat_code=mat_code) & Q(is_lost=is_lost) & ~Q(siteinfo__code = '------')
+        query &= Q(mat_id=mat_id) & Q(is_lost=is_lost) & ~Q(siteinfo__code = '------')
         final_query = ~( Q(quantity=0) & Q(quantity2=0)) & Q(close=is_close)
         return BoardReport.get_current_by_query(query=query ,final_query=final_query )
 
     def get_whse_martials(self, context):
         year,month = self.get_year_month()
-        mat_code =self.request.GET.get("mat_code")
-        context['mat_code'] = mat_code
-        if mat_code is None or mat_code=="-22":
+        mat_id =self.request.GET.get("mat_id")
+        context['mat_id'] = mat_id
+        if mat_id is None or mat_id=="-28":
             return None
         # obj_board= BoardReport.objects.select_related("siteinfo").filter( Q(mat_code = mat_code))
-        context['hui_huang'] = BoardReport.get_site_matial(SiteInfo.get_site_by_code('------'),mat_code,year,month)
-        context['lk_report'] = BoardReport.get_site_matial(SiteInfo.get_site_by_code('0001'),mat_code,year,month)
-        if '22' in mat_code :
-            context['warning_lk_report'] = BoardReport.get_site_matial(SiteInfo.get_site_by_code('0001'),mat_code,year,month,True)
-        context['kh_report'] = BoardReport.get_site_matial(SiteInfo.get_site_by_code('0003'),mat_code,year,month)
+        context['hui_huang'] = BoardReport.get_site_matial(SiteInfo.get_site_by_code('------'),mat_id,year,month)
+        context['lk_report'] = BoardReport.get_site_matial(SiteInfo.get_site_by_code('0001'),mat_id,year,month)
+        if '28' in mat_id :
+            context['warning_lk_report'] = BoardReport.get_site_matial(SiteInfo.get_site_by_code('0001'),mat_id,year,month,True)
+        context['kh_report'] = BoardReport.get_site_matial(SiteInfo.get_site_by_code('0003'),mat_id,year,month)
 
 
     def get_context_data(self, **kwargs):

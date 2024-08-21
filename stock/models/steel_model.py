@@ -71,6 +71,22 @@ class SteelReport(BaseSteelReport) :
         cls.update_column_value(report.id, not is_in, f"m_{mat.mat_code}", value)
 
 
+class SteelColumn(models.Model):
+    report = models.ForeignKey(
+        SteelReport,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+        verbose_name="report",
+    )
+    material = models.ForeignKey(
+        Materials, on_delete=models.CASCADE, verbose_name="物料"
+    )
+    all_quantity = models.IntegerField(default=0, verbose_name="總數量")
+
+    class Meta:
+        unique_together = ["report", "material", "all_quantity"]
+        ordering = ["id"]  # 按照 id 升序排序
 
 # class SteelItem(MonthReport):
 #     steel = models.ForeignKey(

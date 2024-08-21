@@ -52,7 +52,7 @@
              name="is_close"
              {% if report.close %}checked{% endif %}>
     </div>
-    {% if  report.mat_code == '22' %}
+    {% if  report.mat_id == '28' %}
       <div>
         <label for="is_lost">遺失</label>
         <input class="form-check-input"
@@ -68,29 +68,29 @@
       <select id="board_stuts" name="board_stuts">
         <option value='0' {% if report.done_type == 0 %}selected{% endif %}>無</option>
         <option value='1' {% if report.done_type == 1 %}selected{% endif %}>
-          {% if report.mat_code == '22' %}
+          {% if report.mat_id == '28' %}
             完成支撐
           {% else %}
             完工
           {% endif %}
         </option>
-        {% if report.mat_code == '22' %}
+        {% if report.mat_id == '28' %}
           <option value='2' {% if report.done_type == 2 %}selected{% endif %}>簽單</option>
         {% endif %}
       </select>
     </div>
     <div>
       <table>
-        {% if report.mat_code == '22' %}
+        {% if report.mat_id == '28' %}
           鐵板
-        {% elif report.mat_code == '92' %}
+        {% elif report.mat_id == '102' %}
           簍空覆工板
-        {% elif report.mat_code == '95' %}
+        {% elif report.mat_id == '105' %}
           洗車板
         {% endif %}
       </caption>
       <tr>
-        {% if  report.mat_code == '22' %}
+        {% if  report.mat_id == '28' %}
           <th>鐵板 全</th>
           <th>鐵板 半</th>
         {% else %}
@@ -101,7 +101,7 @@
       </tr>
       <tr>
         <td>{{ report.quantity|floatformat:"0" }}</td>
-        {% if report.mat_code == '22' %}<td>{{ report.quantity2|floatformat:"0" }}</td>{% endif %}
+        {% if report.mat_id == '28' %}<td>{{ report.quantity2|floatformat:"0" }}</td>{% endif %}
         <td>
           <input type="text"
                  name="member"

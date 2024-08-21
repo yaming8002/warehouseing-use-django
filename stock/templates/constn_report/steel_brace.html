@@ -158,7 +158,11 @@
                 <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.code }}</td>
                 <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
                   {% if item.turn_site|is_not_none %}
-                    {% if forloop.counter|divisibleby:2 %}轉{% else %}入{% endif %}
+                    {% if forloop.counter|divisibleby:2 %}
+                      轉移
+                    {% else %}
+                      來源
+                    {% endif %}
                     {{ item.turn_site }}
                     <br>
                   {% endif %}
