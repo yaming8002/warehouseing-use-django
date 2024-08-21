@@ -37,7 +37,6 @@
         $('.box_items').prop('checked', isChecked);
       });
       $("#group_1").change(function () {
-        console.log('test') ;
         var isChecked = $(this).prop('checked');
         $('.class_1').prop('checked', isChecked);
       });
@@ -85,6 +84,7 @@
 {% endblock %}
 {% block form %}
   {% load strmap %}
+  {% load custom_filters %}
   <!-- Corrected form tag and added trailing slash to action attribute -->
   <form id="search" action="/constn/component/" method="POST">
     {% csrf_token %}
@@ -124,7 +124,7 @@
                        id="group_{{ cla.id }}"
                        value="{{ cla.id }}"
                        name="{{ cla.id }}"
-                       {% if cla.id in request.POST or request.method == 'GET' %}checked{% endif %}>
+                       {% if cla.id|stringformat:"s" in request.POST or request.method == 'GET' %}checked{% endif %}>
                 <label class="form-check-label" for="{{ item.key }}">{{ cla.name }}</label>
               </td>
             </tr>
@@ -140,7 +140,7 @@
                            id="{{ mat.id }}"
                            name="selected_items"
                            value="{{ mat.id }}"
-                           {% if item.key in selected_items or request.method == 'GET' %}checked{% endif %}>
+                           {% if mat.id|stringformat:"s" in selected_items or request.method == 'GET' %}checked{% endif %}>
                     <label class="form-check-label" for="{{ item.key }}">{{ mat.name }}</label>
                   </td>
                   {% if forloop.counter|divisibleby:8 and not forloop.last %}
@@ -225,9 +225,9 @@
                   <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
                     {% if item.turn_site|is_not_none %}
                       {% if forloop.counter|divisibleby:2 %}
-                        轉
+                        轉移
                       {% else %}
-                        入
+                        來源
                       {% endif %}
                       {{ item.turn_site }}
                       <br>

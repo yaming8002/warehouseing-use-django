@@ -106,12 +106,11 @@
           <tr>
             {% for item in tool_list %}
               <td>
-                {{ request.POST.selected_items }}
                 <input type="checkbox"
                        class="form-check-input box_items class_{{ mat.topic }} "
                        name="selected_items"
                        value="{{ item.id }}"
-                       {% if item.id in request.POST.selected_items or request.method == 'GET' %}checked{% endif %}>
+                       {% if item.id|stringformat:"s" in selected_items or request.method == 'GET' %}checked{% endif %}>
                 <label class="form-check-label" for="{{ item.key }}">{{ item.name }}</label>
               </td>
               {% if forloop.counter|divisibleby:8 and not forloop.last %}
@@ -193,9 +192,9 @@
                   <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
                     {% if item.turn_site|is_not_none %}
                       {% if forloop.counter|divisibleby:2 %}
-                        轉
+                        轉移
                       {% else %}
-                        入
+                        來源
                       {% endif %}
                       {{ item.turn_site }}
                       <br>

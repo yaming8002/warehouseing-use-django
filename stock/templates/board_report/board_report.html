@@ -47,15 +47,15 @@
              id="yearMonthInput"
              name="yearMonth"
              value='{{ yearMonth }}'>
-      <label for="mat_code">物料:</label>
-      <select id="mat_code" name="mat_code">
-        <option value='22' {% if mat_code == '22' %}selected{% endif %}>鐵板</option>
-        <option value='-22' {% if mat_code == '-22' %}selected{% endif %}>鐵板遺失</option>
-        <option value='92' {% if mat_code == '92' %}selected{% endif %}>簍空覆工板</option>
-        <option value='95' {% if mat_code == '95' %}selected{% endif %}>洗車板</option>
+      <label for="mat_id">物料:</label>
+      <select id="mat_id" name="mat_id">
+        <option value='28' {% if mat_id == '28' %}selected{% endif %}>鐵板</option>
+        <option value='-28' {% if mat_id == '-28' %}selected{% endif %}>鐵板遺失</option>
+        <option value='102' {% if mat_id == '102' %}selected{% endif %}>簍空覆工板</option>
+        <option value='105' {% if mat_id == '105' %}selected{% endif %}>洗車板</option>
       </select>
       <!--<label for="is_close"> 已關閉</label>
-      <input type="checkbox" id="is_close" name="is_close" {% if request.GET.is_close %} checked {% endif %}>-->
+      <input type="checkbox" id="is_close" name="is_close" {% if request.GET.is_close %}checked{% endif %}>-->
     </p>
     <input type="submit" value="查詢" />
     <!-- <input type="button" id="exceloutput" value="匯出EXCEL" />-->
@@ -64,10 +64,10 @@
 {% block table %}
   <caption>
     <h3>
-      {% if mat_code == '22' %}鐵板{% endif %}
-      {% if mat_code == '-22' %}鐵板遺失{% endif %}
-      {% if mat_code == '92' %}簍空覆工板{% endif %}
-      {% if mat_code == '95' %}洗車板{% endif %}
+      {% if mat_id == '28' %}鐵板{% endif %}
+      {% if mat_id == '-28' %}鐵板遺失{% endif %}
+      {% if mat_id == '102' %}簍空覆工板{% endif %}
+      {% if mat_id == '105' %}洗車板{% endif %}
     </h3>
   </caption>
   <tr>
@@ -75,7 +75,7 @@
     <th>工地代號</th>
     <th>業主</th>
     <th>名稱</th>
-    {% if  '22' in mat_code %}
+    {% if '28' == mat_id %}
       <th>鐵板 全</th>
       <th>鐵板 半</th>
       <th>總計</th>
@@ -96,14 +96,14 @@
       <td>{{ item.siteinfo.owner }}</td>
       <td>{{ item.siteinfo.name }}</td>
       <td>{{ item.quantity | floatformat:"0" }}</td>
-      {% if '22' in mat_code %}
+      {% if '28' in mat_id %}
         <td>{{ item.quantity2 | floatformat:"0" }}</td>
         <td>{{ item.quantity|add:item.quantity2 | floatformat:"0" }}</td>
       {% endif %}
       <td>
         {% if item.done_type > 0 %}O{% endif %}
       </td>
-      {% if '22' in mat_code %}
+      {% if '28' in mat_id %}
         <td>
           {% if item.done_type > 1 %}O{% endif %}
         </td>
@@ -115,17 +115,17 @@
         {% if item.remark %}{{ item.remark }}{% endif %}
       </td>
       {% if request.session.u_permission > 1 %}
-      <td>
-        <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>
-      </td>
+        <td>
+          <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>
+        </td>
       {% endif %}
     </tr>
   {% endfor %}
-  {% if hui_huang and request.GET.mat_code == '22' %}
+  {% if hui_huang and request.GET.mat_id == '28' %}
     <tr class="table-warning">
       <th colspan="4">{{ hui_huang.siteinfo.name }}</th>
       <th>{{ hui_huang.quantity | floatformat:"0" }}</th>
-      {% if request.GET.mat_code == '22' %}
+      {% if request.GET.mat_id == '28' %}
         <th>{{ hui_huang.quantity2 | floatformat:"0" }}</th>
         <th>{{ hui_huang.quantity|add:hui_huang.quantity2 | floatformat:"0" }}</th>
         <th></th>
@@ -140,7 +140,7 @@
     <tr class="table-warning">
       <th colspan="4">{{ kh_report.siteinfo.name }}</th>
       <th>{{ kh_report.quantity | floatformat:"0" }}</th>
-      {% if request.GET.mat_code == '22' %}
+      {% if request.GET.mat_id == '28' %}
         <th>{{ kh_report.quantity2 | floatformat:"0" }}</th>
         <th>{{ kh_report.quantity|add:kh_report.quantity2 | floatformat:"0" }}</th>
         <th></th>
@@ -151,24 +151,24 @@
       {% if request.session.u_permission > 1 %}<th></th>{% endif %}
     </tr>
   {% endif %}
-  {% if warning_lk_report and request.GET.mat_code == '22' %}
-  <tr class="table-warning">
-    <th colspan="4">{{ warning_lk_report.siteinfo.name }} 整片不堪使用</th>
-    <th>{{ warning_lk_report.quantity | floatformat:"0" }}</th>
-    <th>{{ warning_lk_report.quantity2 | floatformat:"0" }}</th>
-    <th>{{ warning_lk_report.quantity|add:warning_lk_report.quantity2 | floatformat:"0" }}</th>
-    <th></th>
-    <th></th>
-    <th></th>
-    <th></th>
-    {% if request.session.u_permission > 1 %}<th></th>{% endif %}
-  </tr>
-{% endif %}
+  {% if warning_lk_report and request.GET.mat_id == '28' %}
+    <tr class="table-warning">
+      <th colspan="4">{{ warning_lk_report.siteinfo.name }} 整片不堪使用</th>
+      <th>{{ warning_lk_report.quantity | floatformat:"0" }}</th>
+      <th>{{ warning_lk_report.quantity2 | floatformat:"0" }}</th>
+      <th>{{ warning_lk_report.quantity|add:warning_lk_report.quantity2 | floatformat:"0" }}</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      {% if request.session.u_permission > 1 %}<th></th>{% endif %}
+    </tr>
+  {% endif %}
   {% if lk_report %}
     <tr class="table-warning">
       <th colspan="4">{{ lk_report.siteinfo.name }}</th>
       <th>{{ lk_report.quantity | floatformat:"0" }}</th>
-      {% if request.GET.mat_code == '22' %}
+      {% if request.GET.mat_id == '28' %}
         <th>{{ lk_report.quantity2 | floatformat:"0" }}</th>
         <th>{{ lk_report.quantity|add:lk_report.quantity2 | floatformat:"0" }}</th>
         <th></th>

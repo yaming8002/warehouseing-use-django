@@ -20,7 +20,6 @@ values_dict = {
 def build_tools_table(constn, level, map_list) -> Dict[str, Dict[str, any]]:
     translog = TransLog.objects.filter(constn_site=constn)
     transdefaullog = TransLogDetail.objects.filter(translog__in=translog)
-    print(map_list)
     steel_map = dict()
     level += 1
     for tool in map_list:

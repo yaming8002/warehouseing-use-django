@@ -107,9 +107,9 @@
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
                   {% if item.turn_site|is_not_none %}
                     {% if forloop.counter|divisibleby:2 %}
-                      轉
+                      轉移
                     {% else %}
-                      入
+                      來源
                     {% endif %}
                     {{ item.turn_site }}
                     <br>

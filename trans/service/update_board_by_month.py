@@ -27,8 +27,8 @@ def update_board_by_month(year, month , first_day_of_month,last_day_of_month ):
     query = (
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
         & (
-            Q(material__mat_code__in=["22", "2205", "95"])
-            | (Q(material__mat_code="92") & Q(remark__iregex=r"(?i)簍空|鏤空"))
+            Q(material__id__in=[28, 29, 105])
+            | (Q(material__id=102) & Q(remark__iregex=r"(?i)簍空|鏤空"))
         )
         & Q(is_rent=False)
         & Q(is_rollback=False)
@@ -40,9 +40,9 @@ def update_board_by_month(year, month , first_day_of_month,last_day_of_month ):
         )
         .filter(query)
         .values(
-           site_code=F( "translog__constn_site__code"), 
+           site_code=F( "translog__constn_site__code"),
            genre=F("translog__constn_site__genre"),
-           mat_code=F("material__mat_code")
+           mat_id=F("material__id")
         )
         .annotate(
             sum_quantity=conditional_sum("quantity"),
@@ -53,7 +53,7 @@ def update_board_by_month(year, month , first_day_of_month,last_day_of_month ):
     whse_dct = {}
     for x in update_list:
         siteinfo = SiteInfo.get_site_by_code(x["site_code"])
-        column = x["mat_code"]
+        column = str( x["mat_id"])
         if x["genre"] == 1 or x["site_code"]=='0003' :
             BoardReport.update_column_value_by_before(
                 siteinfo, year, month, False, column, x["sum_quantity"]
@@ -61,7 +61,7 @@ def update_board_by_month(year, month , first_day_of_month,last_day_of_month ):
         if column not in whse_dct.keys():
             whse_dct[column] = Decimal(0)
         whse_dct[column] += x["sum_quantity"]
-        
+
     site_whse = SiteInfo.get_site_by_code("0001")
     for k, v in whse_dct.items():
         BoardReport.update_column_value_by_before(site_whse, year, month, True, k, v)

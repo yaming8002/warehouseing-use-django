@@ -87,3 +87,7 @@ def month_full(month):
         return f"{month}"
 
     return f"0{month}"
+
+@register.filter
+def list_find_str_value(value,list):
+    return  value in list or str(value) in list
