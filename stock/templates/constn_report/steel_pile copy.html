@@ -111,34 +111,30 @@
             {% for item in row %}
               {% if item %}
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
-                  {{ item.translog.build_date | date:"Y/m/d" }}
+                  {{ item.build_date | date:"Y/m/d" }}
                 </td>
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
-                  {{ item.quantity |floatformat:"0" }}
+                  {{ item.total_quantity |floatformat:"0" }}
                 </td>
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
-                  {{ item.unit |floatformat:"2" }}
+                  {{ item.total_unit |floatformat:"2" }}
                 </td>
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>{{ item.code }}</td>
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
-                  {{ item.translog.code }}
-                </td>
-                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
-                  {% if item.translog.turn_site|is_not_none %}
+                  {% if item.turn_site|is_not_none %}
                     {% if forloop.counter|divisibleby:2 %}
                       轉移
                     {% else %}
                       來源
                     {% endif %}
-                    {{ item.translog.turn_site.code }}
+                    {{ item.turn_site }}
                     <br>
                   {% endif %}
-                  {% if item.remark|is_not_none %}{{ item.remark }}{% endif %}
+                  {% if item.d_remark|is_not_none %}{{ item.d_remark }}{% endif %}
                 </td>
                 {% if request.session.u_permission > 1 %}
                   <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
-                    {% if item.material.mat_code != '3050' %}
-                      <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯構台樑</a>
-                    {% endif %}
+                    {% if key != '鋼軌樁' %}<a class="editRow_select" href="#" onclick="editRow({{ item.kp }})">編輯構台樑</a>{% endif %}
                   </td>
                 {% endif %}
               {% else %}
@@ -184,24 +180,24 @@
       <td class="separator"></td>
     </tr>
     <tr class='table-warning'>
-      <td colspan="15">NG 廢鐵</td>
+      <td colspan="13">NG 廢鐵</td>
     </tr>
     <tr>
       <th rowspan="2">規格:</th>
-      <th colspan="6" class="table-danger">出料</th>
-      <th colspan="8" class="table-success">入料</th>
+      <th colspan="5" class="table-danger">出料</th>
+      <th colspan="7" class="table-success">入料</th>
     </tr>
     <tr style="height: 20px">
       <th class="table-danger">日期</th>
       <th class="table-danger">支</th>
       <th class="table-danger">合計M</th>
       <th class="table-danger">單號</th>
-      <th colspan="2" class="table-danger">備註</th>
+      <th class="table-danger">備註</th>
       <th class="table-success">日期</th>
       <th class="table-success">支</th>
       <th class="table-success">合計M</th>
       <th class="table-success">單號</th>
-      <th colspan="4" class="table-success">備註</th>
+      <th colspan="3" class="table-success">備註</th>
     </tr>
     {% load custom_filters %}
     {% for key, tran_map in steel_ng_table.items %}
@@ -217,26 +213,23 @@
             {% for item in row %}
               {% if item %}
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
-                  {{ item.translog.build_date | date:"Y/m/d" }}
+                  {{ item.build_date | date:"Y/m/d" }}
                 </td>
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>-</td>
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
-                  {{ item.material.mat_code|kg_to_meter:item.quantity }}
+                  {{ tran_map.mat_code|kg_to_meter:item.total_quantity }}
                 </td>
-                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
-                  {{ item.translog.code }}
-                </td>
-                <td {% if forloop.counter == 2 %} class='table-success' colspan="4"{% else %} class='table-danger' colspan="2"{% endif %}>
-                  {% if item.remark|is_not_none %}{{ item.remark }}{% endif %}
-                  ({{ item.quantity }}&nbsp;&nbsp;KG)
+                <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>{{ item.code }}</td>
+                <td {% if forloop.counter == 2 %} class='table-success' colspan="3"{% else %} class='table-danger'{% endif %}>
+                  {{ item.total_quantity }}(KG)
+                  {% if item.d_remark|is_not_none %}{{ item.d_remark }}{% endif %}
                 </td>
               {% else %}
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
                 <td {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></td>
-                <td {% if forloop.counter == 2 %} class='table-success' colspan="4"{% else %} class='table-danger' colspan="2"{% endif %}>
-                </td>
+                <td {% if forloop.counter == 2 %} class='table-success' colspan="3"{% else %} class='table-danger'{% endif %}></td>
               {% endif %}
             {% endfor %}
           </tr>
@@ -244,13 +237,14 @@
         <tr style="height: 20px">
           {% for row in tran_map.level_summary %}
             <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>總計:</th>
-            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>-</th>
+            <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
+              {{ row.count |floatformat:"0" }}
+            </th>
             <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}>
               {{ row.unit |floatformat:"2" }}
             </th>
             <th {% if forloop.counter == 2 %} class='table-success'{% else %} class='table-danger'{% endif %}></th>
-            <th {% if forloop.counter == 2 %} class='table-success' colspan="4"{% else %} class='table-danger' colspan="2"{% endif %}>
-            </th>
+            <th {% if forloop.counter == 2 %} class='table-success' colspan="3"{% else %} class='table-danger'{% endif %}></th>
           {% endfor %}
         </tr>
       {% endif %}

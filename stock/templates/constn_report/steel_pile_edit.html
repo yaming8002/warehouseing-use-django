@@ -1,0 +1,91 @@
+{% extends 'base/model_edit.html' %}
+{% block javascript %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+{% endblock %}
+{% block styles %}
+  <style>
+    .modal-dialog {
+      position: fixed;
+      margin: auto;
+      width: 320px;
+      height: 100%;
+      left: 80px;
+    }
+
+    .modal.left .modal-content {
+      height: 100%;
+      border: 0;
+    }
+  .helptext{
+  color:red ;
+  display:inline-block ;
+  }
+  .steel_table{
+    width:1300px ;
+  }
+
+  .steel_table input{
+    width:100% ;
+  }
+
+  th, td {
+    border: 1px solid black; /* 設置單元格邊框 */
+    padding: 8px; /* 設置內邊距 */
+    text-align: center; /* 文字居中 */
+  }
+
+  th {
+    background-color: #f2f2f2; /* 設置表頭背景顏色 */
+  }
+  </style>
+{% endblock %}
+{% block form %}
+  <!-- 修改了 form 的 id 以便直接选中 -->
+  <form style="with:100%" method="post" action="/constn/pile/edit/">
+    {% csrf_token %}
+    <div>日期 : {{ item.translog.build_date | date:"Y/m/d" }}</div>
+    <div>工地編號 : {{ item.translog.constn_site.code }}</div>
+    <div>業主 : {{ item.translog.constn_site.owner }}</div>
+    <div>工地 : {{ item.translog.constn_site.name }}</div>
+    <div>物料編號 : {{ item.material.mat_code }}</div>
+    <div>物料名稱 : {{ item.material.name }}</div>
+    <div>數量 : {{ item.quantity }}</div>
+    <div>米數 : {{ item.unit }}</div>
+    <input type="hidden" name="id" id="id" value="{{ item.id }}">
+    <div>
+      <table id="input_table">
+        <tr>
+          <th>名稱</th>
+          <th>數量</th>
+          <th>米數</th>
+        </tr>
+        <tr>
+          <th>構台梁</th>
+          <td>
+            <input type="text"
+                   name="truss_quantity"
+                   value="{% if report.siteinfo.member %} {{ report.siteinfo.member }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   name="truss_unit"
+                   value="{% if report.siteinfo.member %} {{ report.siteinfo.member }}{% endif %}">
+          </td>
+        </tr>
+        <tr>
+          <th>中柱</th>
+          <td>
+            <input type="text"
+                   name="quantity"
+                   value="{% if report.siteinfo.member %} {{ report.siteinfo.member }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   name="unit"
+                   value="{% if report.siteinfo.member %} {{ report.siteinfo.member }}{% endif %}">
+          </td>
+        </tr>
+      </table>
+    </div>
+  </form>
+{% endblock %}

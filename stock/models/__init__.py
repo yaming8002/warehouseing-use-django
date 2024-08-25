@@ -5,3 +5,4 @@ from .monthreport_model import MonthData, MonthReport
 from .rail_model import RailReport
 from .steel_model import SteelReport
 from .steel_pillar import SteelPillar
+from .steel_pile_model import SteelPile

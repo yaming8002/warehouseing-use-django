@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from decimal import Decimal
 import re
 
 def excel_value_to_str(code,desired_length=None):
@@ -64,3 +65,8 @@ def is_whse_code(s):
         return True
     else:
         return False
+
+def value_to_decimal(value):
+    if value and isinstance(value, (str,int,float,Decimal)):
+            return Decimal(value)
+    return Decimal(0)
