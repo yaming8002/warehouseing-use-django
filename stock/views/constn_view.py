@@ -70,17 +70,17 @@ def steel_pile_edit_view(request):
             item.delete()
         if truss_quantity == 0 and truss_unit == 0:
             item.is_mid = False
-            item.remark = item.remark.replace("None", "").replace("構台樑", "")
+            item.remark = item.remark.replace("None", "").replace("構台樑", "").replace("修改", "") + "修改"
             item.save()
         elif quantity == 0 and unit == 0:
-            item.remark = item.remark.replace("None", "")+ "修改"
+            item.remark = item.remark.replace("None", "").replace("修改", "")+ "修改"
             item.is_mid = True
             item.save()
         else:
             item.is_mid = False
             item.quantity = quantity
             item.unit = unit
-            item.remark = item.remark.replace("None", "").replace("構台樑", "") + " 修改"
+            item.remark = item.remark.replace("None", "").replace("構台樑", "").replace("修改", "")  + " 修改"
             item.save()
             SteelPile.objects.create(
                 translog=item.translog,
