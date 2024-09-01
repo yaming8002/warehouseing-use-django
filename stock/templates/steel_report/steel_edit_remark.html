@@ -11,7 +11,7 @@
       height: 100%;
       left: 80px;
     }
-    
+
     .modal.left .modal-content {
       height: 100%;
       border: 0;
@@ -63,14 +63,14 @@
              value="{{ report.siteinfo.id }}">
     </div>
     {% if report.done_type > 2 %}
-    {% load custom_filters %}
-    <div>
-      <label for="yearMonthInput">結案月份:</label>
-      <input type="month"
-             id="yearMonthInput"
-             name="yearMonth"
-             value='{{ report.year }}-{{report.month|month_full }}'>
-    </div>
+      {% load custom_filters %}
+      <div>
+        <label for="yearMonthInput">結案月份:</label>
+        <input type="month"
+               id="yearMonthInput"
+               name="yearMonth"
+               value='{{ report.year }}-{{ report.month|month_full }}'>
+      </div>
     {% endif %}
     <div>
       <table id="input_table" class="steel_table" style="width:1200px;">
@@ -134,27 +134,21 @@
                    name="done_type"
                    value="{{ report.done_type }}">
             <input type="text"
-                   id="m_300"
-                   name="m_300"
-                   value="{% if report.m_300 %}{{ report.m_300 }}{% endif %}">
+                   id="m_358"
+                   name="m_358"
+                   value="{% if report.m_358 %}{{ report.m_358 }}{% endif %}">
           </td>
           <td>
             <input type="text"
-                   id="m_301"
-                   name="m_301"
-                   value="{% if report.m_301 %}{{ report.m_301 }}{% endif %}">
+                   id="m_352"
+                   name="m_352"
+                   value="{% if report.m_352 %}{{ report.m_352 }}{% endif %}">
           </td>
           <td>
             <input type="text"
-                   id="m_350"
-                   name="m_350"
-                   value="{% if report.m_350 %}{{ report.m_350 }}{% endif %}">
-          </td>
-          <td>
-            <input type="text"
-                   id="m_351"
-                   name="m_351"
-                   value="{% if report.m_351 %}{{ report.m_351 }}{% endif %}">
+                   id="m_295"
+                   name="m_295"
+                   value="{% if report.m_295 %}{{ report.m_295 }}{% endif %}">
           </td>
           <td>
             <input type="text"
@@ -164,45 +158,51 @@
           </td>
           <td>
             <input type="text"
-                   id="m_401"
-                   name="m_401"
-                   value="{% if report.m_401 %}{{ report.m_401 }}{% endif %}">
+                   id="m_424"
+                   name="m_424"
+                   value="{% if report.m_424 %}{{ report.m_424 }}{% endif %}">
           </td>
           <td>
             <input type="text"
-                   id="m_408"
-                   name="m_408"
-                   value="{% if report.m_408 %}{{ report.m_408 }}{% endif %}">
+                   id="m_367"
+                   name="m_367"
+                   value="{% if report.m_367 %}{{ report.m_367 }}{% endif %}">
           </td>
           <td>
             <input type="text"
-                   id="m_414"
-                   name="m_414"
-                   value="{% if report.m_414 %}{{ report.m_414 }}{% endif %}">
+                   id="m_170"
+                   name="m_170"
+                   value="{% if report.m_170 %}{{ report.m_170 }}{% endif %}">
           </td>
           <td>
             <input type="text"
-                   id="m_4141"
-                   name="m_4141"
-                   value="{% if report.m_4141 %}{{ report.m_4141 }}{% endif %}">
+                   id="m_193"
+                   name="m_193"
+                   value="{% if report.m_193 %}{{ report.m_193 }}{% endif %}">
           </td>
           <td>
             <input type="text"
-                   id="m_92"
-                   name="m_92"
-                   value="{% if report.m_92 %}{{ report.m_92 }}{% endif %}">
+                   id="m_265"
+                   name="m_265"
+                   value="{% if report.m_265 %}{{ report.m_265 }}{% endif %}">
           </td>
           <td>
             <input type="text"
-                   id="m_12"
-                   name="m_12"
-                   value="{% if report.m_12 %}{{ report.m_12 |floatformat:'0' }}{% endif %}">
+                   id="m_102"
+                   name="m_102"
+                   value="{% if report.m_102 %}{{ report.m_102 }}{% endif %}">
           </td>
           <td>
             <input type="text"
-                   id="m_13"
-                   name="m_13"
-                   value="{% if report.m_13 %}{{ report.m_13 |floatformat:'0' }}{% endif %}">
+                   id="m_18"
+                   name="m_18"
+                   value="{% if report.m_18 %}{{ report.m_18 |floatformat:'0' }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   id="m_19"
+                   name="m_19"
+                   value="{% if report.m_19 %}{{ report.m_19 |floatformat:'0' }}{% endif %}">
           </td>
           <td>
             <textarea style="with:100%" id="remark" name="remark" row="5">{% if report.remark %}{{report.remark}}{% endif %}</textarea>

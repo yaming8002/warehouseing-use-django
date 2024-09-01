@@ -23,19 +23,18 @@ logger = logging.getLogger(__name__)
 
 class BaseSteelReport(MonthReport):
     static_column_code = {
-        "300": "H300*300",
-        "301": "H300中柱",
-        "350": "H350*350",
-        "351": "H350中柱",
-        "390": "H390*400",
-        "400": "H400*400",
-        "401": "H400中柱",
-        "408": "H408*400",
-        "414": "H414*405",
-        "4141": "H414中柱",
-        "92": "覆工板",
-        "12": "千斤頂",
-        "13": "土壓計",
+        "358": "H300*300",
+        "352": "H300中柱",
+        "295": "H350*350",
+        "400": "H350中柱",
+        "424": "H400*400",
+        "367": "H400中柱",
+        "170": "H408*400",
+        "193": "H414*405",
+        "265": "H414中柱",
+        "102": "覆工板",
+        "18": "千斤頂",
+        "19": "土壓計",
     }
 
     for k, v in static_column_code.items():
@@ -58,7 +57,7 @@ class SteelReport(BaseSteelReport) :
         all_quantity: Decimal,
         all_unit: Decimal,
     ):
-        if mat.mat_code not in cls.static_column_code.keys():
+        if mat.id not in cls.static_column_code.keys():
             return
 
         year, month = build_date.year, build_date.month
@@ -67,8 +66,8 @@ class SteelReport(BaseSteelReport) :
 
         value = all_unit if mat.is_divisible else all_quantity
         value = Decimal(value)
-        cls.update_column_value(whse.id, not is_in, f"m_{mat.mat_code}", value)
-        cls.update_column_value(report.id, not is_in, f"m_{mat.mat_code}", value)
+        cls.update_column_value(whse.id, not is_in, f"m_{mat.id}", value)
+        cls.update_column_value(report.id, not is_in, f"m_{mat.id}", value)
 
 
 class SteelColumn(models.Model):

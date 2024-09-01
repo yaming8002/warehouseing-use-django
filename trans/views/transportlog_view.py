@@ -95,7 +95,6 @@ def move_old_data(request):
     yearmonth = yearmonth_str.split('-')
     year = int(yearmonth[0])
     month =  int(yearmonth[1])
-    # print(year,month)
     move_old_data_by_month(year,month)
     response_data = {
         "success": True,

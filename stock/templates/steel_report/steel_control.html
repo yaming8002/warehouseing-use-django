@@ -2,7 +2,8 @@
 {% block title %}{{ title }} {{ '' }}{% endblock %}
 {% block javascript %}
   <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
-  <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+  <script type="text/javascript"
+          src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
   <script>
     $(document).ready(function () {
       // Adjusting the style of the caption in the table with id 'base_table'
@@ -14,7 +15,7 @@
       var yearMonthInput = $('#yearMonthInput').val(); // 從輸入欄位獲得年月值
       var currentDate = new Date();
       var currentYearMonth = currentDate.toISOString().slice(0, 7); // 獲取當前年月
-  
+
       if (yearMonthInput < currentYearMonth) {
         // 如果輸入的年月早於當前年月，尋找並隱藏結案連結
         $('.editRow_select').hide(); // 隱藏包含結案連結的<td>元素
@@ -44,9 +45,7 @@
       })
     }
   </script>
-  
 {% endblock %}
-
 {% block form %}
   <form id="search" action="/steel_control/" method="GET">
     {% csrf_token %}
@@ -58,150 +57,193 @@
              value='{{ yearMonth }}'>
     </p>
     <input type="submit" value="查詢" />
-   <!-- <input type="button" id="exceloutput" value="匯出EXCEL" />-->
+    <!-- <input type="button" id="exceloutput" value="匯出EXCEL" />-->
   </form>
-
-
 {% endblock %}
 {% block table %}
-<caption><h3>月份:{{ yearMonth }}</h3></caption>
-  <tr class="sticky-header" >
+  <caption>
+    <h3>月份:{{ yearMonth }}</h3>
+  </caption>
+  <tr class="sticky-header">
     <th>項次</th>
     <th>工地代號</th>
     <th>業主</th>
-    <th>名稱  <button id="hieddenConstnName" class="btn btn-sm btn-secondary ms-2">展開</button> </th>
-    <th>H300 <br>
-      支撐(m)</th>
-    <th>H300 <br>
-      中柱(m)</th>
-    <th>H350 <br>
-      支撐(m)</th>
-    <th>H350 <br>
-      中柱(m)</th>
-    <th>H400 <br>
-      支撐(m)</th>
-    <th>H400 <br>
-      中柱(m)</th>
-    <th>H408 <br>
-      支撐(m)</th>
-    <th>H414 <br>
-      支撐(m)</th>
-    <th>H414 <br>
-      中柱(m)</th>
-    <th>覆工板</th>      
+    <th>
+      名稱
+      <button id="hieddenConstnName" class="btn btn-sm btn-secondary ms-2">展開</button>
+    </th>
+    <th>
+      H300
+      <br>
+      支撐(m)
+    </th>
+    <th>
+      H300
+      <br>
+      中柱(m)
+    </th>
+    <th>
+      H350
+      <br>
+      支撐(m)
+    </th>
+    <th>
+      H350
+      <br>
+      中柱(m)
+    </th>
+    <th>
+      H400
+      <br>
+      支撐(m)
+    </th>
+    <th>
+      H400
+      <br>
+      中柱(m)
+    </th>
+    <th>
+      H408
+      <br>
+      支撐(m)
+    </th>
+    <th>
+      H414
+      <br>
+      支撐(m)
+    </th>
+    <th>
+      H414
+      <br>
+      中柱(m)
+    </th>
+    <th>覆工板</th>
     <th>千斤頂(個)</th>
     <th>土壓計(個)</th>
-    {% if request.session.u_permission > 1  %}
-    <th>結案</th>
-    {% endif %} 
+    {% if request.session.u_permission > 1 %}<th>結案</th>{% endif %}
   </tr>
-
   {% for item in list %}
-  <tr class="item seat_{{forloop.counter}}" >
-    <td>{{ forloop.counter }}</td>
-    <td>{{ item.siteinfo.code }}</td>
-    <td class="truncate">{{ item.siteinfo.owner }}</td>
-    <td class="truncate constn_name collapsed-content" >{{ item.siteinfo.name }}</td>
-    <td class="value">{% if item.m_300 != 0 %}{{ item.m_300 }}{% endif%}</td>
-    <td class="value">{% if item.m_301 != 0 %}{{ item.m_301 }}{% endif%}</td>
-    <td class="value">{% if item.m_350 != 0 %}{{ item.m_350 }}{% endif%}</td>
-    <td class="value">{% if item.m_351 != 0 %}{{ item.m_351 }}{% endif%}</td>
-    <td class="value">{% if item.m_400 != 0 %}{{ item.m_400 }}{% endif%}</td>
-    <td class="value">{% if item.m_401 != 0 %}{{ item.m_401 }}{% endif%}</td>
-    <td class="value">{% if item.m_408 != 0 %}{{ item.m_408 }}{% endif%}</td>
-    <td class="value">{% if item.m_414 != 0 %}{{ item.m_414 }}{% endif%}</td>
-    <td class="value">{% if item.m_4141 != 0 %}{{ item.m_4141 }}{% endif%}</td>
-    <td class="value">{% if item.m_92 != 0 %}{{ item.m_92 }}{% endif%}</td>
-    <td class="value">{% if item.m_12 != 0 %}{{ item.m_12 |floatformat:"0"}}{% endif%}</td>
-    <td class="value">{% if item.m_13 != 0 %}{{ item.m_13 |floatformat:"0"}}{% endif%}</td>
-    {% if request.session.u_permission > 1 %}
-    <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a></td>
-    {% endif %} 
-  </tr>
+    <tr class="item seat_{{ forloop.counter }}">
+      <td>{{ forloop.counter }}</td>
+      <td>{{ item.siteinfo.code }}</td>
+      <td class="truncate">{{ item.siteinfo.owner }}</td>
+      <td class="truncate constn_name collapsed-content">{{ item.siteinfo.name }}</td>
+      <td class="value">
+        {% if item.m_358 != 0 %}{{ item.m_358 }}{% endif %}
+      </td>
+      <td class="value">
+        {% if item.m_352 != 0 %}{{ item.m_352 }}{% endif %}
+      </td>
+      <td class="value">
+        {% if item.m_295 != 0 %}{{ item.m_295 }}{% endif %}
+      </td>
+      <td class="value">
+        {% if item.m_400 != 0 %}{{ item.m_400 }}{% endif %}
+      </td>
+      <td class="value">
+        {% if item.m_424 != 0 %}{{ item.m_424 }}{% endif %}
+      </td>
+      <td class="value">
+        {% if item.m_367 != 0 %}{{ item.m_367 }}{% endif %}
+      </td>
+      <td class="value">
+        {% if item.m_170 != 0 %}{{ item.m_170 }}{% endif %}
+      </td>
+      <td class="value">
+        {% if item.m_193 != 0 %}{{ item.m_193 }}{% endif %}
+      </td>
+      <td class="value">
+        {% if item.m_265 != 0 %}{{ item.m_265 }}{% endif %}
+      </td>
+      <td class="value">
+        {% if item.m_102 != 0 %}{{ item.m_102 }}{% endif %}
+      </td>
+      <td class="value">
+        {% if item.m_18 != 0 %}{{ item.m_18 |floatformat:"0" }}{% endif %}
+      </td>
+      <td class="value">
+        {% if item.m_19 != 0 %}{{ item.m_19 |floatformat:"0" }}{% endif %}
+      </td>
+      {% if request.session.u_permission > 1 %}
+        <td>
+          <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a>
+        </td>
+      {% endif %}
+    </tr>
   {% endfor %}
   <tr class="table-warning">
     <th colspan=4>高雄倉庫</th>
-    <th>{{ kh_report.m_300 }}</th>
-    <th>{{ kh_report.m_301 }}</th>
-    <th>{{ kh_report.m_350 }}</th>
-    <th>{{ kh_report.m_351 }}</th>
+    <th>{{ kh_report.m_358 }}</th>
+    <th>{{ kh_report.m_352 }}</th>
+    <th>{{ kh_report.m_295 }}</th>
     <th>{{ kh_report.m_400 }}</th>
-    <th>{{ kh_report.m_401 }}</th>
-    <th>{{ kh_report.m_408 }}</th>
-    <th>{{ kh_report.m_414 }}</th>
-    <th>{{ kh_report.m_4141 }}</th>
-    <th>{{ kh_report.m_92 }}</th>
-    <th>{{ kh_report.m_12 |floatformat:"0"}}</th>
-    <th>{{ kh_report.m_13 |floatformat:"0"}}</th>
-    {% if request.session.u_permission > 1  %}
-    <th></th>
-    {% endif %} 
+    <th>{{ kh_report.m_424 }}</th>
+    <th>{{ kh_report.m_367 }}</th>
+    <th>{{ kh_report.m_170 }}</th>
+    <th>{{ kh_report.m_193 }}</th>
+    <th>{{ kh_report.m_265 }}</th>
+    <th>{{ kh_report.m_102 }}</th>
+    <th>{{ kh_report.m_18 |floatformat:"0" }}</th>
+    <th>{{ kh_report.m_19 |floatformat:"0" }}</th>
+    {% if request.session.u_permission > 1 %}<th></th>{% endif %}
   </tr>
   <tr class="table-warning">
     <th colspan=4>林口倉庫</th>
-    <th>{{ lk_report.m_300 }}</th>
-    <th>{{ lk_report.m_301 }}</th>
-    <th>{{ lk_report.m_350 }}</th>
-    <th>{{ lk_report.m_351 }}</th>
+    <th>{{ lk_report.m_358 }}</th>
+    <th>{{ lk_report.m_352 }}</th>
+    <th>{{ lk_report.m_295 }}</th>
     <th>{{ lk_report.m_400 }}</th>
-    <th>{{ lk_report.m_401 }}</th>
-    <th>{{ lk_report.m_408 }}</th>
-    <th>{{ lk_report.m_414 }}</th>
-    <th>{{ lk_report.m_4141 }}</th>
-    <th>{{ lk_report.m_92  }}</th>
-    <th>{{ lk_report.m_12 |floatformat:"0"}}</th>
-    <th>{{ lk_report.m_13 |floatformat:"0"}}</th>
-    {% if request.session.u_permission > 1  %}
-    <th></th>
-    {% endif %} 
+    <th>{{ lk_report.m_424 }}</th>
+    <th>{{ lk_report.m_367 }}</th>
+    <th>{{ lk_report.m_170 }}</th>
+    <th>{{ lk_report.m_193 }}</th>
+    <th>{{ lk_report.m_265 }}</th>
+    <th>{{ lk_report.m_102 }}</th>
+    <th>{{ lk_report.m_18 |floatformat:"0" }}</th>
+    <th>{{ lk_report.m_19 |floatformat:"0" }}</th>
+    {% if request.session.u_permission > 1 %}<th></th>{% endif %}
   </tr>
   <tr class="table-warning">
-    <th colspan=4>總計({{yearMonth}})</th>
-    <th>{{ total_report.m_300 }}</th>
-    <th>{{ total_report.m_301 }}</th>
-    <th>{{ total_report.m_350 }}</th>
-    <th>{{ total_report.m_351 }}</th>
+    <th colspan=4>總計({{ yearMonth }})</th>
+    <th>{{ total_report.m_358 }}</th>
+    <th>{{ total_report.m_352 }}</th>
+    <th>{{ total_report.m_295 }}</th>
     <th>{{ total_report.m_400 }}</th>
-    <th>{{ total_report.m_401 }}</th>
-    <th>{{ total_report.m_408 }}</th>
-    <th>{{ total_report.m_414 }}</th>
-    <th>{{ total_report.m_4141 }}</th>
-    <th>{{ total_report.m_92 }}</th>
-    <th>{{ total_report.m_12 |floatformat:"0"}}</th>
-    <th>{{ total_report.m_13 |floatformat:"0"}}</th>
-    {% if request.session.u_permission > 1  %}
-    <th></th>
-    {% endif %} 
+    <th>{{ total_report.m_424 }}</th>
+    <th>{{ total_report.m_367 }}</th>
+    <th>{{ total_report.m_170 }}</th>
+    <th>{{ total_report.m_193 }}</th>
+    <th>{{ total_report.m_265 }}</th>
+    <th>{{ total_report.m_102 }}</th>
+    <th>{{ total_report.m_18 |floatformat:"0" }}</th>
+    <th>{{ total_report.m_19 |floatformat:"0" }}</th>
+    {% if request.session.u_permission > 1 %}<th></th>{% endif %}
   </tr>
   <tr class="table-warning">
-    <th colspan=4>上期之總計({{before_yearMonth}})</th>
-    <th>{{ befote_total_report.m_300 }}</th>
-    <th>{{ befote_total_report.m_301 }}</th>
-    <th>{{ befote_total_report.m_350 }}</th>
-    <th>{{ befote_total_report.m_351 }}</th>
+    <th colspan=4>上期之總計({{ before_yearMonth }})</th>
+    <th>{{ befote_total_report.m_358 }}</th>
+    <th>{{ befote_total_report.m_352 }}</th>
+    <th>{{ befote_total_report.m_295 }}</th>
     <th>{{ befote_total_report.m_400 }}</th>
-    <th>{{ befote_total_report.m_401 }}</th>
-    <th>{{ befote_total_report.m_408 }}</th>
-    <th>{{ befote_total_report.m_414 }}</th>
-    <th>{{ befote_total_report.m_4141 }}</th>    
-    <th>{{ befote_total_report.m_92 }}</th>
-    <th>{{ befote_total_report.m_12 |floatformat:"0"}}</th>
-    <th>{{ befote_total_report.m_13 |floatformat:"0"}}</th>
-    {% if request.session.u_permission > 1 %}
-    <th></th>
-    {% endif %} 
+    <th>{{ befote_total_report.m_424 }}</th>
+    <th>{{ befote_total_report.m_367 }}</th>
+    <th>{{ befote_total_report.m_170 }}</th>
+    <th>{{ befote_total_report.m_193 }}</th>
+    <th>{{ befote_total_report.m_265 }}</th>
+    <th>{{ befote_total_report.m_102 }}</th>
+    <th>{{ befote_total_report.m_18 |floatformat:"0" }}</th>
+    <th>{{ befote_total_report.m_19 |floatformat:"0" }}</th>
+    {% if request.session.u_permission > 1 %}<th></th>{% endif %}
   </tr>
   <tr class="table-warning">
-    <th colspan=4>本月與上期之差異(({{yearMonth}})-({{before_yearMonth}})=差異數)</th>
+    <th colspan=4>本月與上期之差異(({{ yearMonth }})-({{ before_yearMonth }})=差異數)</th>
     {% for d in diff %}
       {% if forloop.counter > 9 %}
-      <th>{{d |floatformat:"0"}}</th>
+        <th>{{ d |floatformat:"0" }}</th>
       {% else %}
-      <th>{{d |floatformat:"2"}}</th>
+        <th>{{ d |floatformat:"2" }}</th>
       {% endif %}
     {% endfor %}
-    {% if request.session.u_permission > 1 %}
-    <th></th>
-    {% endif %} 
+    {% if request.session.u_permission > 1 %}<th></th>{% endif %}
   </tr>
 {% endblock %}

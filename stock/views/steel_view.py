@@ -16,20 +16,6 @@ from trans.service.update_done_steel_by_month import update_total_by_month
 from wcom.utils import MonthListView
 from wcom.utils.uitls import get_year_month
 
-static_column_code = [
-        "300",
-        "301",
-        "350",
-        "351",
-        "400",
-        "401",
-        "408",
-        "414",
-        "4141",
-        "92",
-        "12",
-        "13",
-]
 
 class SteelControlView(MonthListView):
     template_name = "steel_report/steel_control.html"
@@ -38,7 +24,7 @@ class SteelControlView(MonthListView):
         year,month = self.get_year_month()
         query =  (Q(siteinfo__id__gt=4) & (Q(year__lt=year) | Q(year=year, month__lte=month)) )
         exclude_query = Q()
-        for x in static_column_code:
+        for x in SteelReport.static_column_code.keys():
             exclude_query  |= ~Q(**{f'm_{x}': 0})
         return SteelReport.get_current_by_query(query,final_query=exclude_query)
 
@@ -59,7 +45,7 @@ class SteelControlView(MonthListView):
         if current and before:
             currentdata = model_to_dict(current)
             beforedata = model_to_dict(before)
-            diff = [(float(currentdata[f'm_{key}']) - float(beforedata[f'm_{key}'])) for key in static_column_code]
+            diff = [(float(currentdata[f'm_{key}']) - float(beforedata[f'm_{key}'])) for key in SteelReport.static_column_code.keys()]
         return diff
 
 
@@ -104,7 +90,7 @@ class SteelDoneView(MonthListView):
         if current and before:
             current = model_to_dict(current)
             before = model_to_dict(before)
-            diff = [(current[f'm_{key}'] - before[f'm_{key}']) for key in static_column_code ]
+            diff = [(current[f'm_{key}'] - before[f'm_{key}']) for key in SteelReport.static_column_code.keys() ]
         return diff
 
 def get_steel_edit_done(request):

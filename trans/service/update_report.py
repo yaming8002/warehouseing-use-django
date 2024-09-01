@@ -1,9 +1,4 @@
 from datetime import datetime
-import pdb
-from stock.models.done_steel_model import DoneSteelReport
-from stock.models.steel_model import SteelReport
-from stock.models.steel_pile_model import SteelPile
-from trans.models.trans_model import TransLog, TransLogDetail
 from trans.service.update_board_by_month import update_board_by_month
 from trans.service.update_done_steel_by_month import (
     reomve_total_steel,
@@ -27,7 +22,6 @@ def count_all_report(count_date: datetime):
     )
     execute_stored_procedure(stock_sql_command, [first_day_of_month, last_day_of_month, True])
     execute_stored_procedure(pile_sql_command, [first_day_of_month, last_day_of_month])
-    print("execute_stored_procedure is run ")
     update_rail_by_month(
         year, month, first_day_of_month, last_day_of_month
     )  # 鋼軌的計算
@@ -37,7 +31,7 @@ def count_all_report(count_date: datetime):
     update_steel_by_month(
         year, month, first_day_of_month, last_day_of_month
     )  # 一般工地的鋼樁計算
-    reomve_total_steel(year, month, first_day_of_month, last_day_of_month)  # 材料類棄用
+    reomve_total_steel( first_day_of_month, last_day_of_month)  # 材料類棄用
     update_done_steel_by_month(year, month, first_day_of_month, last_day_of_month)
     update_done_steel_by_month_only_F(
         year, month, first_day_of_month, last_day_of_month
@@ -50,22 +44,4 @@ def move_old_data_by_month(year, month):
     last_day_of_month = (
         first_day_of_month + relativedelta(months=1) - relativedelta(seconds=1)
     )
-    logs = TransLog.objects.filter(
-        build_date__range=(first_day_of_month, last_day_of_month)
-    )
-    if logs.exists():
-        execute_stored_procedure(stock_sql_command, [first_day_of_month, last_day_of_month, False])
-        details = TransLogDetail.objects.filter(translog__in=logs)
-        if details.exists():
-            details.delete()
-        piles = SteelPile.objects.filter(translog__in=logs)
-        if piles.exists():
-            piles.delete()
-        if logs.exists():
-            logs.delete()
-    report = SteelReport.objects.filter(year=year,month=month,is_done=False)
-    if report.exists():
-        report.delete()
-    report = DoneSteelReport.objects.filter(year=year,month=month,done_type=2)
-    if report.exists():
-        report.delete()
+    execute_stored_procedure("CALL proc_move_old_by_month(%s, %s)", [first_day_of_month, last_day_of_month])

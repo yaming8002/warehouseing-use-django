@@ -11,7 +11,7 @@
       height: 100%;
       left: 80px;
     }
-    
+
     .modal.left .modal-content {
       height: 100%;
       border: 0;
@@ -123,41 +123,41 @@
           </tr>
           <tr>
             <td>剩餘物料</td>
-            <td id="o.m_300">
-              {% if report.m_300 %}{{ report.m_300 }}{% endif %}
+            <td id="o.m_358">
+              {% if report.m_358 %}{{ report.m_358 }}{% endif %}
             </td>
-            <td id="o.m_301">
-              {% if report.m_301 %}{{ report.m_301 }}{% endif %}
+            <td id="o.m_352">
+              {% if report.m_352 %}{{ report.m_352 }}{% endif %}
             </td>
-            <td id="o.m_350">
-              {% if report.m_350 %}{{ report.m_350 }}{% endif %}
-            </td>
-            <td id="o.m_351">
-              {% if report.m_351 %}{{ report.m_351 }}{% endif %}
+            <td id="o.m_295">
+              {% if report.m_295 %}{{ report.m_295 }}{% endif %}
             </td>
             <td id="o.m_400">
               {% if report.m_400 %}{{ report.m_400 }}{% endif %}
             </td>
-            <td id="o.m_401">
-              {% if report.m_401 %}{{ report.m_401 }}{% endif %}
+            <td id="o.m_424">
+              {% if report.m_424 %}{{ report.m_424 }}{% endif %}
             </td>
-            <td id="o.m_408">
-              {% if report.m_408 %}{{ report.m_408 }}{% endif %}
+            <td id="o.m_367">
+              {% if report.m_367 %}{{ report.m_367 }}{% endif %}
             </td>
-            <td id="o.m_414">
-              {% if report.m_414 %}{{ report.m_414 }}{% endif %}
+            <td id="o.m_170">
+              {% if report.m_170 %}{{ report.m_170 }}{% endif %}
             </td>
-            <td id="o.m_4141">
-              {% if report.m_4141 %}{{ report.m_4141 }}{% endif %}
+            <td id="o.m_193">
+              {% if report.m_193 %}{{ report.m_193 }}{% endif %}
             </td>
-            <td id="o.m_92">
-              {% if report.m_92 %}{{ report.m_92 }}{% endif %}
+            <td id="o.m_265">
+              {% if report.m_265 %}{{ report.m_265 }}{% endif %}
             </td>
-            <td id="o.m_12">
-              {% if report.m_12 %}{{ report.m_12 |floatformat:"0" }}{% endif %}
+            <td id="o.m_102">
+              {% if report.m_102 %}{{ report.m_102 }}{% endif %}
             </td>
-            <td id="o.m_13">
-              {% if report.m_13 %}{{ report.m_13 |floatformat:"0" }}{% endif %}
+            <td id="o.m_18">
+              {% if report.m_18 %}{{ report.m_18 |floatformat:"0" }}{% endif %}
+            </td>
+            <td id="o.m_19">
+              {% if report.m_19 %}{{ report.m_19 |floatformat:"0" }}{% endif %}
             </td>
             <td></td>
           </tr>
@@ -172,40 +172,40 @@
               <input type="hidden" id="change.done_type" name="change.done_type" value="3">
             </td>
             <td>
-              <input type="text" id="change.m_300" name="change.m_300">
+              <input type="text" id="change.m_358" name="change.m_358">
             </td>
             <td>
-              <input type="text" id="change.m_301" name="change.m_301">
+              <input type="text" id="change.m_352" name="change.m_352">
             </td>
             <td>
-              <input type="text" id="change.m_350" name="change.m_350">
-            </td>
-            <td>
-              <input type="text" id="change.m_351" name="change.m_351">
+              <input type="text" id="change.m_295" name="change.m_295">
             </td>
             <td>
               <input type="text" id="change.m_400" name="change.m_400">
             </td>
             <td>
-              <input type="text" id="change.m_401" name="change.m_401">
+              <input type="text" id="change.m_424" name="change.m_424">
             </td>
             <td>
-              <input type="text" id="change.m_408" name="change.m_408">
+              <input type="text" id="change.m_367" name="change.m_367">
             </td>
             <td>
-              <input type="text" id="change.m_414" name="change.m_414">
+              <input type="text" id="change.m_170" name="change.m_170">
             </td>
             <td>
-              <input type="text" id="change.m_4141" name="change.m_4141">
+              <input type="text" id="change.m_193" name="change.m_193">
             </td>
             <td>
-              <input type="text" id="change.m_92" name="change.m_92">
+              <input type="text" id="change.m_265" name="change.m_265">
             </td>
             <td>
-              <input type="text" id="change.m_12" name="change.m_12">
+              <input type="text" id="change.m_102" name="change.m_102">
             </td>
             <td>
-              <input type="text" id="change.m_13" name="change.m_13">
+              <input type="text" id="change.m_18" name="change.m_18">
+            </td>
+            <td>
+              <input type="text" id="change.m_19" name="change.m_19">
             </td>
             <td>
               <textarea style="with:100%" id="change.remark" name="change.remark" row="5"></textarea>
@@ -220,27 +220,21 @@
             </td>
             <td>
               <input type="text"
-                     id="cut.m_300"
-                     name="cut.m_300"
-                     value="{% if report.m_300 %}{{ report.m_300 }}{% endif %}">
+                     id="cut.m_358"
+                     name="cut.m_358"
+                     value="{% if report.m_358 %}{{ report.m_358 }}{% endif %}">
             </td>
             <td>
               <input type="text"
-                     id="cut.m_301"
-                     name="cut.m_301"
-                     value="{% if report.m_301 %}{{ report.m_301 }}{% endif %}">
+                     id="cut.m_352"
+                     name="cut.m_352"
+                     value="{% if report.m_352 %}{{ report.m_352 }}{% endif %}">
             </td>
             <td>
               <input type="text"
-                     id="cut.m_350"
-                     name="cut.m_350"
-                     value="{% if report.m_350 %}{{ report.m_350 }}{% endif %}">
-            </td>
-            <td>
-              <input type="text"
-                     id="cut.m_351"
-                     name="cut.m_351"
-                     value="{% if report.m_351 %}{{ report.m_351 }}{% endif %}">
+                     id="cut.m_295"
+                     name="cut.m_295"
+                     value="{% if report.m_295 %}{{ report.m_295 }}{% endif %}">
             </td>
             <td>
               <input type="text"
@@ -250,45 +244,51 @@
             </td>
             <td>
               <input type="text"
-                     id="cut.m_401"
-                     name="cut.m_401"
-                     value="{% if report.m_401 %}{{ report.m_401 }}{% endif %}">
+                     id="cut.m_424"
+                     name="cut.m_424"
+                     value="{% if report.m_424 %}{{ report.m_424 }}{% endif %}">
             </td>
             <td>
               <input type="text"
-                     id="cut.m_408"
-                     name="cut.m_408"
-                     value="{% if report.m_408 %}{{ report.m_408 }}{% endif %}">
+                     id="cut.m_367"
+                     name="cut.m_367"
+                     value="{% if report.m_367 %}{{ report.m_367 }}{% endif %}">
             </td>
             <td>
               <input type="text"
-                     id="cut.m_414"
-                     name="cut.m_414"
-                     value="{% if report.m_414 %}{{ report.m_414 }}{% endif %}">
+                     id="cut.m_170"
+                     name="cut.m_170"
+                     value="{% if report.m_170 %}{{ report.m_170 }}{% endif %}">
             </td>
             <td>
               <input type="text"
-                     id="cut.m_4141"
-                     name="cut.m_4141"
-                     value="{% if report.m_4141 %}{{ report.m_4141 }}{% endif %}">
+                     id="cut.m_193"
+                     name="cut.m_193"
+                     value="{% if report.m_193 %}{{ report.m_193 }}{% endif %}">
             </td>
             <td>
               <input type="text"
-                     id="cut.m_92"
-                     name="cut.m_92"
-                     value="{% if report.m_92 %}{{ report.m_92 }}{% endif %}">
+                     id="cut.m_265"
+                     name="cut.m_265"
+                     value="{% if report.m_265 %}{{ report.m_265 }}{% endif %}">
             </td>
             <td>
               <input type="text"
-                     id="cut.m_12"
-                     name="cut.m_12"
-                     value="{% if report.m_12 %}{{ report.m_12 |floatformat:'0' }}{% endif %}">
+                     id="cut.m_102"
+                     name="cut.m_102"
+                     value="{% if report.m_102 %}{{ report.m_102 }}{% endif %}">
             </td>
             <td>
               <input type="text"
-                     id="cut.m_13"
-                     name="cut.m_13"
-                     value="{% if report.m_13 %}{{ report.m_13 |floatformat:'0' }}{% endif %}">
+                     id="cut.m_18"
+                     name="cut.m_18"
+                     value="{% if report.m_18 %}{{ report.m_18 |floatformat:'0' }}{% endif %}">
+            </td>
+            <td>
+              <input type="text"
+                     id="cut.m_19"
+                     name="cut.m_19"
+                     value="{% if report.m_19 %}{{ report.m_19 |floatformat:'0' }}{% endif %}">
             </td>
             <td>
               <textarea style="with:100%" id="cut.remark" name="cut.remark" row="5"></textarea>

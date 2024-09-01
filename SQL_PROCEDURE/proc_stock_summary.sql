@@ -23,6 +23,7 @@ BEGIN
         tg.build_date BETWEEN begin_date AND end_date
         AND d.remark NOT LIKE '%#%'
         AND tg.constn_site_id <> 1
+        AND d.is_rent = 0
     GROUP BY
         d.material_id,
         mat.specification_id,
@@ -42,6 +43,7 @@ BEGIN
         INNER JOIN stock_materials AS mat ON mat.id = d.material_id
     WHERE
         tg.build_date BETWEEN begin_date AND end_date
+        AND d.is_rent = 0
     GROUP BY
         d.material_id,
         mat.specification_id;
@@ -129,7 +131,7 @@ BEGIN
 	    SUM(st.total_unit) AS total_unit
 	FROM stock_stock AS st
     INNER JOIN stock_siteinfo AS info ON st.siteinfo_id = info.id
-    where info.`code` in ('F002','F003')
+    where info.`code` in ('F001','F002','F003')
 	GROUP BY st.material_id
 	ON DUPLICATE KEY UPDATE
 	    stock_stock.quantity = VALUES(quantity),

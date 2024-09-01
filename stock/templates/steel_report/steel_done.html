@@ -18,7 +18,7 @@
           "caption-side": "top"
         });
       });
-  
+
 
     });
 
@@ -53,8 +53,8 @@
                 console.error('Error loading modal content: ', error);
             }
         });
-      } 
-     
+      }
+
     }
   </script>
 {% endblock %}
@@ -65,9 +65,9 @@
     min-width: auto !important;  /* 可以根据需要调整 */
     min-height: auto !important;
     width: auto;      /* 允许表格根据内容自动调整宽度 */
-  }  
+  }
 
- 
+
   </style>
 {% endblock %}
 {% block form %}
@@ -81,12 +81,13 @@
              value='{{ yearMonth }}'>
     </p>
     <input type="submit" value="查詢" />
-     <!-- <input type="button" id="exceloutput" value="匯出EXCEL" />-->
+    <!-- <input type="button" id="exceloutput" value="匯出EXCEL" />-->
   </form>
-
 {% endblock %}
 {% block table %}
-<caption><h3>月份:{{ yearMonth }}</h3></caption>
+  <caption>
+    <h3>月份:{{ yearMonth }}</h3>
+  </caption>
   <tr>
     <th>工地代號</th>
     <th>業主</th>
@@ -126,33 +127,36 @@
       <br>
       支撐(m)
     </th>
-    <th>H414 <br>
-      支撐(m)</th>
-    <th>H414 <br>
-      中柱(m)</th>
+    <th>
+      H414
+      <br>
+      支撐(m)
+    </th>
+    <th>
+      H414
+      <br>
+      中柱(m)
+    </th>
     <th>覆工板(片)</th>
     <th>千斤頂(個)</th>
     <th>土壓計(個)</th>
     <th colspan='6' rowspan='2'>差       異      數      說       明</th>
-    {% if request.session.u_permission > 1 %}
-    <th rowspan='2'>編輯</th>
-    {% endif %} 
+    {% if request.session.u_permission > 1 %}<th rowspan='2'>編輯</th>{% endif %}
   </tr>
   <tr>
     <th colspan='3'>上期之總計({{ before_yearMonth }})</th>
-    <th>{{ befote_total_report.m_300 }}</th>
-    <th>{{ befote_total_report.m_301 }}</th>
-    <th>{{ befote_total_report.m_350 }}</th>
-    <th>{{ befote_total_report.m_351 }}</th>
+    <th>{{ befote_total_report.m_358 }}</th>
+    <th>{{ befote_total_report.m_352 }}</th>
+    <th>{{ befote_total_report.m_295 }}</th>
     <th>{{ befote_total_report.m_400 }}</th>
-    <th>{{ befote_total_report.m_401 }}</th>
-    <th>{{ befote_total_report.m_408 }}</th>
-    <th>{{ befote_total_report.m_414 }}</th>
-    <th>{{ befote_total_report.m_4141 }}</th>
-    <th>{{ befote_total_report.m_92  }}</th>
-    <th>{{ befote_total_report.m_12 |floatformat:"0" }}</th>
-    <th>{{ befote_total_report.m_13 |floatformat:"0" }}</th>
-    
+    <th>{{ befote_total_report.m_424 }}</th>
+    <th>{{ befote_total_report.m_367 }}</th>
+    <th>{{ befote_total_report.m_170 }}</th>
+    <th>{{ befote_total_report.m_193 }}</th>
+    <th>{{ befote_total_report.m_265 }}</th>
+    <th>{{ befote_total_report.m_102 }}</th>
+    <th>{{ befote_total_report.m_18 |floatformat:"0" }}</th>
+    <th>{{ befote_total_report.m_19 |floatformat:"0" }}</th>
   </tr>
   {% load strmap %}
   {% load custom_filters %}
@@ -167,82 +171,109 @@
     <tr>
       <td>{{ item.siteinfo.code }}</td>
       <td>{{ item.siteinfo.owner }}</td>
-      <td>{% if item.siteinfo.name %}{{ item.siteinfo.name }}{% endif %}</td>
-      <td>{% if item.m_300 != 0 %}{{ item.m_300 }}{% endif%}</td>
-      <td>{% if item.m_301 != 0 %}{{ item.m_301 }}{% endif%}</td>
-      <td>{% if item.m_350 != 0 %}{{ item.m_350 }}{% endif%}</td>
-      <td>{% if item.m_351 != 0 %}{{ item.m_351 }}{% endif%}</td>
-      <td>{% if item.m_400 != 0 %}{{ item.m_400 }}{% endif%}</td>
-      <td>{% if item.m_401 != 0 %}{{ item.m_401 }}{% endif%}</td>
-      <td>{% if item.m_408 != 0 %}{{ item.m_408 }}{% endif%}</td>
-      <td>{% if item.m_414 != 0 %}{{ item.m_414 }}{% endif%}</td>
-      <td>{% if item.m_4141 != 0 %}{{ item.m_4141 }}{% endif%}</td>
-      <td>{% if item.m_92 != 0 %}{{ item.m_92 }}{% endif%}</td>
-      <td>{% if item.m_12 != 0 %}{{ item.m_12 |floatformat:"0" }}{% endif%}</td>
-      <td>{% if item.m_13 != 0 %}{{ item.m_13 |floatformat:"0" }}{% endif%}</td>
-      <td colspan='6' style="text-align:left" >{% if item.remark %}{{ item.remark |safe}}<br>{% endif %}
-        {% if item.turn_site_id %}目的地:[{{item.turn_site.code}}]{{item.turn_site.owner}}{% endif %}
+      <td>
+        {% if item.siteinfo.name %}{{ item.siteinfo.name }}{% endif %}
       </td>
-      {% if request.session.u_permission > 1 %}
-      <td><a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>{% if item.done_type > 2 %} <a href="#" onclick="rollback({{ item.id }})">退回</a>{% endif %}</td>
-      {% endif %} 
-    </tr>
-  {% endfor %}
-  <tr>
-    <th colspan='3'>總計</th>
-    <th>{{ sum_report.m_300 }}</th>
-    <th>{{ sum_report.m_301 }}</th>
-    <th>{{ sum_report.m_350 }}</th>
-    <th>{{ sum_report.m_351 }}</th>
-    <th>{{ sum_report.m_400 }}</th>
-    <th>{{ sum_report.m_401 }}</th>
-    <th>{{ sum_report.m_408 }}</th>
-    <th>{{ sum_report.m_414 }}</th>
-    <th>{{ sum_report.m_4141 }}</th>
-    <th>{{ sum_report.m_92  }}</th>
-    <th>{{ sum_report.m_12 |floatformat:"0" }}</th>
-    <th>{{ sum_report.m_13 |floatformat:"0" }}</th>
-    <th colspan='6'></th>
-    {% if request.session.u_permission > 1 %}
-    <th></th>
-    {% endif %} 
-  </tr>
-  <tr class="table-warning">
-    <th colspan='3'  >總計({{ yearMonth }})</th>
-    <th>{{ total_report.m_300 }}</th>
-    <th>{{ total_report.m_301 }}</th>
-    <th>{{ total_report.m_350 }}</th>
-    <th>{{ total_report.m_351 }}</th>
-    <th>{{ total_report.m_400 }}</th>
-    <th>{{ total_report.m_401 }}</th>
-    <th>{{ total_report.m_408 }}</th>
-    <th>{{ total_report.m_414 }}</th>
-    <th>{{ total_report.m_4141 }}</th>
-    <th>{{ total_report.m_92  }}</th>
-    <th>{{ total_report.m_12 |floatformat:"0" }}</th>
-    <th>{{ total_report.m_13 |floatformat:"0" }}</th>
-    <th colspan='6'></th>
-    {% if request.session.u_permission > 1 %}
-    <th></th>
-    {% endif %} 
-  </tr>
-  <tr class="table-warning">
-    <th colspan=3 >差異數)</th>
-    {% for d in diff %}
-      <th>
-        {% if forloop.counter < 11 %}
-          {{ d }}
-        {% else %}
-          {{ d|floatformat:"0" }}
-        {% endif %}
-      </th>
-    {% endfor %}
-    <th colspan='6'></th>
-    {% if request.session.u_permission > 1 %}
-    <th></th>
-    {% endif %} 
-  </tr>
-  <!--
+      <td>
+        {% if item.m_358 != 0 %}{{ item.m_358 }}{% endif %}
+        </td>
+        <td>
+          {% if item.m_352 != 0 %}{{ item.m_352 }}{% endif %}
+          </td>
+          <td>
+            {% if item.m_295 != 0 %}{{ item.m_295 }}{% endif %}
+            </td>
+            <td>
+              {% if item.m_400 != 0 %}{{ item.m_400 }}{% endif %}
+              </td>
+              <td>
+                {% if item.m_424 != 0 %}{{ item.m_424 }}{% endif %}
+                </td>
+                <td>
+                  {% if item.m_367 != 0 %}{{ item.m_367 }}{% endif %}
+                  </td>
+                  <td>
+                    {% if item.m_170 != 0 %}{{ item.m_170 }}{% endif %}
+                    </td>
+                    <td>
+                      {% if item.m_193 != 0 %}{{ item.m_193 }}{% endif %}
+                      </td>
+                      <td>
+                        {% if item.m_265 != 0 %}{{ item.m_265 }}{% endif %}
+                        </td>
+                        <td>
+                          {% if item.m_102 != 0 %}{{ item.m_102 }}{% endif %}
+                          </td>
+                          <td>
+                            {% if item.m_18 != 0 %}{{ item.m_18 |floatformat:"0" }}{% endif %}
+                            </td>
+                            <td>
+                              {% if item.m_19 != 0 %}{{ item.m_19 |floatformat:"0" }}{% endif %}
+                              </td>
+                              <td colspan='6' style="text-align:left">
+                                {% if item.remark %}
+                                  {{ item.remark |safe }}
+                                  <br>
+                                {% endif %}
+                                {% if item.turn_site_id %}目的地:[{{ item.turn_site.code }}]{{ item.turn_site.owner }}{% endif %}
+                              </td>
+                              {% if request.session.u_permission > 1 %}
+                                <td>
+                                  <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>
+                                  {% if item.done_type > 2 %}<a href="#" onclick="rollback({{ item.id }})">退回</a>{% endif %}
+                                </td>
+                              {% endif %}
+                            </tr>
+                          {% endfor %}
+                          <tr>
+                            <th colspan='3'>總計</th>
+                            <th>{{ sum_report.m_358 }}</th>
+                            <th>{{ sum_report.m_352 }}</th>
+                            <th>{{ sum_report.m_295 }}</th>
+                            <th>{{ sum_report.m_400 }}</th>
+                            <th>{{ sum_report.m_424 }}</th>
+                            <th>{{ sum_report.m_367 }}</th>
+                            <th>{{ sum_report.m_170 }}</th>
+                            <th>{{ sum_report.m_193 }}</th>
+                            <th>{{ sum_report.m_265 }}</th>
+                            <th>{{ sum_report.m_102 }}</th>
+                            <th>{{ sum_report.m_18 |floatformat:"0" }}</th>
+                            <th>{{ sum_report.m_19 |floatformat:"0" }}</th>
+                            <th colspan='6'></th>
+                            {% if request.session.u_permission > 1 %}<th></th>{% endif %}
+                          </tr>
+                          <tr class="table-warning">
+                            <th colspan='3'>總計({{ yearMonth }})</th>
+                            <th>{{ total_report.m_358 }}</th>
+                            <th>{{ total_report.m_352 }}</th>
+                            <th>{{ total_report.m_295 }}</th>
+                            <th>{{ total_report.m_400 }}</th>
+                            <th>{{ total_report.m_424 }}</th>
+                            <th>{{ total_report.m_367 }}</th>
+                            <th>{{ total_report.m_170 }}</th>
+                            <th>{{ total_report.m_193 }}</th>
+                            <th>{{ total_report.m_265 }}</th>
+                            <th>{{ total_report.m_102 }}</th>
+                            <th>{{ total_report.m_18 |floatformat:"0" }}</th>
+                            <th>{{ total_report.m_19 |floatformat:"0" }}</th>
+                            <th colspan='6'></th>
+                            {% if request.session.u_permission > 1 %}<th></th>{% endif %}
+                          </tr>
+                          <tr class="table-warning">
+                            <th colspan=3>差異數)</th>
+                            {% for d in diff %}
+                              <th>
+                                {% if forloop.counter < 11 %}
+                                  {{ d }}
+                                {% else %}
+                                  {{ d|floatformat:"0" }}
+                                {% endif %}
+                              </th>
+                            {% endfor %}
+                            <th colspan='6'></th>
+                            {% if request.session.u_permission > 1 %}<th></th>{% endif %}
+                          </tr>
+                          <!--
   <tr>
     <td colspan="21" class="separator"></td>
   </tr>
@@ -333,4 +364,4 @@
     <th>{{ h401.l_17 }}</th>
     <th>{{ h401.total }}</th>
   </tr>-->
-{% endblock %}
+                        {% endblock %}
