@@ -45,60 +45,6 @@ class DoneSteelReport(BaseSteelReport):
         verbose_name_plural = "變動資訊"
         ordering = ["done_type", "siteinfo", "id"]  # 按照 id 升序排序
 
-    @classmethod
-    def whse_reomve_matials(
-        cls,
-        mat_code: str,
-        year: int,
-        month: int,
-        all_quantity: Decimal,
-        all_unit: Decimal,
-    ):
-        if not year:
-            now = datetime.now()
-            year, month = now.year, now.month
-
-        column = f"m_{mat_code}"
-        value = all_quantity if mat_code in ["92", "12", "13"] else all_unit
-        donesteel, _ = cls.objects.get_or_create(
-            siteinfo=SiteInfo.get_site_by_code("0000"),
-            year=year,
-            month=month,
-            done_type=2,
-            is_done=True,
-            remark="林口倉報廢",
-        )
-        setattr(donesteel, column, 0 - value)
-        donesteel.save()
-
-    @classmethod
-    def add_new_mat(
-        cls,
-        site: SiteInfo,
-        turn_site: Optional[SiteInfo],
-        year: int,
-        month: int,
-        mat_code: str,
-        all_quantity: Decimal,
-        all_unit: Decimal,
-        remark: Optional[str],
-    ):
-        column = f"m_{mat_code}"
-        donesteel, _ = cls.objects.get_or_create(
-            siteinfo=site,
-            turn_site=turn_site,
-            year=year,
-            month=month,
-            done_type=2,
-            is_done=True,
-            defaults={"remark": remark if remark else ""},
-        )
-
-        value = all_quantity if mat_code in ["92", "12", "13"] else all_unit
-        setattr(donesteel, column, value)
-
-        donesteel.save()
-        return donesteel
 
     @classmethod
     def roll_back(cls, site: SiteInfo):

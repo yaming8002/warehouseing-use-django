@@ -176,192 +176,101 @@
       </td>
       <td>
         {% if item.m_358 != 0 %}{{ item.m_358 }}{% endif %}
-        </td>
+      </td>
+      <td>
+        {% if item.m_352 != 0 %}{{ item.m_352 }}{% endif %}
+      </td>
+      <td>
+        {% if item.m_295 != 0 %}{{ item.m_295 }}{% endif %}
+      </td>
+      <td>
+        {% if item.m_400 != 0 %}{{ item.m_400 }}{% endif %}
+      </td>
+      <td>
+        {% if item.m_424 != 0 %}{{ item.m_424 }}{% endif %}
+      </td>
+      <td>
+        {% if item.m_367 != 0 %}{{ item.m_367 }}{% endif %}
+      </td>
+      <td>
+        {% if item.m_170 != 0 %}{{ item.m_170 }}{% endif %}
+      </td>
+      <td>
+        {% if item.m_193 != 0 %}{{ item.m_193 }}{% endif %}
+      </td>
+      <td>
+        {% if item.m_265 != 0 %}{{ item.m_265 }}{% endif %}
+      </td>
+      <td>
+        {% if item.m_102 != 0 %}{{ item.m_102 }}{% endif %}
+      </td>
+      <td>
+        {% if item.m_18 != 0 %}{{ item.m_18 |floatformat:"0" }}{% endif %}
+      </td>
+      <td>
+        {% if item.m_19 != 0 %}{{ item.m_19 |floatformat:"0" }}{% endif %}
+      </td>
+      <td colspan='6' style="text-align:left">
+        {% if item.remark %}
+          {{ item.remark |safe }}
+          <br>
+        {% endif %}
+        {% if item.turn_site_id %}目的地:[{{ item.turn_site.code }}]{{ item.turn_site.owner }}{% endif %}
+      </td>
+      {% if request.session.u_permission > 1 %}
         <td>
-          {% if item.m_352 != 0 %}{{ item.m_352 }}{% endif %}
-          </td>
-          <td>
-            {% if item.m_295 != 0 %}{{ item.m_295 }}{% endif %}
-            </td>
-            <td>
-              {% if item.m_400 != 0 %}{{ item.m_400 }}{% endif %}
-              </td>
-              <td>
-                {% if item.m_424 != 0 %}{{ item.m_424 }}{% endif %}
-                </td>
-                <td>
-                  {% if item.m_367 != 0 %}{{ item.m_367 }}{% endif %}
-                  </td>
-                  <td>
-                    {% if item.m_170 != 0 %}{{ item.m_170 }}{% endif %}
-                    </td>
-                    <td>
-                      {% if item.m_193 != 0 %}{{ item.m_193 }}{% endif %}
-                      </td>
-                      <td>
-                        {% if item.m_265 != 0 %}{{ item.m_265 }}{% endif %}
-                        </td>
-                        <td>
-                          {% if item.m_102 != 0 %}{{ item.m_102 }}{% endif %}
-                          </td>
-                          <td>
-                            {% if item.m_18 != 0 %}{{ item.m_18 |floatformat:"0" }}{% endif %}
-                            </td>
-                            <td>
-                              {% if item.m_19 != 0 %}{{ item.m_19 |floatformat:"0" }}{% endif %}
-                              </td>
-                              <td colspan='6' style="text-align:left">
-                                {% if item.remark %}
-                                  {{ item.remark |safe }}
-                                  <br>
-                                {% endif %}
-                                {% if item.turn_site_id %}目的地:[{{ item.turn_site.code }}]{{ item.turn_site.owner }}{% endif %}
-                              </td>
-                              {% if request.session.u_permission > 1 %}
-                                <td>
-                                  <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>
-                                  {% if item.done_type > 2 %}<a href="#" onclick="rollback({{ item.id }})">退回</a>{% endif %}
-                                </td>
-                              {% endif %}
-                            </tr>
-                          {% endfor %}
-                          <tr>
-                            <th colspan='3'>總計</th>
-                            <th>{{ sum_report.m_358 }}</th>
-                            <th>{{ sum_report.m_352 }}</th>
-                            <th>{{ sum_report.m_295 }}</th>
-                            <th>{{ sum_report.m_400 }}</th>
-                            <th>{{ sum_report.m_424 }}</th>
-                            <th>{{ sum_report.m_367 }}</th>
-                            <th>{{ sum_report.m_170 }}</th>
-                            <th>{{ sum_report.m_193 }}</th>
-                            <th>{{ sum_report.m_265 }}</th>
-                            <th>{{ sum_report.m_102 }}</th>
-                            <th>{{ sum_report.m_18 |floatformat:"0" }}</th>
-                            <th>{{ sum_report.m_19 |floatformat:"0" }}</th>
-                            <th colspan='6'></th>
-                            {% if request.session.u_permission > 1 %}<th></th>{% endif %}
-                          </tr>
-                          <tr class="table-warning">
-                            <th colspan='3'>總計({{ yearMonth }})</th>
-                            <th>{{ total_report.m_358 }}</th>
-                            <th>{{ total_report.m_352 }}</th>
-                            <th>{{ total_report.m_295 }}</th>
-                            <th>{{ total_report.m_400 }}</th>
-                            <th>{{ total_report.m_424 }}</th>
-                            <th>{{ total_report.m_367 }}</th>
-                            <th>{{ total_report.m_170 }}</th>
-                            <th>{{ total_report.m_193 }}</th>
-                            <th>{{ total_report.m_265 }}</th>
-                            <th>{{ total_report.m_102 }}</th>
-                            <th>{{ total_report.m_18 |floatformat:"0" }}</th>
-                            <th>{{ total_report.m_19 |floatformat:"0" }}</th>
-                            <th colspan='6'></th>
-                            {% if request.session.u_permission > 1 %}<th></th>{% endif %}
-                          </tr>
-                          <tr class="table-warning">
-                            <th colspan=3>差異數)</th>
-                            {% for d in diff %}
-                              <th>
-                                {% if forloop.counter < 11 %}
-                                  {{ d }}
-                                {% else %}
-                                  {{ d|floatformat:"0" }}
-                                {% endif %}
-                              </th>
-                            {% endfor %}
-                            <th colspan='6'></th>
-                            {% if request.session.u_permission > 1 %}<th></th>{% endif %}
-                          </tr>
-                          <!--
+          <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>
+          {% if item.done_type > 2 %}<a href="#" onclick="rollback({{ item.id }})">退回</a>{% endif %}
+        </td>
+      {% endif %}
+    </tr>
+  {% endfor %}
   <tr>
-    <td colspan="21" class="separator"></td>
+    <th colspan='3'>總計</th>
+    <th>{{ sum_report.m_358 }}</th>
+    <th>{{ sum_report.m_352 }}</th>
+    <th>{{ sum_report.m_295 }}</th>
+    <th>{{ sum_report.m_400 }}</th>
+    <th>{{ sum_report.m_424 }}</th>
+    <th>{{ sum_report.m_367 }}</th>
+    <th>{{ sum_report.m_170 }}</th>
+    <th>{{ sum_report.m_193 }}</th>
+    <th>{{ sum_report.m_265 }}</th>
+    <th>{{ sum_report.m_102 }}</th>
+    <th>{{ sum_report.m_18 |floatformat:"0" }}</th>
+    <th>{{ sum_report.m_19 |floatformat:"0" }}</th>
+    <th colspan='6'></th>
+    {% if request.session.u_permission > 1 %}<th></th>{% endif %}
   </tr>
-  <tr>
-    <th colspan="21" class="table-warning">倉庫{{ yearMonth }}中間樁樁體庫存規格</th>
+  <tr class="table-warning">
+    <th colspan='3'>總計({{ yearMonth }})</th>
+    <th>{{ total_report.m_358 }}</th>
+    <th>{{ total_report.m_352 }}</th>
+    <th>{{ total_report.m_295 }}</th>
+    <th>{{ total_report.m_400 }}</th>
+    <th>{{ total_report.m_424 }}</th>
+    <th>{{ total_report.m_367 }}</th>
+    <th>{{ total_report.m_170 }}</th>
+    <th>{{ total_report.m_193 }}</th>
+    <th>{{ total_report.m_265 }}</th>
+    <th>{{ total_report.m_102 }}</th>
+    <th>{{ total_report.m_18 |floatformat:"0" }}</th>
+    <th>{{ total_report.m_19 |floatformat:"0" }}</th>
+    <th colspan='6'></th>
+    {% if request.session.u_permission > 1 %}<th></th>{% endif %}
   </tr>
-  <tr>
-    <th colspan="3">米數規格</th>
-    <th>0~1m</th>
-    <th>1.01~2m</th>
-    <th>2.01-3m</th>
-    <th>3.01-4m</th>
-    <th>4.01-5m</th>
-    <th>5.01-6m</th>
-    <th>6.01-7M</th>
-    <th>7.01-8m</th>
-    <th>8.01-9m</th>
-    <th>9.01-10m</th>
-    <th>10.01-11m</th>
-    <th>11.01-12m</th>
-    <th>12.01-13m</th>
-    <th>13.01-14m</th>
-    <th>14.01-15m</th>
-    <th>15.01-16m</th>
-    <th>16.01-17m</th>
-    <th>總計</th>
+  <tr class="table-warning">
+    <th colspan=3>差異數)</th>
+    {% for d in diff %}
+      <th>
+        {% if forloop.counter < 11 %}
+          {{ d }}
+        {% else %}
+          {{ d|floatformat:"0" }}
+        {% endif %}
+      </th>
+    {% endfor %}
+    <th colspan='6'></th>
+    {% if request.session.u_permission > 1 %}<th></th>{% endif %}
   </tr>
-  <tr>
-    <th colspan="3">H300(中)</th>
-    <th>{{ h301.l_1 }}</th>
-    <th>{{ h301.l_2 }}</th>
-    <th>{{ h301.l_3 }}</th>
-    <th>{{ h301.l_4 }}</th>
-    <th>{{ h301.l_5 }}</th>
-    <th>{{ h301.l_6 }}</th>
-    <th>{{ h301.l_7 }}</th>
-    <th>{{ h301.l_8 }}</th>
-    <th>{{ h301.l_9 }}</th>
-    <th>{{ h301.l_10 }}</th>
-    <th>{{ h301.l_11 }}</th>
-    <th>{{ h301.l_12 }}</th>
-    <th>{{ h301.l_13 }}</th>
-    <th>{{ h301.l_14 }}</th>
-    <th>{{ h301.l_15 }}</th>
-    <th>{{ h301.l_16 }}</th>
-    <th>{{ h301.l_17 }}</th>
-    <th>{{ h301.total }}</th>
-  </tr>
-  <tr>
-    <th colspan="3">H350(中)</th>
-    <th>{{ h351.l_1 }}</th>
-    <th>{{ h351.l_2 }}</th>
-    <th>{{ h351.l_3 }}</th>
-    <th>{{ h351.l_4 }}</th>
-    <th>{{ h351.l_5 }}</th>
-    <th>{{ h351.l_6 }}</th>
-    <th>{{ h351.l_7 }}</th>
-    <th>{{ h351.l_8 }}</th>
-    <th>{{ h351.l_9 }}</th>
-    <th>{{ h351.l_10 }}</th>
-    <th>{{ h351.l_11 }}</th>
-    <th>{{ h351.l_12 }}</th>
-    <th>{{ h351.l_13 }}</th>
-    <th>{{ h351.l_14 }}</th>
-    <th>{{ h351.l_15 }}</th>
-    <th>{{ h351.l_16 }}</th>
-    <th>{{ h351.l_17 }}</th>
-    <th>{{ h351.total }}</th>
-  </tr>
-  <tr>
-    <th colspan="3">H400(中)</th>
-    <th>{{ h401.l_1 }}</th>
-    <th>{{ h401.l_2 }}</th>
-    <th>{{ h401.l_3 }}</th>
-    <th>{{ h401.l_4 }}</th>
-    <th>{{ h401.l_5 }}</th>
-    <th>{{ h401.l_6 }}</th>
-    <th>{{ h401.l_7 }}</th>
-    <th>{{ h401.l_8 }}</th>
-    <th>{{ h401.l_9 }}</th>
-    <th>{{ h401.l_10 }}</th>
-    <th>{{ h401.l_11 }}</th>
-    <th>{{ h401.l_12 }}</th>
-    <th>{{ h401.l_13 }}</th>
-    <th>{{ h401.l_14 }}</th>
-    <th>{{ h401.l_15 }}</th>
-    <th>{{ h401.l_16 }}</th>
-    <th>{{ h401.l_17 }}</th>
-    <th>{{ h401.total }}</th>
-  </tr>-->
-                        {% endblock %}
+{% endblock %}
