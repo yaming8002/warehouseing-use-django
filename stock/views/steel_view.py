@@ -178,7 +178,7 @@ def get_edit_remark(request):
         report = DoneSteelReport.objects.get(id=report_id)
         report.remark = request.POST.get("remark")
         diff_dct = defaultdict(lambda: Decimal(0))
-        for mat_code in DoneSteelReport.static_column_code:
+        for mat_code in DoneSteelReport.static_column_code.keys():
             column = f"m_{mat_code}"
             value_str = request.POST.get(column)
             value = Decimal(value_str) if value_str else Decimal(0)
