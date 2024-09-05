@@ -39,6 +39,13 @@ BEGIN
     DELETE FROM stock_steelreport
     WHERE Year = yyyy AND Month = mm AND is_done = 0;
 
+    -- 刪除未完成的 SteelReport
+    DELETE FROM stock_steelreport
+    WHERE Year = yyyy AND Month = mm AND is_done = 0;
+
+    DELETE FROM stock_boardreport
+    WHERE Year = yyyy AND Month = mm AND close = 0;
+
     -- 刪除 DoneSteelReport 資料
     DELETE FROM stock_donesteelreport
     WHERE Year = yyyy AND Month = mm AND done_type = 2;

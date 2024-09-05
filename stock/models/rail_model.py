@@ -38,4 +38,4 @@ class RailReport(MonthReport):
         else:
             now.out_total = value
         now.save()
-
+        return now

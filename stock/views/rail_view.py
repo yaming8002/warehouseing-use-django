@@ -7,6 +7,7 @@ from django.shortcuts import render
 
 from stock.models import RailReport
 from stock.models.site_model import SiteInfo
+from trans.service.update_rail_by_month import count_done_report
 from wcom.utils import MonthListView
 from wcom.utils.uitls import get_year_month
 
@@ -62,7 +63,7 @@ def get_rail_edit_done(request):
         return render(request,'rail_report/rail_edit.html',context)
     else :
         site_id = request.POST.get('site_id')
-        selled =   request.POST.get('selled')
+        selled = request.POST.get('selled')
         remark = request.POST.get('remark')
         isdone = request.POST.get('isdone')
         year,month = get_year_month(request.POST.get('yearMonth'))
@@ -83,8 +84,7 @@ def get_rail_edit_done(request):
         q = Q(siteinfo=report.siteinfo) & ((Q(year=report.year, month__gt=report.month) | Q(year__gt=report.year)))
         RailReport.objects.filter(q).delete()
 
-        if report.is_done:
-            rail_update__total(report,False,year,month)
+        count_done_report( year, month)
         context = {'msg':"成功"}
         return JsonResponse(context)
 
@@ -112,8 +112,8 @@ def rail_done_withdraw(request):
         report.is_done = False
         report.siteinfo.is_rail_done = False
         report.siteinfo.save()
-        rail_update__total(report,True,report.year,report.month )
         report.save()
+        count_done_report( report.year,report.month )
         context={'msg':"成功退回"}
         return JsonResponse(context)
 

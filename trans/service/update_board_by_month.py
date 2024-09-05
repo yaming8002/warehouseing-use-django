@@ -28,7 +28,7 @@ def update_board_by_month(year, month , first_day_of_month,last_day_of_month ):
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
         & (
             Q(material__id__in=[28, 29, 105])
-            | (Q(material__id=102) & Q(remark__iregex=r"(?i)簍空|鏤空"))
+            | (Q(material__id=102) & (Q(remark__contains='簍空') | Q(remark__contains='鏤空') ))
         )
         & Q(is_rent=False)
         & Q(is_rollback=False)
@@ -54,7 +54,7 @@ def update_board_by_month(year, month , first_day_of_month,last_day_of_month ):
     for x in update_list:
         siteinfo = SiteInfo.get_site_by_code(x["site_code"])
         column = str( x["mat_id"])
-        if x["genre"] == 1 or x["site_code"]=='0003' :
+        if x["genre"] in (1,2) or x["site_code"]=='0003' :
             BoardReport.update_column_value_by_before(
                 siteinfo, year, month, False, column, x["sum_quantity"]
             )

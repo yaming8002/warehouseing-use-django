@@ -1,15 +1,12 @@
 from datetime import datetime
 from decimal import Decimal
-import sys
 
-from django.db import models, transaction
-from django.forms import model_to_dict
+from django.db import models
 
 from stock.models.material_model import Materials
 from stock.models.monthreport_model import MonthReport
 from stock.models.site_model import SiteInfo
-from stock.models.stock_model import Stock
-from wcom.utils.uitls import get_year_month
+
 import logging
 
 # # Create your models here.
