@@ -162,6 +162,12 @@ def steel_done_withdraw(request):
         report = DoneSteelReport.objects.select_related("siteinfo").get(id=report_id)
         report.is_done = False
         report.save()
+        query = (
+            Q(year__lt=report.year) | Q(year=report.year, month__lte=report.month)
+        ) & Q(siteinfo=report.siteinfo)
+        steel = SteelReport.get_current_by_query(query).first()
+        steel.is_done = False
+        steel.save()
         context = {"msg": "成功退回"}
         return JsonResponse(context)
 

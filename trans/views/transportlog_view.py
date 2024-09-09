@@ -198,8 +198,7 @@ class ImportTransportView(ImportData2Generic):
 
                 trans_log = TransLog.create(code=trancode, item=item)
                 if mat_code and mat_code != "":
-                    detail = TransLogDetail.create(trans_log, item, is_rent=False)
-                    detail.save()
+                    TransLogDetail.create(trans_log, item, is_rent=False)
 
         except Exception as e:
             # 处理可能的异常情况

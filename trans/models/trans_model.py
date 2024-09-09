@@ -133,7 +133,7 @@ class TransLogDetail(models.Model):
         mat = Materials.get_item_by_code(mat_code, remark, unit)
 
         all_unit = unit * quantity if unit else Decimal(0)
-        return cls(
+        return cls.objects.create(
             translog=tran,
             material=mat,
             level=level,

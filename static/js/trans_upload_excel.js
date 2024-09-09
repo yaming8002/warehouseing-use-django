@@ -34,20 +34,6 @@ async function totalUpload(file) {
     }
 }
 
-// 模擬一個設置conditionMet為true的異步操作
-function simulateAsyncOperation() {
-    setTimeout(() => {
-        conditionMet = true;
-    }, 5000); // 模擬一個耗時5秒的異步操作
-}
-
-async function performActions() {
-    console.log("正在等待條件成立...");
-    await waitForConditionToBeTrue(conditionMet);
-    console.log("條件已成立，繼續執行剩餘代碼。");
-
-    // 繼續執行你的代碼
-}
 
 function waitForConditionToBeTrue(conditionVariable) {
     return new Promise(resolve => {

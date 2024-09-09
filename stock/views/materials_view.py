@@ -2,13 +2,8 @@ import logging
 import os
 from urllib.parse import quote
 from django.core import serializers
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Q
-from django.forms.models import model_to_dict
 from django.http import HttpResponse, JsonResponse
 from django.views import View
-from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic.list import ListView
 from openpyxl import load_workbook
 from openpyxl.styles import NamedStyle
 from openpyxl.worksheet.datavalidation import DataValidation
@@ -16,7 +11,7 @@ from openpyxl.worksheet.datavalidation import DataValidation
 from stock.froms.material import MaterialsForm
 from stock.models.material_model import MatCat, Materials, MatSpec
 from warehousing_server import settings
-from wcom.utils.excel_tool import ImportData2Generic, ImportDataGeneric
+from wcom.utils.excel_tool import ImportData2Generic
 from wcom.utils.pagelist import PageListView
 from wcom.utils.save_control import SaveControlView
 from wcom.utils.uitls import excel_value_to_str
