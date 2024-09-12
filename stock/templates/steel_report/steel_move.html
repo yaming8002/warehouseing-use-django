@@ -1,0 +1,184 @@
+{% extends 'base/model_edit.html' %}
+{% block javascript %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+{% endblock %}
+{% block styles %}
+  <style>
+    .modal-dialog {
+      position: fixed;
+      margin: auto;
+      width: 320px;
+      height: 100%;
+      left: 80px;
+    }
+
+    .modal.left .modal-content {
+      height: 100%;
+      border: 0;
+    }
+
+  .helptext{
+  color:red ;
+  display:inline-block ;
+  }
+  .steel_table{
+    width:1300px ;
+  }
+
+  .steel_table input{
+    width:100% ;
+  }
+
+  th, td {
+    border: 1px solid black; /* 設置單元格邊框 */
+    padding: 8px; /* 設置內邊距 */
+    text-align: center; /* 文字居中 */
+  }
+
+  th {
+    background-color: #f2f2f2; /* 設置表頭背景顏色 */
+  }
+  </style>
+{% endblock %}
+{% block form %}
+  <!-- 修改了 form 的 id 以便直接选中 -->
+  <form style="with:100%" method="post" action="/steel_control/move/">
+    {% csrf_token %}
+    <div>林口倉轉移到高雄</div>
+    <input type="hidden" name="yearMonth" id="yearMonth" value="{{ yearMonth }}">
+    <div>
+      <table id="input_table" class="steel_table" style="width:1200px;">
+        <tr>
+          <th>
+            H300
+            <br>
+            支撐(m)
+          </th>
+          <th>
+            H300
+            <br>
+            中柱(m)
+          </th>
+          <th>
+            H350
+            <br>
+            支撐(m)
+          </th>
+          <th>
+            H350
+            <br>
+            中柱(m)
+          </th>
+          <th>
+            H400
+            <br>
+            支撐(m)
+          </th>
+          <th>
+            H400
+            <br>
+            中柱(m)
+          </th>
+          <th>
+            H408
+            <br>
+            支撐(m)
+          </th>
+          <th>
+            H414
+            <br>
+            支撐(m)
+          </th>
+          <th>
+            H414
+            <br>
+            中柱(m)
+          </th>
+          <th>覆工板</th>
+          <th>千斤頂(個)</th>
+          <th>土壓計(個)</th>
+        </tr>
+        <tr>
+          <td>
+            <input type="hidden" id="year" name="year" value="{{ report.year }}">
+            <input type="hidden" id="month" name="month" value="{{ report.month }}">
+            <input type="hidden"
+                   id="done_type"
+                   name="done_type"
+                   value="{{ report.done_type }}">
+            <input type="text"
+                   id="m_358"
+                   name="m_358"
+                   value="{% if report.m_358 %}{{ report.m_358 }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   id="m_352"
+                   name="m_352"
+                   value="{% if report.m_352 %}{{ report.m_352 }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   id="m_295"
+                   name="m_295"
+                   value="{% if report.m_295 %}{{ report.m_295 }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   id="m_400"
+                   name="m_400"
+                   value="{% if report.m_400 %}{{ report.m_400 }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   id="m_424"
+                   name="m_424"
+                   value="{% if report.m_424 %}{{ report.m_424 }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   id="m_367"
+                   name="m_367"
+                   value="{% if report.m_367 %}{{ report.m_367 }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   id="m_170"
+                   name="m_170"
+                   value="{% if report.m_170 %}{{ report.m_170 }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   id="m_193"
+                   name="m_193"
+                   value="{% if report.m_193 %}{{ report.m_193 }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   id="m_265"
+                   name="m_265"
+                   value="{% if report.m_265 %}{{ report.m_265 }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   id="m_102"
+                   name="m_102"
+                   value="{% if report.m_102 %}{{ report.m_102 }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   id="m_18"
+                   name="m_18"
+                   value="{% if report.m_18 %}{{ report.m_18 |floatformat:'0' }}{% endif %}">
+          </td>
+          <td>
+            <input type="text"
+                   id="m_19"
+                   name="m_19"
+                   value="{% if report.m_19 %}{{ report.m_19 |floatformat:'0' }}{% endif %}">
+          </td>
+        </tr>
+      </table>
+    </div>
+  </form>
+{% endblock %}

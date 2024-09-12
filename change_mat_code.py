@@ -55,7 +55,6 @@ modified_files = replace_in_files(directory, replacements)
 
 # 列出所有修改的文件
 if modified_files:
-    print("以下文件已修改：")
     for file in modified_files:
         print(file)
 else:

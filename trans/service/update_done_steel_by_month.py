@@ -75,7 +75,7 @@ def update_done_steel_by_month(year, month,first_day_of_month,last_day_of_month)
             all_unit_sum=Sum("all_unit"),
         )
     )
-    print(update_list.query)
+    # print(update_list.query)
     for detial in update_list:
         site = SiteInfo.get_site_by_code(detial["site_code"])
         trun_site = SiteInfo.get_site_by_code(detial["trans_code"])
@@ -133,7 +133,7 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
         )
     )
     f002_dct = defaultdict(lambda: Decimal(0))
-    print(update_list.query)
+    # print(update_list.query)
     for detial in update_list:
         trun_site = (
             SiteInfo.get_site_by_code(detial["turn_code"])

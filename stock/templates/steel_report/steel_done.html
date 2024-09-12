@@ -35,7 +35,7 @@
         error: function (error) {
           console.error('Error loading modal content: ', error)
         }
-      })
+      }) ;
     }
 
     function rollback(id) {
@@ -56,6 +56,22 @@
       }
 
     }
+
+    function addchangetotal(yearMonth){
+      $.ajax({
+        url: '/steel_done/add/',
+        method: 'GET',
+        data:{"yearMonth":yearMonth},
+        success: function (data) {
+          $('#modalContainer').html(data)
+          $('#createModal').modal('show')
+        },
+        error: function (error) {
+          console.error('Error loading modal content: ', error)
+        }
+      }) ;
+    }
+
   </script>
 {% endblock %}
 {% block styles %}
@@ -165,7 +181,12 @@
     {% if item.done_type|check_done_type:encountered_done_type %}
       {% define item.done_type as encountered_done_type %}
       <tr>
-        <th colspan='22' class="table-warning">{% get_done_type_value encountered_done_type %}</th>
+        <th colspan='22' class="table-warning">
+          {% get_done_type_value encountered_done_type %}
+          {% if encountered_done_type == 2 %}
+            <input type="button" onclick="addchangetotal('{{ yearMonth }}')"  value="新增" />
+          {% endif %}
+        </th>
       </tr>
     {% endif %}
     <tr>

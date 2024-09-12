@@ -44,6 +44,21 @@
         }
       })
     }
+
+    function movewhse(yearMonth){
+      $.ajax({
+        url: '/steel_control/move/',
+        method: 'GET',
+        data:{"yearMonth":yearMonth},
+        success: function (data) {
+          $('#modalContainer').html(data)
+          $('#createModal').modal('show')
+        },
+        error: function (error) {
+          console.error('Error loading modal content: ', error)
+        }
+      })
+    }
   </script>
 {% endblock %}
 {% block form %}
@@ -120,7 +135,7 @@
     <th>覆工板</th>
     <th>千斤頂(個)</th>
     <th>土壓計(個)</th>
-    {% if request.session.u_permission > 1 %}<th>結案</th>{% endif %}
+    {% if request.session.u_permission > 1 %}<th>編輯</th>{% endif %}
   </tr>
   {% for item in list %}
     <tr class="item seat_{{ forloop.counter }}">
@@ -166,7 +181,7 @@
       </td>
       {% if request.session.u_permission > 1 %}
         <td>
-          <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">結案</a>
+          <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>
         </td>
       {% endif %}
     </tr>
@@ -185,7 +200,11 @@
     <th>{{ kh_report.m_102 }}</th>
     <th>{{ kh_report.m_18 |floatformat:"0" }}</th>
     <th>{{ kh_report.m_19 |floatformat:"0" }}</th>
-    {% if request.session.u_permission > 1 %}<th></th>{% endif %}
+    {% if request.session.u_permission > 1 %}
+      <th>
+        <a href="#" onclick="movewhse('{{ yearMonth }}')">林口轉移</a>
+      </th>
+    {% endif %}
   </tr>
   <tr class="table-warning">
     <th colspan=4>林口倉庫</th>

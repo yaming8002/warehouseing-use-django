@@ -2,7 +2,7 @@
 from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal
-
+import json
 from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
@@ -149,7 +149,7 @@ def get_steel_edit_done(request):
             query = Q(siteinfo=SiteInfo.get_site_by_code(site_code)) & (
                 Q(year=y, month__gt=m) | Q(year__gt=y)
             )
-            SteelReport.objects.filter(query).delete()
+            SteelReport.objects.filter(query).update(is_done=True)
         update_total_by_month(y, m)
         context = {"msg": "成功"}
         return JsonResponse(context)
@@ -169,6 +169,7 @@ def steel_done_withdraw(request):
         steel.is_done = False
         steel.save()
         context = {"msg": "成功退回"}
+        update_total_by_month(report.year, report.month)
         return JsonResponse(context)
 
 
@@ -192,7 +193,6 @@ def get_edit_remark(request):
             setattr(report, column, value)
 
         report.save()
-        update_total_by_month(report.year, report.month)
         from_report = SteelReport.get_current_by_site(
             report.siteinfo, report.year, report.month
         )
@@ -201,12 +201,78 @@ def get_edit_remark(request):
             report.year,
             report.month,
         )
-        print(diff_dct)
+
         for k, v in diff_dct.items():
             setattr(from_report, k, getattr(from_report, k) + v)
             setattr(trun_reprot, k, getattr(trun_reprot, k) - v)
         from_report.save()
         trun_reprot.save()
+        update_total_by_month(report.year, report.month)
+        context = {"msg": "成功"}
+        return JsonResponse(context)
+
+
+def get_add_remark(request):
+    if request.method == "GET":
+        year_month = request.GET.get("yearMonth")
+        sitelist = list(
+            SiteInfo.objects.values("code", "name", "owner").order_by("code").all()
+        )
+        context = {
+            "sitelist": json.dumps(sitelist, ensure_ascii=False),
+            "yearMonth": year_month,
+        }
+        return render(request, "steel_report/steel_add.html", context)
+    else:
+        site_code = request.POST.get("sitelist")
+        site = SiteInfo.objects.get(code=site_code)
+        y, m = get_year_month(request.POST.get("yearMonth"))
+        report = DoneSteelReport.objects.create(
+            siteinfo=site,
+            done_type=2,
+            year=y,
+            month=m,
+            is_done=True,
+            remark=request.POST.get("remark"),
+        )
+        steel = SteelReport.get_current_by_site(
+            report.siteinfo, report.year, report.month
+        )
+        for mat_code in DoneSteelReport.static_column_code.keys():
+            column = f"m_{mat_code}"
+            value_str = request.POST.get(column)
+            value = Decimal(value_str) if value_str else Decimal(0)
+            setattr(report, column, value)
+            setattr(steel, column, getattr(steel, column) + value)
+        report.save()
+        steel.save()
+        update_total_by_month(report.year, report.month)
+        context = {"msg": "成功"}
+        return JsonResponse(context)
+
+
+def get_move_mat(request):
+    if request.method == "GET":
+        year_month = request.GET.get("yearMonth")
+        context = {"yearMonth": year_month}
+        return render(request, "steel_report/steel_move.html", context)
+    else:
+        y, m = get_year_month(request.POST.get("yearMonth"))
+        lk_steel = SteelReport.get_current_by_site(
+            SiteInfo.get_site_by_code("0003"), y, m
+        )
+        wh_steel = SteelReport.get_current_by_site(
+            SiteInfo.get_warehouse(), y, m
+        )
+        for mat_code in DoneSteelReport.static_column_code.keys():
+            column = f"m_{mat_code}"
+            value_str = request.POST.get(column)
+            value = Decimal(value_str) if value_str else Decimal(0)
+            setattr(lk_steel, column, getattr(lk_steel, column) - value)
+            setattr(wh_steel, column, getattr(wh_steel, column) - value)
+
+        lk_steel.save()
+        wh_steel.save()
 
         context = {"msg": "成功"}
         return JsonResponse(context)

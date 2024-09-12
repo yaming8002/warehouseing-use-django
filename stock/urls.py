@@ -23,7 +23,7 @@ from stock.views.board_view import BoardControlView, get_board_edit_done
 from stock.views.constn_view import component_view, constn_diff_view, steel_pile_edit_view, tool_view
 from stock.views.materials_view import DownloadMaterialView
 from stock.views.site_view import ConstnSeveView, ImportSiteInfoByTotalView
-from stock.views.steel_view import get_edit_remark
+from stock.views.steel_view import get_add_remark, get_edit_remark, get_move_mat
 from stock.views.stock_view import ConstnStockViewList, stock_edit
 
 urlpatterns = [
@@ -60,7 +60,9 @@ urlpatterns = [
     # path("rail_end/", rail_end, name="rail_end"),
     path("steel_control/", SteelControlView.as_view(), name="rail_control"),
     path("steel_control/edit/", get_steel_edit_done, name="rail_edit"),
+     path("steel_control/move/", get_move_mat, name="rail_done"),
     path("steel_done/", SteelDoneView.as_view(), name="rail_done"),
+    path("steel_done/add/", get_add_remark, name="rail_done"),
     path("steel_done/edit/", get_edit_remark, name="rail_withdraw"),
     path("steel_done/withdraw/", steel_done_withdraw, name="rail_withdraw"),
     path("board_report/", BoardControlView.as_view(), name="board_report"),
