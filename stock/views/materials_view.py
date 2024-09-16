@@ -7,7 +7,7 @@ from django.views import View
 from openpyxl import load_workbook
 from openpyxl.styles import NamedStyle
 from openpyxl.worksheet.datavalidation import DataValidation
-
+from django.db.models import Q
 from stock.froms.material import MaterialsForm
 from stock.models.material_model import MatCat, Materials, MatSpec
 from warehousing_server import settings
@@ -26,24 +26,24 @@ class MaterialsView(PageListView):
     title_name = "物料清單"
 
     def get_queryset(self):
-        result = Materials.objects
         code = self.request.GET.get("mat_code")
         name = self.request.GET.get("name")
         category_id = self.request.GET.get("category_id")
         is_detail = self.request.GET.get("is_detail")
-
+        queryset = Q()
         if name:
-            result = result.filter(name__istartswith=name)
+            queryset &= Q(name__contains=name)
         if code:
-            result = result.filter(mat_code=code)
+            queryset &= Q(mat_code=code) | Q(mat_code2=code) | Q(mat_code3=code)
         if category_id:
             category = MatCat.objects.get(id=category_id)
-            result = result.filter(category=category)
+            queryset &= Q(category=category)
+
         if not is_detail:
-            result = result.filter(specification_id__in =  [23,24])
+            queryset &= Q(specification_id__in=[23, 24])
+        print(Materials.objects.filter(queryset).query)
 
-
-        return result.all()
+        return Materials.objects.filter(queryset).order_by('id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -69,32 +69,28 @@ class ImportMaterialView(ImportData2Generic):
         "規格",
         "耗材",
         "拆分",
-        "拆分單位"
+        "拆分單位",
     ]
 
     def insertDB(self, item):
-        if item[1] is None :
+        if item[1] is None:
             return
 
         id = item[0] if item[0] else None
 
         material_defaults = {
-            'mat_code': excel_value_to_str(item[1]),
-            'mat_code2': excel_value_to_str(item[2]),
-            'mat_code3': excel_value_to_str(item[3]),
-            'name': str(item[4]),
-            'category': MatCat.objects.filter(name=item[5]).first(),
-            'specification': MatSpec.objects.filter(name=item[6]).first(),
-            'is_consumable': item[7] == "是",
-            'is_divisible': item[8] == "是",
-            'unit_of_division': item[9],
+            "mat_code": excel_value_to_str(item[1]),
+            "mat_code2": excel_value_to_str(item[2]),
+            "mat_code3": excel_value_to_str(item[3]),
+            "name": str(item[4]),
+            "category": MatCat.objects.filter(name=item[5]).first(),
+            "specification": MatSpec.objects.filter(name=item[6]).first(),
+            "is_consumable": item[7] == "是",
+            "is_divisible": item[8] == "是",
+            "unit_of_division": item[9],
         }
 
-        Materials.objects.update_or_create(
-            id=id,
-            defaults=material_defaults
-        )
-
+        Materials.objects.update_or_create(id=id, defaults=material_defaults)
 
 
 class DownloadMaterialView(View):
