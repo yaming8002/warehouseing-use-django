@@ -1,8 +1,9 @@
 from datetime import datetime
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 
-from django.db import models
+from django.db import IntegrityError, models
 from django.db.models import Q
+from django.forms import ValidationError
 
 from stock.models.material_model import Materials
 from stock.models.site_model import SiteInfo
@@ -122,29 +123,36 @@ class TransLogDetail(models.Model):
 
     @classmethod
     def create(cls, tran: TransLog, item: list, is_rent: False):
-        unit_req = item[9]
+        try:
+            unit_req = item[9]
 
-        unit = Decimal("{:.2f}".format(unit_req)) if unit_req else None
-        quantity = Decimal(abs(item[15]))
-        mat_code = excel_value_to_str(item[7])
-        level = int(item[21]) % 10 if item[21] and isinstance(item[21], (int)) else None
-        remark = str(item[20])
+            unit = Decimal("{:.2f}".format(unit_req)) if unit_req else None
+            quantity = Decimal(abs(item[15]))
+            mat_code = excel_value_to_str(item[7])
+            level = int(item[21]) % 10 if item[21] and isinstance(item[21], (int)) else None
+            remark = str(item[20])
 
-        mat = Materials.get_item_by_code(mat_code, remark, unit)
+            mat = Materials.get_item_by_code(mat_code, remark, unit)
 
-        all_unit = unit * quantity if unit else Decimal(0)
-        return cls.objects.create(
-            translog=tran,
-            material=mat,
-            level=level,
-            unit=unit,
-            is_rollback=False,
-            is_rent=is_rent,
-            quantity=quantity,
-            all_quantity=quantity,
-            all_unit=all_unit,
-            remark=remark,
-        )
+            all_unit = unit * quantity if unit else Decimal(0)
+            return cls.objects.create(
+                translog=tran,
+                material=mat,
+                level=level,
+                unit=unit,
+                is_rollback=False,
+                is_rent=is_rent,
+                quantity=quantity,
+                all_quantity=quantity,
+                all_unit=all_unit,
+                remark=remark,
+            )
+        except IntegrityError as e:
+            raise ValidationError('資料重複，有相同單號、工地、物料、註解。')
+        except Exception as e:
+            raise ValidationError(f'進出錯誤: {str(e)}')
+
+
 
     @classmethod
     def rollback(cls, tran: TransLog, detial_id=None):

@@ -2,12 +2,9 @@ import json
 import logging
 # # Create your models here.
 import logging.config
-import sys
 import traceback
 from datetime import datetime, timedelta
-from django.db import transaction
 from django.conf import settings
-from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 import re
@@ -179,38 +176,38 @@ class ImportTransportView(ImportData2Generic):
         trans_end_date = SysInfo.get_value_by_name("trans_end_day")
         trans_end_date = datetime.strptime(trans_end_date, "%Y/%m/%d")
         self.end_date = trans_end_date
-        try:
-            for item in data:
-                trancode = excel_value_to_str(item[6])
-                if trancode is None:
-                    return
 
-                mat_code = excel_value_to_str(item[8])
-                edit_date = excel_num_to_date(item[27])
+        for item in data:
+            trancode = excel_value_to_str(item[6])
+            if trancode is None:
+                return
 
-                self.end_date = (
-                    self.end_date if self.end_date > edit_date else edit_date
-                )
-                remark = excel_value_to_str(item[20])
+            mat_code = excel_value_to_str(item[8])
+            edit_date = excel_num_to_date(item[27])
 
-                if remark is not None and "作廢" in remark:
-                    continue
+            self.end_date = (
+                self.end_date if self.end_date > edit_date else edit_date
+            )
+            remark = excel_value_to_str(item[20])
 
+            if remark is not None and "作廢" in remark:
+                continue
+            try:
                 trans_log = TransLog.create(code=trancode, item=item)
                 if mat_code and mat_code != "":
                     TransLogDetail.create(trans_log, item, is_rent=False)
 
-        except Exception as e:
-            # 处理可能的异常情况
-            errordct = {"item": item, "e": str(e)}
-            self.error_list.append(errordct)
+            except Exception as e:
+                # 处理可能的异常情况
+                errordct = {"item": item, "e": str(e)}
+                self.error_list.append(errordct)
 
-            logger.info(
-                {
-                    "item": item,
-                    "e": f"{str(e)}\n{type(e).__name__}\n{traceback.format_exc()}",
-                }
-            )
+                logger.info(
+                    {
+                        "item": item,
+                        "e": f"{str(e)}\n{type(e).__name__}\n{traceback.format_exc()}",
+                    }
+                )
 
 
     def insert_rent_DB(self, data):

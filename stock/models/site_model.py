@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import ValidationError
 from wcom.templatetags import constn_state, site_genre
 from django.utils import timezone
 from django.db.models import Q
@@ -34,10 +35,28 @@ class SiteInfo(models.Model):
         return cls.objects.get(code='0001')
 
     @classmethod
-    def get_site_by_code(cls,code:str):
-        if cls.objects.filter(code=code ).exists():
-            return cls.objects.get(code=code)
-        return None
+    def get_site_by_code(cls, code: str):
+
+        try:
+            # 获取所有匹配 code 的对象
+            queryset = cls.objects.filter(code=code)
+            count = queryset.count()
+
+            if count > 1:
+                # 如果有多条匹配记录，抛出重复的错误
+                raise ValidationError(_(f'工地代码 "{code}" 重複，無法使用'))
+            elif count == 0:
+                # 如果没有匹配记录，抛出不存在的错误
+                raise ValidationError(_(f'工地代码 "{code}" 不存在，请检查输入。'))
+            else:
+                # 返回单个匹配的记录
+                return queryset.first()
+        except ValidationError as e:
+            # 捕获 ValidationError，直接抛出
+            raise e
+        except Exception as e:
+            # 捕获其他任何异常并抛出带有具体错误信息的 ValidationError
+            raise ValidationError(_(f'工地代码 "{code}" 数据有误: {str(e)}'))
 
     @classmethod
     def get_obj_by_value(cls, code=None, owner=None, name=None,genre=None):
