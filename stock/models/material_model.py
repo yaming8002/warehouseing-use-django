@@ -54,16 +54,11 @@ class Materials(models.Model):
         quest = Q(mat_code=code) | Q(mat_code2=code) | Q(mat_code3=code)
 
         if code == "999":
-            if (
-                remark is None
-                or "出售" in remark
-                or remark not in ng_spec_name
-                or remark == "廢鐵"
-            ):
-                spec = MatSpec.objects.get(id=23)
-            else:
+            if  remark  in ng_spec_name :
                 spec = MatSpec.objects.get(name=remark)
-                quest &= Q(specification=spec)
+            else:
+                spec = MatSpec.objects.get(id=23)
+            quest &= Q(specification=spec)
         elif unit is None and cls.objects.filter(quest).count() > 1:
             spec = MatSpec.objects.get(id=23)
             quest &= Q(specification=spec)

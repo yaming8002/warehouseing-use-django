@@ -1,6 +1,5 @@
 var conditionMet = false;
 
-
 async function totalUpload(file) {
     if (file) {
         // 顯示載入指示器
@@ -8,10 +7,9 @@ async function totalUpload(file) {
         showSpinner();
 
         $('#update_text').text("移除舊資料....");
-        var filename=file.name ;
+        var filename = file.name;
         var pattern = /(\d+)年(\d+)月/;  // 正規表達式模式
-        console.log(filename)
-        // 使用正規表達式進行匹配
+        console.log(filename);
         var match = filename.match(pattern);
 
         if (match) {
@@ -22,18 +20,17 @@ async function totalUpload(file) {
             var yearAD = 1911 + yearChinese;
             await $.ajax({
                 url: '/transport_log/move_old_data/',
-                data:{"yearmonth":yearAD+'-'+month},
+                data: { "yearmonth": yearAD + '-' + month },
                 method: 'GET'
             });
         }
+
         $('#update_text').text("EXCEL 分析中....");
-        handleFileProcessing(file);
+        await handleFileProcessing(file); // Await to ensure the whole process completes
     } else {
-        // 如果沒有選擇檔，則提示用戶
         alert("請先選擇一個檔。");
     }
 }
-
 
 function waitForConditionToBeTrue(conditionVariable) {
     return new Promise(resolve => {
@@ -70,150 +67,127 @@ function checkColumns(columns, input) {
 async function handleFileProcessing(file) {
     const csrftoken = getCookie('csrftoken');
     const reader = new FileReader();
-    let count_date = null ;
+    let count_date = null;
+
     reader.onload = async function (e) {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
-        // 轉換工作表資料為JSON
-        const total_rows = XLSX.utils.sheet_to_json(workbook.Sheets["總表"], {
-            header: 1
-        });
-        const rent_rows = XLSX.utils.sheet_to_json(workbook.Sheets["租賃"], {
-            header: 1
-        });
-        const index_rows = XLSX.utils.sheet_to_json(workbook.Sheets["Index"], {
-            header: 1
-        });
+        const total_rows = XLSX.utils.sheet_to_json(workbook.Sheets["總表"], { header: 1 });
+        const rent_rows = XLSX.utils.sheet_to_json(workbook.Sheets["租賃"], { header: 1 });
+        const index_rows = XLSX.utils.sheet_to_json(workbook.Sheets["Index"], { header: 1 });
 
-        var carbcData = index_rows.slice(1, 2000).map(row => ({
-            car_number: row[19],  // U 列
-            car_firm: row[20],   // V 列
-            remark: row[21],  // W 列
-            value: row[22]   // X 列
+        // Process carbcData
+        const carbcData = index_rows.slice(1, 2000).map(row => ({
+            car_number: row[19],
+            car_firm: row[20],
+            remark: row[21],
+            value: row[22]
         }));
 
-        await $.ajax({
-            url: '/carinfo/uploadexcelByTotal/',
-            type: 'POST',
-            contentType: 'application/json',
-            headers: { 'X-CSRFToken': csrftoken },
-            data: JSON.stringify(carbcData),
-            success: function (response) {
-                console.log('Data uploaded successfully:', response);
-            },
-            error: function (xhr, status, error) {
-                console.log('Error uploading data:', error);
-            }
-        });
+        // Ensure this is awaited for proper flow
+        await uploadData('/carinfo/uploadexcelByTotal/', carbcData, csrftoken);
 
-        var siteinfo = index_rows.slice(2, 2000).map(row => ({
-            code: row[9],  // K 列
-            owner: row[10],  // L 列
-            name: row[11]   // M 列
+        // Process siteinfo in batches
+        const siteinfo = index_rows.slice(2, 2000).map(row => ({
+            code: row[9],
+            owner: row[10],
+            name: row[11]
         }));
+        await uploadData('/constn/uploadexcelByTotal/', siteinfo, csrftoken);
 
-        let i = 0
-        for (; i < siteinfo.length; i += 100) {
-            var bcData = siteinfo.slice(i, i + 100);
-            $.ajax({
-                url: '/constn/uploadexcelByTotal/',
-                type: 'POST',
-                contentType: 'application/json',
-                headers: { 'X-CSRFToken': csrftoken },
-                data: JSON.stringify(bcData)
-            });
-            console.log(`Batch ${i + 1} uploaded successfully:`);
-        }
-
-        var bcData = siteinfo.slice(i);
-        await $.ajax({
-            url: '/constn/uploadexcelByTotal/',
-            type: 'POST',
-            contentType: 'application/json',
-            headers: { 'X-CSRFToken': csrftoken },
-            data: JSON.stringify(bcData),
-            success: function (data) {
-                conditionMet = false;
-            }
-        });
+        // Process other rows if any
         if (total_rows.length > 0 || rent_rows.length > 1) {
-            count_date = total_rows.slice(4)[5][1]
-            console.log('count_date is ' + count_date) ;
+            count_date = total_rows.slice(4)[5][1];
+            console.log('count_date is ' + count_date);
             // 驗證列名
-            if (checkColumns(columns3, total_rows[2]) & checkColumns(columns4, total_rows[3])) {
+            if (checkColumns(columns3, total_rows[2]) && checkColumns(columns4, total_rows[3])) {
                 // 如果驗證通過，則處理並分批上傳資料
-                await processAndUploadData(count_date,total_rows.slice(4), false,csrftoken); // 移除列名行
+                await processAndUploadData(count_date, total_rows.slice(4), false, csrftoken);
             } else {
                 alert("總表檔案格式不正確");
             }
 
-            if (checkColumns(columns3, rent_rows[2]) & checkColumns(columns4, rent_rows[3])) {
-                await processAndUploadData(count_date,rent_rows.slice(4), true,csrftoken); // 移除列名行
+            if (checkColumns(columns3, rent_rows[2]) && checkColumns(columns4, rent_rows[3])) {
+                await processAndUploadData(count_date, rent_rows.slice(4), true, csrftoken);
             } else {
                 alert("租賃檔案格式不正確");
             }
         }
-
     };
-    await reader.readAsArrayBuffer(file);
+
+    reader.readAsArrayBuffer(file);
 }
 
+async function uploadData(url, data, csrftoken, is_item = false) {
+    try {
+        await $.ajax({
+            url: url,
+            type: 'POST',
+            contentType: 'application/json',
+            headers: { 'X-CSRFToken': csrftoken },
+            data: JSON.stringify(data),
+            success: function (data) {
+                if (is_item) {
+                    data.error_list.forEach(item => {
+                        const tr = $('<tr></tr>').append(`<td>${item.e}</td>`);
+                        item.item.slice(1).forEach((col, index) => {
+                            if (index + 1 === 1 || index + 1 === 27) {
+                                let formattedDate = formatDate(col); // Format to "Y-m-d"
+                                tr.append(`<td>${formattedDate}</td>`); // Append formatted date
+                            } else {
+                                tr.append(`<td>${col || ''}</td>`);
+                            }
 
-async function processAndUploadData( count_date , rows, is_rent,csrftoken) {
+                        });
+                        $("#base_table tbody").append(tr);
+                    });
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error uploading data:', error);
+
+    }
+}
+/*
+async function uploadInBatches(url, data, csrftoken) {
+    const batchSize = 100;
+    for (let i = 0; i < data.length; i += batchSize) {
+        const batch = data.slice(i, i + batchSize);
+        await uploadData(url, batch, csrftoken,3000);
+        console.log(`Batch ${i + 1} uploaded successfully.`);
+    }
+}
+*/
+async function processAndUploadData(count_date, rows, is_rent, csrftoken) {
     const batchSize = 100;
     let batchData = [];
-    let is_all=$('#is_all').is(':checked') ;
-    for (let i = 0; i < rows.length; i++) {
+    let is_all = $('#is_all').is(':checked');
+    const end_date = new Date();  // Assuming end_date is defined elsewhere
 
-        if (end_date < rows[i][1] || is_all ) {
+    for (let i = 0; i < rows.length; i++) {
+        if (end_date < rows[i][1] || is_all) {
             batchData.push(rows[i]);
         }
 
-        // Upload when batch is full or at the end of array
         if (batchData.length === batchSize || rows[i].length < 2 || !rows[i][6]) {
-            $('#update_text').text("上傳..." + i + "/" + rows.length);
-            try {
-                await $.ajax({
-                    url: url,
-                    type: 'POST',
-                    contentType: 'application/json; charset=utf-8',
-                    headers: { 'X-CSRFToken': csrftoken },
-                    data: JSON.stringify({ jsonData: batchData, is_rent: is_rent }),
-                    dataType: 'json',
-                    success: function (data) {
-                        data.error_list.forEach(item => {
-                            const tr = $('<tr></tr>').append(`<td>${item.e}</td>`);
-                            item.item.slice(1).forEach((col, index) => {
-                                if (index + 1 === 1 || index + 1 === 27) {
-                                    let formattedDate = formatDate(col); // Format to "Y-m-d"
-                                    tr.append(`<td>${formattedDate}</td>`); // Append formatted date
-                                } else {
-                                    tr.append(`<td>${col || ''}</td>`);
-                                }
+            $('#update_text').text(`上傳...${i}/${rows.length}`);
+            await uploadData(url, { jsonData: batchData, is_rent: is_rent }, csrftoken, true);
+            console.log(`Batch ${i + 1} uploaded successfully.`);
+            batchData = [];
+        }
 
-                            });
-                            $("#base_table tbody").append(tr);
-                        });
-                    }
-                });
-
-            } catch (error) {
-                console.error("上傳資料過程中出現錯誤：", error);
-            }
-            batchData = []; // Clear the batch data after upload
-            if (rows[i].length < 2 || !rows[i][6]) {
-                break; // Skip the rest if data is incomplete
-            }
+        if (rows[i].length < 2 || !rows[i][6]) {
+            break; // Exit loop if incomplete data
         }
     }
 
-    // Update the end date if applicable
     if (is_rent) {
-        console.log('count_date is ' + count_date) ;
         try {
             await $.ajax({
                 url: "/update_end_date/",
-                data:{"count_date":formatDate(count_date)},
+                data: { "count_date": formatDate(count_date) },
                 method: 'GET'
             });
             alert("上傳完成");
@@ -224,20 +198,23 @@ async function processAndUploadData( count_date , rows, is_rent,csrftoken) {
     }
 }
 
-
 function excelDateToJSDate(excelDate) {
-    const date = new Date(1899, 11, 30); // 月份从 0 开始，11 代表 12 月
-    date.setDate(date.getDate() + excelDate );
+    const date = new Date(1899, 11, 30);
+    date.setDate(date.getDate() + excelDate);
     return date;
-  }
+}
 
 function formatDate(date) {
-    let d = excelDateToJSDate(date)
-    let month = '' + (d.getMonth()+ 1), // getUTCMonth returns 0-11
-        day = '' + d.getDate(),
-        year = d.getFullYear();
+    let d = excelDateToJSDate(date);
+    let month = '' + (d.getMonth() + 1);
+    let day = '' + d.getDate();
+    let year = d.getFullYear();
 
-    if (month.length < 2) month = '0' + month; // padding single-digit months
-    if (day.length < 2) day = '0' + day; // padding single-digit days
-    return [year, month, day].join('-'); // joining components with '-'
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+    return [year, month, day].join('-');
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

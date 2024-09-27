@@ -5,9 +5,10 @@ import logging.config
 import traceback
 from datetime import datetime, timedelta
 from django.conf import settings
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
-import re
+
 from stock.models.material_model import MatCat, Materials
 from stock.models.site_model import SiteInfo
 # from trans.forms import TransLogDetailForm
@@ -29,10 +30,6 @@ class TrandportView(PageListView):
     title_name = "出入總表"
 
     def get_queryset(self):
-        detail = TransLogDetail.objects.select_related()
-        log = TransLog.objects.select_related("constn_site", "turn_site", "carinfo")
-        material = Materials.objects
-
         begin, end = self.get_month_range()
         code = self.request.GET.get("code")
 
@@ -47,36 +44,47 @@ class TrandportView(PageListView):
         matinfo_cat = self.request.GET.get("matinfo_cat")
         tran_type = self.request.GET.get("tran_type")
 
-        # 过滤 TransportLog
+        # Build the filter conditions using Q objects
+        log_filters = Q()
+        material_filters = Q()
+
+        # Add date range filter
         if begin and end:
-            log = log.filter(build_date__range=[begin, end])
+            log_filters &= Q(build_date__range=[begin, end])
+
+        # Add log filters using Q objects
         if code:
-            log = log.filter(code__iendswith=code)
+            log_filters &= Q(code__iendswith=code)
         if tran_type:
-            log = log.filter(transaction_type=tran_type)
+            log_filters &= Q(transaction_type=tran_type)
         if constn_id:
-            log = log.filter(constn_site__code=constn_id)
+            log_filters &= Q(constn_site__code=constn_id)
         if constn_name:
-            log = log.filter(constn_site__name__istartswith=constn_name)
+            log_filters &= Q(constn_site__name__istartswith=constn_name)
         if car_firm:
-            log = log.filter(carinfo__firm__istartswith=car_firm)
+            log_filters &= Q(carinfo__firm__istartswith=car_firm)
         if car_number:
-            log = log.filter(carinfo__car_number__istartswith=car_number)
+            log_filters &= Q(carinfo__car_number__istartswith=car_number)
 
-        # 过滤 Materials
+        # Add material filters using Q objects
         if matinfo_core:
-            material = material.filter(mat_code=matinfo_core)
+            material_filters &= Q(mat_code=matinfo_core)
         if matinfo_cat:
-            material = material.filter(category=MatCat.objects.get(name=matinfo_cat))
+            material_filters &= Q(category=MatCat.objects.get(name=matinfo_cat))
         if matinfo_name:
-            material = material.filter(name__istartswith=matinfo_name)
+            material_filters &= Q(name__istartswith=matinfo_name)
 
-        # 使用过滤后的 log 过滤 detail
-        detail = detail.filter(
-            is_rent=False, material__in=material.all(), translog__in=log.all()
+        # Filter the queryset based on the accumulated Q filters
+        log = TransLog.objects.filter(log_filters)
+        material = Materials.objects.filter(material_filters)
+
+        # Use the filtered log and material to filter the detail queryset
+        detail = TransLogDetail.objects.filter(
+            is_rent=False, material__in=material, translog__in=log
         ).order_by("id")
-        # print(detail.query)
-        return detail.all()
+        # Return the queryset without calling `all()` since it's unnecessary.
+        return detail
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -190,13 +198,15 @@ class ImportTransportView(ImportData2Generic):
             )
             remark = excel_value_to_str(item[20])
 
-            if remark is not None and "作廢" in remark:
+            if remark is not None and ("作廢" in remark or "僅記單號"in remark):
                 continue
             try:
                 trans_log = TransLog.create(code=trancode, item=item)
                 if mat_code and mat_code != "":
                     TransLogDetail.create(trans_log, item, is_rent=False)
-
+                else:
+                    errordct = {"item": item, "e": '進出錯誤: 物料代碼錯誤'}
+                    self.error_list.append(errordct)
             except Exception as e:
                 # 处理可能的异常情况
                 errordct = {"item": item, "e": str(e)}

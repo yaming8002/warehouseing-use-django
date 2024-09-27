@@ -1,7 +1,6 @@
 from decimal import Decimal
 
 from django.db import models
-from stock.models.material_model import Materials
 from stock.models.monthreport_model import MonthReport
 from stock.models.site_model import SiteInfo
 

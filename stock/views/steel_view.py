@@ -253,26 +253,18 @@ def get_add_remark(request):
 
 def get_move_mat(request):
     if request.method == "GET":
-        year_month = request.GET.get("yearMonth")
-        context = {"yearMonth": year_month}
-        return render(request, "steel_report/steel_move.html", context)
+        id = request.GET.get("id")
+        context = {'report': SteelReport.objects.get(id=id)}
+        return render(request, "steel_report/steel_wh_edit.html", context)
     else:
         y, m = get_year_month(request.POST.get("yearMonth"))
-        lk_steel = SteelReport.get_current_by_site(
-            SiteInfo.get_site_by_code("0003"), y, m
-        )
-        wh_steel = SteelReport.get_current_by_site(
-            SiteInfo.get_warehouse(), y, m
-        )
+        id = request.POST.get('id')
+        wh = SteelReport.objects.get(id=id)
         for mat_code in DoneSteelReport.static_column_code.keys():
             column = f"m_{mat_code}"
             value_str = request.POST.get(column)
             value = Decimal(value_str) if value_str else Decimal(0)
-            setattr(lk_steel, column, getattr(lk_steel, column) - value)
-            setattr(wh_steel, column, getattr(wh_steel, column) - value)
-
-        lk_steel.save()
-        wh_steel.save()
-
+            setattr(wh, column, value)
+        wh.save()
         context = {"msg": "成功"}
         return JsonResponse(context)
