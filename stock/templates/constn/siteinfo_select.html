@@ -1,0 +1,87 @@
+<!-- templates/constn/siteinfo_select.html -->
+<p>
+    <label for="code">工地編號</label>
+    <input type="text" id="code" />
+    <label for="owner">業主</label>
+    <input type="text" id="owner" />
+    <label for="name">名稱</label>
+    <input type="text" id="name" />
+    <input type="hidden" id="hid_code" value="{{ constn.code }}">
+</p>
+<p>
+    <label for="code">工地選單</label>
+    <select id="sitelist" name="site_code"></select>
+</p>
+<!-- JavaScript 用於篩選和更新 sitelist -->
+<script>
+    // AJAX 請求獲取 sitelist 資料
+    function fetchSitelist() {
+        $.ajax({
+            url: '/constn/get_sitelist',  // Django 後端的 API 路徑
+            method: 'GET',
+            success: function(data) {
+                updateSitelist(data[0]);  // 調用函數更新下拉框
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching sitelist:", error);
+            }
+        });
+    }
+
+    function updateSitelist(data) {
+        // 取得輸入框的值
+        let code = $('#code').val().trim();
+        let owner = $('#owner').val().trim();
+        let name = $('#name').val().trim();
+        var hid_code= $('#hid_code').val() ;
+        // 清空現有的 sitelist
+        $('#sitelist').empty();
+        // 遍歷 sitelist_js 進行篩選
+        $.each(data, function(index, item) {
+            let isMatch = true;
+
+            // 根據 code 篩選
+            if (code && !item.code.startsWith(code)) {
+                isMatch = false;
+            }
+
+            // 根據 owner 篩選
+            if (owner && !item.owner.startsWith(owner)) {
+                isMatch = false;
+            }
+
+            // 根據 name 篩選
+            if (name && !item.name.includes(name)) {
+                isMatch = false;
+            }
+
+            // 如果符合所有篩選條件，則加入選項
+            if (isMatch) {
+                var optionText = item.code + "|" + item.owner;
+                if (item.name && item.name.trim() !== "") {
+                    optionText += "|" + item.name.substring(0, 6);
+                }
+                var option = $('<option>', {
+                    value: item.code,
+                    text: optionText
+                });
+                if (hid_code == item.code ){
+                    option.prop("selected", true)
+                }
+                $('#sitelist').append(option);
+
+            }
+        });
+    }
+
+    // 當頁面加載完成時，初始化 sitelist
+    $(document).ready(function () {
+        fetchSitelist();  // 初始化顯示所有 sitelist
+    });
+
+    // 綁定輸入框的事件處理器，當輸入框內容變化時更新 sitelist
+    // 當輸入框內容變化時重新篩選選項
+    $('#code, #owner, #name').on('input', function() {
+        fetchSitelist();
+    });
+</script>

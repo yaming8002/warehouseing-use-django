@@ -11,6 +11,7 @@ import copy
 from stock.models import SteelReport
 from stock.models.done_steel_model import DoneSteelReport
 from stock.models.site_model import SiteInfo
+from stock.utils import get_global_site_json
 from trans.service.update_done_steel_by_month import update_total_by_month
 from wcom.utils import MonthListView
 from wcom.utils.uitls import get_year_month
@@ -215,11 +216,8 @@ def get_edit_remark(request):
 def get_add_remark(request):
     if request.method == "GET":
         year_month = request.GET.get("yearMonth")
-        sitelist = list(
-            SiteInfo.objects.values("code", "name", "owner").order_by("code").all()
-        )
         context = {
-            "sitelist": json.dumps(sitelist, ensure_ascii=False),
+            "sitelist": get_global_site_json(),
             "yearMonth": year_month,
         }
         return render(request, "steel_report/steel_add.html", context)

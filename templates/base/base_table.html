@@ -19,6 +19,7 @@
             integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
             crossorigin="anonymous"></script>
     <script>
+
       $(document).ready(function () {
         // 選擇所有具有id="report"的表格，位於class="col-md-9 m-0"的div內
         $(".col-md-9.m-0 table").not('.emptytable').each(function () {
@@ -44,7 +45,8 @@
 
 
         $('#exceloutput').click(function() {
-          var fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
+          let fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
+          fileName = fileName.replace(/[_\s]+/g, ' ').trim();
           $('#base_table').tableExport({
             type: 'excel',
             mso: {

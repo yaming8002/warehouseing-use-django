@@ -3,8 +3,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
   <script>
     // 将 Django 数据传递给 JavaScript
-    var sitelist_js = {{ sitelist |safe }};
-
+    let sitelist_js = {{ sitelist |safe }};
     $(document).ready(function () {
       // Adjusting the style of the caption in the table with id 'base_table'
       $.each(sitelist_js, function(index, item) {
@@ -13,7 +12,6 @@
         if (item.name && item.name.trim() !== "") {
           optionText += "|" + item.name.substring(0, 6);
         }
-        console.log( item.code)
         // 动态创建并添加 option 元素
         $('#sitelist').append($('<option>', {
             value: item.code,

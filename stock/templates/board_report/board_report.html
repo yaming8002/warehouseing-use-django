@@ -58,12 +58,13 @@
       <input type="checkbox" id="is_close" name="is_close" {% if request.GET.is_close %}checked{% endif %}>-->
     </p>
     <input type="submit" value="查詢" />
-    <!-- <input type="button" id="exceloutput" value="匯出EXCEL" />-->
+    <input type="button" id="exceloutput" value="匯出EXCEL" />
   </form>
 {% endblock %}
 {% block table %}
   <caption>
     <h3>
+      {{ yearMonth }}
       {% if mat_id == '28' %}鐵板{% endif %}
       {% if mat_id == '-28' %}鐵板遺失{% endif %}
       {% if mat_id == '102' %}簍空覆工板{% endif %}

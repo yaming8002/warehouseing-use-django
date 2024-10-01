@@ -67,7 +67,6 @@ th {
                 // 将每个字段的错误信息添加到 errorMessages 数组
                 JSON.parse(errors[field]).forEach(error => errorMessages.push(error.message));
             }
-            console.info(errorMessages.join("; "))
             // 显示错误信息
             alert('Error: ' + errorMessages.join("; "));
           }

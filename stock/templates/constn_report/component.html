@@ -60,23 +60,6 @@
       });
     });
 
-    $('#search').on('submit', function() {
-      var code = $('#code').val().trim();
-      var owner = $('#owner').val().trim();
-      var name = $('#name').val().trim();
-
-      if (code.length > 0) {
-          return true;
-      }
-
-      if (owner.length > 0 && name.length > 0) {
-          return true;
-      }
-
-      alert('請填寫工地編號，或同時填寫業主和姓名！');
-      return false;
-  });
-
   });
 
 
@@ -88,14 +71,7 @@
   <!-- Corrected form tag and added trailing slash to action attribute -->
   <form id="search" action="/constn/component/" method="POST">
     {% csrf_token %}
-    <p>
-      <label for="code">工地編號</label>
-      <input type="text" id="code" name="code" value="{{ request.POST.code }}" />
-      <label for="owner">業主</label>
-      <input type="text" id="owner" name="owner" value="{{ request.POST.owner }}" />
-      <label for="name">名稱</label>
-      <input type="text" id="name" name="name" value="{{ request.POST.name }}" />
-    </p>
+    {% include "constn/siteinfo_select.html" %}
     <p>
       <label for="level">層數</label>
       <select id="level" name="level">
