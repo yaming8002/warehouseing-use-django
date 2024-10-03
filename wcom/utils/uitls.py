@@ -70,3 +70,9 @@ def value_to_decimal(value):
     if value and isinstance(value, (str,int,float,Decimal)):
             return Decimal(value)
     return Decimal(0)
+
+def to_taiwan_date_format(date):
+    # Subtract 1911 to get the Taiwanese (Minguo) year
+    taiwan_year = date.year - 1911
+    # Format the date as '103/08/01'
+    return f"{taiwan_year:03}/{date.month:02}/{date.day:02}"

@@ -2,43 +2,43 @@
 {% block title %}{{ title }} {{ '' }}{% endblock %}
 {% load custom_filters %}
 {% block javascript %}
-  <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
-  <script type="text/javascript"
-          src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
   <script>
-    $(document).ready(function () {
-      // Adjusting the style of the caption in the table with id 'base_table'
+    function exceloutput_diff(){
+      var sitecode = $('#sitelist').val() ;
+      $.ajax({
+        url: '/constn/constn_diff/output',
+        method: 'GET',
+        data: { 'sitecode': sitecode },
+        xhrFields: {
+          responseType: 'blob'  // Specify the response type as a blob to handle binary data
+        },
+        success: function (response, status, xhr) {
+          // Get the filename from the response headers (if sent by the server)
+          var filename =  $('#base_table caption').text().trim()+'.xlsx';
+          console.log(filename)
+          // Create a new Blob object using the response data
+          var blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
-      // Setting up the click event for the button with id 'exceloutput'
-      $('#exceloutput').click(function() {
-        var fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
-        $('#base_table').tableExport({
-          type: 'excel',
-          mso: {
-            fileFormat: 'xlsx',
-          },
-          fileName: fileName // Using the captured file name
-        });
+          // Create a link element to trigger the download
+          var link = document.createElement('a');
+          link.href = window.URL.createObjectURL(blob);
+          link.download = filename;
+
+          // Append the link to the body
+          document.body.appendChild(link);
+
+          // Trigger the download
+          link.click();
+
+          // Remove the link from the document
+          document.body.removeChild(link);
+      },
+      error: function (error) {
+          console.error('Error downloading the Excel file:', error);
+      }
       });
-      $('#search').on('submit', function() {
-        var code = $('#code').val().trim();
-        var owner = $('#owner').val().trim();
-        var name = $('#name').val().trim();
-
-        if (code.length > 0) {
-            return true;
-        }
-
-        if (owner.length > 0 && name.length > 0) {
-            return true;
-        }
-
-        alert('請填寫工地編號，或同時填寫業主和姓名！');
-        return false;
-    });
-
-    });
-
+    }
   </script>
 {% endblock %}
 {% block styles %}{% endblock %}
@@ -49,7 +49,7 @@
     {% csrf_token %}
     {% include "constn/siteinfo_select.html" %}
     <input type="submit" value="查詢" />
-    <input type="button" id="exceloutput" value="匯出EXCEL" />
+    <input type="button" value="匯出EXCEL" onclick='exceloutput_diff()' />
   </form>
 {% endblock %}
 {% block table %}
@@ -59,32 +59,9 @@
   <!--{{steel_pile_table }}-->
   <tbody>
     <tr>
-      <th class="noshow"  colspan="20">國廣機械工程有限公司</th>
-    </tr>
-    <tr>
-      <th class="noshow" colspan="20">材料差異明細表</th>
-    </tr>
-    <tr>
-      <th class="noshow" style="text-align: left;" colspan="20">工地編號: {{ constn.code }}</th>
-    </tr>
-    <tr>
-      <th class="noshow" style="text-align: left;"  colspan="20">業    主: {{ constn.owner }}</th>
-    </tr>
-    <tr>
-      <th class="noshow"  style="text-align: left;" colspan="20">工程名稱: {{ constn.name }}</th>
-    </tr>
-    <tr>
-      <th colspan="5" class="noshow">業主合約表</th>
-      <th rowspan="60" class="noshow"></th>
       <th colspan="9">實作出入料狀況</th>
-      <th colspan="4" rowspan="3" class="noshow">倉庫-結案說明</th>
     </tr>
     <tr>
-      <th rowspan="2" class="noshow">項次</th>
-      <th rowspan="2" class="noshow">工程項目及規格</th>
-      <th rowspan="2" class="noshow">單位</th>
-      <th rowspan="2" class="noshow">數量</th>
-      <th rowspan="2" class="noshow">備註</th>
       <th colspan="2">倉庫材料</th>
       <th colspan="2">A.實作出料數量</th>
       <th colspan="2">B.實作收回數量</th>
@@ -104,11 +81,6 @@
     </tr>
     {% for steel in steel_table %}
       <tr>
-        <td class="noshow"></td>
-        <td class="noshow"></td>
-        <td class="noshow"></td>
-        <td class="noshow"></td>
-        <td class="noshow"></td>
         <td>{{ steel.name }}</td>
         <td>{{ steel.unit_name }}</td>
         <td>{{ steel.input.quantity |floatformat:"2" }}</td>
@@ -118,21 +90,13 @@
         <td>{{ steel.ng_value |floatformat:"2" }}</td>
         <td>{{ steel.input.quantity|subtract:steel.output.quantity |floatformat:"2" }}</td>
         <td>{{ steel.input.unit|subtract:steel.output.unit |floatformat:"2" }}</td>
-        {% if steel.code == "300" %}<td class="noshow"  colspan="4"  rowspan="11"></td>{% endif %}
       </tr>
     {% endfor %}
     <tr>
-      <th rowspan="2" class="noshow">項次</th>
-      <th rowspan="2" class="noshow">工程項目及規格</th>
-      <th rowspan="2" class="noshow">單位</th>
-      <th rowspan="2" class="noshow">數量</th>
-      <th rowspan="2" class="noshow">備註</th>
       <th colspan="2">倉庫材料</th>
       <th colspan="2">A.實作出料數量</th>
       <th colspan="2">B.實作收回數量</th>
       <th colspan="3">A-B差異數</th>
-      <th class="noshow" colspan="2" rowspan="2">計價人員-買斷說明</th>
-      <th class="noshow" colspan="2" rowspan="2">現場人員-結案說明</th>
     </tr>
     <tr>
       <th>品項</th>
@@ -146,11 +110,6 @@
     </tr>
     {% for item in components %}
       <tr>
-        <td class="noshow"></td>
-        <td class="noshow"></td>
-        <td class="noshow"></td>
-        <td class="noshow"></td>
-        <td class="noshow"></td>
         <td>{{ item.name }}</td>
         <td>{{ item.unit_name }}</td>
         <td>
@@ -177,10 +136,6 @@
           {% endif %}
         </td>
         <td colspan=2></td>
-        {% if item.code == "10" %}
-          <td colspan="2"  rowspan="20" class="noshow"></td>
-          <td colspan="2"  rowspan="20" class="noshow"></td>
-        {% endif %}
       </tr>
     {% endfor %}
   {% endblock %}

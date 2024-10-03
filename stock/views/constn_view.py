@@ -1,4 +1,5 @@
-from django.http import JsonResponse
+import os
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from stock.models.steel_pile_model import SteelPile
 from stock.service.steel_brace import build_steel_brace_table
@@ -8,10 +9,12 @@ from stock.service.steel_component import build_component_table
 from stock.models.site_model import SiteInfo
 from stock.service.steel_tools import build_tools_table
 from stock.utils import (
+    fill_diff_table_excel,
     get_global_component_list,
     get_global_site_json,
     get_global_tool_list,
 )
+from warehousing_server import settings
 from wcom.templatetags.strmap import get_level
 from wcom.utils.uitls import value_to_decimal
 
@@ -203,3 +206,25 @@ def get_sitelist(request):
 
     # 返回 JSON 資料
     return JsonResponse(sitelist, safe=False)
+
+
+def export_report_list(request):
+    # Fetch the list of reports from the database
+    code = request.GET.get("sitecode")
+    print(code)
+    constn = SiteInfo.get_site_by_code(code)
+    output_path = os.path.join(settings.BASE_DIR, 'templates', 'filled_report.xlsx')
+
+    # Fill the template with dynamic data from the report list
+    fill_diff_table_excel(constn ,output_path )
+
+    # Serve the file as a download
+    response = HttpResponse(open(output_path, 'rb'), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="filled_report.xlsx"'
+
+    try:
+        os.remove(output_path)
+        print(f"Temporary file {output_path} deleted.")
+    except OSError as e:
+        print(f"Error deleting temporary file {output_path}: {e}")
+    return response
