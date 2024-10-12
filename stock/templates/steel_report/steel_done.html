@@ -231,7 +231,10 @@
       <td>
         {% if item.m_19 != 0 %}{{ item.m_19 |floatformat:"0" }}{% endif %}
       </td>
-      <td colspan='6' style="text-align:left">
+      <td colspan='6'
+          style="text-align:left;
+                 word-wrap: break-word;
+                 white-space: normal">
         {% if item.remark %}
           {{ item.remark |safe }}
           <br>

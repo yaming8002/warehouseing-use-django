@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+from django.db.models import Q
 from django.conf import settings
 from django.core.cache import cache
 from openpyxl import load_workbook
@@ -41,57 +42,73 @@ def get_global_component_list(update=False):
 
 
 def get_global_site_json(update=False):
-    setting = cache.get("global_site_json")
-    if update or not setting:
+    sitelist = cache.get("global_site_json")
+    if update or not sitelist:
         # 當緩存中沒有資料時，從資料庫中撈取
-        sitelist = (
-            list(
-                SiteInfo.objects.filter(genre__in=[1, 2])
-                .values("code", "name", "owner")
-                .order_by("code")
-                .all()
-            ),
+        sitelist = list(
+            SiteInfo.objects.exclude(
+                Q(name='None') | Q(name='') | Q(name__isnull=True),  # 排除 name 為 'None'、空字串或 None
+                Q(owner='None') | Q(owner='') | Q(owner__isnull=True)
+              )  # 排除 owner 為 'None'、空字串或 None)
+            .values("code", "name", "owner")
+            .order_by("code")
+            .all()
         )
+        print(  SiteInfo.objects.exclude(name="None", owner="None")
+            .filter( genre__in=[1, 2] )
+            .values("code", "name", "owner")
+            .order_by("code")
+            .all().query)
         # 將撈取到的資料存入緩存，並設置過期時間
         cache.set("global_site_json", sitelist, timeout=7 * 24 * 60 * 60)  # 七天過期
-    return setting
+    return sitelist
 
 
 def fill_diff_table_excel(constn, output_path):
-    # Load the existing Excel template
+    # 差異表的EXCEL 匯出
     steel_table, components = build_constn_diff_view(constn)
 
     # Define the path to the template and output
     template_path = os.path.join(settings.BASE_DIR, "static", "差異表_模板.xlsx")
     workbook = load_workbook(template_path)
     sheet = workbook.active
-    first_record = TransLog.objects.values('build_date').filter(constn_site = constn ).order_by('build_date').first()
-    last_record = TransLog.objects.values('build_date').filter(constn_site = constn ).order_by('build_date').last()
+    first_record = (
+        TransLog.objects.values("build_date")
+        .filter(constn_site=constn)
+        .order_by("build_date")
+        .first()
+    )
+    last_record = (
+        TransLog.objects.values("build_date")
+        .filter(constn_site=constn)
+        .order_by("build_date")
+        .last()
+    )
     map = {
-        'date': to_taiwan_date_format(datetime.now()),
-        'begin':to_taiwan_date_format(first_record['build_date']),
-        'end':to_taiwan_date_format(last_record['build_date']),
-        'code': constn.code,
-        'owner': constn.owner,
-        'name':constn.name,
+        "date": to_taiwan_date_format(datetime.now()),
+        "begin": to_taiwan_date_format(first_record["build_date"]),
+        "end": to_taiwan_date_format(last_record["build_date"]),
+        "code": constn.code,
+        "owner": constn.owner,
+        "name": constn.name,
     }
     replace_cell_value(sheet, map, row_size=5)
 
     current_row = 9
     for report in steel_table:
         # Insert data for each report into the corresponding columns
-        sheet[f"I{current_row}"] = report['input']['quantity']
-        sheet[f"J{current_row}"] = report['input']['unit']
-        sheet[f"K{current_row}"] = report['output']['quantity']
-        sheet[f"L{current_row}"] = report['output']['unit']
-        sheet[f"M{current_row}"] = report['ng_value']
+        sheet[f"I{current_row}"] = report["input"]["quantity"]
+        sheet[f"J{current_row}"] = report["input"]["unit"]
+        sheet[f"K{current_row}"] = report["output"]["quantity"]
+        sheet[f"L{current_row}"] = report["output"]["unit"]
+        sheet[f"M{current_row}"] = report["ng_value"]
         current_row += 1
     # Assuming the first row is the header, start adding data from the second row
     current_row += 2  # Start after the header
     for report in components:
         # Insert data for each report into the corresponding columns
-        sheet[f"I{current_row}"] = report['input']['quantity']
-        sheet[f"K{current_row}"] = report['output']['quantity']
+        sheet[f"I{current_row}"] = report["input"]["quantity"]
+        sheet[f"K{current_row}"] = report["output"]["quantity"]
         current_row += 1
 
     # Save the updated Excel file
@@ -105,7 +122,7 @@ def replace_cell_value(sheet, map: dict, row_size=5):
             break
         for cell in row:
             for x in map.keys():
-                target = '{' +x+ '}'
+                target = "{" + x + "}"
                 if cell.value and isinstance(cell.value, str) and target in cell.value:
                     cell.value = cell.value.replace(target, map[x])
 

@@ -204,8 +204,8 @@ def get_edit_remark(request):
         )
 
         for k, v in diff_dct.items():
-            setattr(from_report, k, getattr(from_report, k) + v)
-            setattr(trun_reprot, k, getattr(trun_reprot, k) - v)
+            setattr(from_report, k, getattr(from_report, k) - v)
+            setattr(trun_reprot, k, getattr(trun_reprot, k) + v)
         from_report.save()
         trun_reprot.save()
         update_total_by_month(report.year, report.month)
