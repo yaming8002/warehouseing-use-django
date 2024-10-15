@@ -16,7 +16,7 @@
       }
     })
   }
-  
+
   function upload(event) {
     // 向後端發送 AJAX 請求
     $.ajax({
@@ -31,10 +31,10 @@
       }
     })
   }
-  
+
   function editRow(id) {
     // 轉換姓名欄位
-  
+
     $.ajax({
       url: '/carinfo/save/',
       method: 'GET',
@@ -77,7 +77,6 @@
     {% if request.session.u_permission > 1 %}<button type="button" onclick="addMaterial(event)">新增</button>{% endif %}
     <!--<button type="button" onclick="upload(event)">上傳EXCEL</button>-->
   </form>
-
 {% endblock %}
 {% block table %}
   <caption>
@@ -89,9 +88,7 @@
       <th scope="col">公司</th>
       <th scope="col">噸數(備註)</th>
       <th scope="col">基本台金額</th>
-      {% if request.session.u_permission > 1 %}
-        <th scope="col">編輯</th>
-      {% endif %}
+      {% if request.session.u_permission > 1 %}<th scope="col">編輯</th>{% endif %}
     </tr>
   </thead>
   <tbody>
@@ -105,17 +102,17 @@
           {% if item.firm %}{{ item.firm }}{% endif %}
         </td>
         <td>
-          {% if item.remark %}{{ item.remark }}{% endif %}
+          {% if item.remark %}{{ item.remark | linebreaksbr | safe }}{% endif %}
         </td>
         <td>
           {% if item.value %}{{ item.value }}{% endif %}
         </td>
         {% if request.session.u_permission > 1 %}
-        <td>
-          <a href="#" onclick="editRow({{ item.id }})">編輯</a>
-        </td>
+          <td>
+            <a href="#" onclick="editRow({{ item.id }})">編輯</a>
+          </td>
         {% endif %}
-     </tr>
+      </tr>
     {% endfor %}
-   </tbody>
+  </tbody>
 {% endblock %}

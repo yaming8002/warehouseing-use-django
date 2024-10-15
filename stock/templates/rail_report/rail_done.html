@@ -14,12 +14,12 @@
       $('.table-success').children().each(function() {
         var text = $(this).html();
         var num = parseInt(text);
-    
+
         if (!isNaN(num) && num < 0) {
                 $(this).css('color', 'red'); // 将文字颜色改为红色
         }
     });
-    
+
     }
 
     function editRow(id,site_id) {
@@ -37,8 +37,8 @@
                 console.error('Error loading modal content: ', error);
             }
         });
-      } 
-     
+      }
+
     }
   </script>
 {% endblock %}
@@ -49,12 +49,12 @@
     min-width: auto !important;  /* 可以根据需要调整 */
     min-height: auto !important;
     width: auto;      /* 允许表格根据内容自动调整宽度 */
-  }  
+  }
 
   #summary td{
 
   }
- 
+
   </style>
 {% endblock %}
 {% block form %}
@@ -68,12 +68,13 @@
              value='{{ yearMonth }}'>
     </p>
     <input type="submit" value="查詢" />
-     <!-- <input type="button" id="exceloutput" value="匯出EXCEL" />-->
+    <!-- <input type="button" id="exceloutput" value="匯出EXCEL" />-->
   </form>
-
 {% endblock %}
 {% block table %}
-<caption><h3>月份:{{ yearMonth }}</h3></caption>
+  <caption>
+    <h3>月份:{{ yearMonth }}</h3>
+  </caption>
   <tr>
     <th>項次</th>
     <th>工地代號</th>
@@ -94,9 +95,7 @@
     <th>15M</th>
     <th>16M</th>
     <th>總支數</th>
-    {% if request.session.u_permission > 1  %}
-    <th>編輯</th>
-    {% endif %} 
+    {% if request.session.u_permission > 1 %}<th>編輯</th>{% endif %}
   </tr>
   {% for item in list %}
     <tr>
@@ -105,7 +104,11 @@
       <td>{{ item.siteinfo.owner }}</td>
       <td>{{ item.siteinfo.name }}</td>
       <td>
-        {% if item.done_type == 1 %} 是 {% else %} 否 {% endif %}
+        {% if item.done_type == 1 %}
+          是
+        {% else %}
+          否
+        {% endif %}
       </td>
       <td>出料</td>
       <td>{{ item.out_5|floatformat:"0" }}</td>
@@ -121,15 +124,15 @@
       <td>{{ item.out_15|floatformat:"0" }}</td>
       <td>{{ item.out_16|floatformat:"0" }}</td>
       <td>{{ item.out_total|floatformat:"0" }}</td>
-      {% if request.session.u_permission > 1  %}
-      <td rowspan='3'>
-        <a href="#" onclick="editRow({{item.id}},{{ item.siteinfo.id }})">退回</a>
-      </td>
-      {% endif %} 
+      {% if request.session.u_permission > 1 %}
+        <td rowspan='3'>
+          <a href="#" onclick="editRow({{ item.id }},{{ item.siteinfo.id }})">退回</a>
+        </td>
+      {% endif %}
     </tr>
     <tr>
       <td rowspan='2'>結案說明</td>
-      <td rowspan='2' colspan='3' style="white-space: pre-line;">{{ item.remark }}</td>
+      <td rowspan='2' colspan='3' style="white-space: pre-line;">{{ item.remark | linebreaksbr | safe }}</td>
       <td>入料</td>
       <td>{{ item.in_5|floatformat:"0" }}</td>
       <td>{{ item.in_6|floatformat:"0" }}</td>
@@ -143,24 +146,24 @@
       <td>{{ item.in_14|floatformat:"0" }}</td>
       <td>{{ item.in_15|floatformat:"0" }}</td>
       <td>{{ item.in_16|floatformat:"0" }}</td>
-      <td>{{ item.in_total|floatformat:"0"}}</td>
+      <td>{{ item.in_total|floatformat:"0" }}</td>
     </tr>
     <tr class="table-success">
       {% load custom_filters %}
       <td>出入差</td>
       <td>{{ item.in_5|subtract:item.out_5 |floatformat:"0" }}</td>
       <td>{{ item.in_6|subtract:item.out_6 |floatformat:"0" }}</td>
-      <td>{{ item.in_7|subtract:item.out_7 |floatformat:"0"}}</td>
-      <td>{{ item.in_8|subtract:item.out_8 |floatformat:"0"}}</td>
-      <td>{{ item.in_9|subtract:item.out_9 |floatformat:"0"}}</td>
-      <td>{{ item.in_10|subtract:item.out_10 |floatformat:"0"}}</td>
-      <td>{{ item.in_11|subtract:item.out_11 |floatformat:"0"}}</td>
-      <td>{{ item.in_12|subtract:item.out_12 |floatformat:"0"}}</td>
-      <td>{{ item.in_13|subtract:item.out_13 |floatformat:"0"}}</td>
-      <td>{{ item.in_14|subtract:item.out_14 |floatformat:"0"}}</td>
-      <td>{{ item.in_15|subtract:item.out_15 |floatformat:"0"}}</td>
-      <td>{{ item.in_16|subtract:item.out_16 |floatformat:"0"}}</td>
-      <td>{{ item.in_total|subtract:item.out_total |floatformat:"0"}}</td>
+      <td>{{ item.in_7|subtract:item.out_7 |floatformat:"0" }}</td>
+      <td>{{ item.in_8|subtract:item.out_8 |floatformat:"0" }}</td>
+      <td>{{ item.in_9|subtract:item.out_9 |floatformat:"0" }}</td>
+      <td>{{ item.in_10|subtract:item.out_10 |floatformat:"0" }}</td>
+      <td>{{ item.in_11|subtract:item.out_11 |floatformat:"0" }}</td>
+      <td>{{ item.in_12|subtract:item.out_12 |floatformat:"0" }}</td>
+      <td>{{ item.in_13|subtract:item.out_13 |floatformat:"0" }}</td>
+      <td>{{ item.in_14|subtract:item.out_14 |floatformat:"0" }}</td>
+      <td>{{ item.in_15|subtract:item.out_15 |floatformat:"0" }}</td>
+      <td>{{ item.in_16|subtract:item.out_16 |floatformat:"0" }}</td>
+      <td>{{ item.in_total|subtract:item.out_total |floatformat:"0" }}</td>
     </tr>
   {% endfor %}
 {% endblock %}

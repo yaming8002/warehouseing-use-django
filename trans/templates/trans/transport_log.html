@@ -190,7 +190,7 @@
         </td>
         {% load custom_filters %}
         <td>
-          {% if item.remark|is_not_none %}{{ item.remark }}{% endif %}
+          {% if item.remark|is_not_none %}{{ item.remark | linebreaksbr | safe }}{% endif %}
           {% if item.is_rollback %}已作廢{% endif %}
         </td>
         <td>

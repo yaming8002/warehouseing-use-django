@@ -107,7 +107,10 @@
   <tr>
     <th>工地代號</th>
     <th>業主</th>
-    <th>名稱</th>
+    <th>
+      名稱
+      <button id="hieddenConstnName" class="btn btn-sm btn-secondary ms-2">展開</button>
+    </th>
     <th>
       H300
       <br>
@@ -192,9 +195,7 @@
     <tr>
       <td>{{ item.siteinfo.code }}</td>
       <td>{{ item.siteinfo.owner }}</td>
-      <td>
-        {% if item.siteinfo.name %}{{ item.siteinfo.name }}{% endif %}
-      </td>
+      <td class="truncate constn_name collapsed-content">{{ item.siteinfo.name }}</td>
       <td>
         {% if item.m_358 != 0 %}{{ item.m_358 }}{% endif %}
       </td>
@@ -236,7 +237,7 @@
                  word-wrap: break-word;
                  white-space: normal">
         {% if item.remark %}
-          {{ item.remark |safe }}
+          {{ item.remark | linebreaksbr | safe }}
           <br>
         {% endif %}
         {% if item.turn_site_id %}目的地:[{{ item.turn_site.code }}]{{ item.turn_site.owner }}{% endif %}

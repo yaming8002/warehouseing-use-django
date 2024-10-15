@@ -10,7 +10,7 @@
     });
 
   });
-  
+
   function upload(event) {
     // 向後端發送 AJAX 請求
     $.ajax({
@@ -39,25 +39,24 @@
     table-layout: auto;
     min-width: 100%;  /* 可以根据需要调整 */
     width: auto;      /* 允许表格根据内容自动调整宽度 */
-  }  
+  }
 
   .tableStyle table td{
     white-space: nowrap; /* 防止内容换行 */
-  }  
+  }
   </style>
 {% endblock %}
 {% block form %}
   <!-- Corrected form tag and added trailing slash to action attribute -->
-
   <form id="search" action="/tran_rent/list/" method="GET">
     {% csrf_token %}
     <p>
       <label for="begin">開始時間</label>
-      <input type="date" id="begin" name="begin" value="{{begin|date:'Y-m-d'}}" />
+      <input type="date" id="begin" name="begin" value="{{ begin|date:'Y-m-d' }}" />
       <label for="end">結束時間</label>
-      <input type="date" id="end" name="end" value="{{end|date:'Y-m-d'}}" />
+      <input type="date" id="end" name="end" value="{{ end|date:'Y-m-d' }}" />
       <label for="code">單號</label>
-      <input type="text" id="code" name="code" value="{{request.GET.code}}" />
+      <input type="text" id="code" name="code" value="{{ request.GET.code }}" />
       <label for ="tran_type">進出料</label>
       <select id="tran_type" name="tran_type">
         <option value>全部</option>
@@ -68,19 +67,37 @@
     </p>
     <p>
       <label for="constn_id">工地代號</label>
-      <input type="text" id="constn_id" name="constn_id" value="{{request.GET.constn_id}}" />
+      <input type="text"
+             id="constn_id"
+             name="constn_id"
+             value="{{ request.GET.constn_id }}" />
       <label for="constn_name">工地名稱</label>
-      <input type="text" id="constn_name" name="constn_name" value="{{request.GET.constn_name}}" />
+      <input type="text"
+             id="constn_name"
+             name="constn_name"
+             value="{{ request.GET.constn_name }}" />
       <label for="car_firm">吊卡車公司</label>
-      <input type="text" id="car_firm" name="car_firm" value="{{request.GET.car_firm}}" />
+      <input type="text"
+             id="car_firm"
+             name="car_firm"
+             value="{{ request.GET.car_firm }}" />
       <label for="car_number">車牌號碼</label>
-      <input type="text" id="car_number" name="car_number"  value="{{request.GET.car_number}}" />
+      <input type="text"
+             id="car_number"
+             name="car_number"
+             value="{{ request.GET.car_number }}" />
     </p>
     <p>
       <label for="matinfo_core">物料編號</label>
-      <input type="text" id="matinfo_core" name="matinfo_core" value="{{request.GET.matinfo_core}}" />
+      <input type="text"
+             id="matinfo_core"
+             name="matinfo_core"
+             value="{{ request.GET.matinfo_core }}" />
       <label for="matinfo_id">物料名稱</label>
-      <input type="text" id="matinfo_name" name="matinfo_name" value="{{request.GET.matinfo_name}}" />
+      <input type="text"
+             id="matinfo_name"
+             name="matinfo_name"
+             value="{{ request.GET.matinfo_name }}" />
       <label for="matinfo_cat">物料類型</label>
       <select id="matinfo_cat" name="matinfo_cat">
         <option value>全部</option>
@@ -92,10 +109,11 @@
     </p>
     <input type="submit" value="查詢" />
   </form>
-
 {% endblock %}
 {% block table %}
-  <caption><h3>租賃表</h3></caption>
+  <caption>
+    <h3>租賃表</h3>
+  </caption>
   <thead>
     <tr>
       <th rowspan="2">日期</th>
@@ -135,7 +153,9 @@
         <td>{{ item.translog.constn_site.name }}</td>
         <td>{{ item.translog.code }}</td>
         <td>{{ item.material.name }}({{ item.material.mat_code }})</td>
-        <td> {% if item.remark %} {{ item.all_unit }} {% endif %}</td>
+        <td>
+          {% if item.remark %}{{ item.all_unit }}{% endif %}
+        </td>
         <td>{{ item.material.unit_of_division }}</td>
         <td {% if item.translog.transaction_type == "OUT" %}style='color:red;'{% endif %}>
           {% if item.translog.transaction_type == "OUT" %}-{% endif %}
@@ -147,11 +167,15 @@
             {{ item.all_unit }}
           {% endif %}
         </td>
-        <td> {% if item.remark %}{{ item.remark }}{% endif %}</td>
-        <td>{% if item.level %}{{ item.level }}{% endif %}</td>
+        <td>
+          {% if item.remark %}{{ item.remark | linebreaksbr | safe }}{% endif %}
+        </td>
+        <td>
+          {% if item.level %}{{ item.level }}{% endif %}
+        </td>
         <td>{{ item.translog.carinfo.firm }}</td>
         <td>{{ item.translog.carinfo.car_number }}</td>
-         <!--<td>{{ item.transportlog.member }}</td>-->
+        <!--<td>{{ item.transportlog.member }}</td>-->
         <td>{{ item.translog.member }}</td>
       </tr>
     {% endfor %}

@@ -208,7 +208,7 @@
                       {{ item.turn_site }}
                       <br>
                     {% endif %}
-                    {% if item.d_remark|is_not_none %}{{ item.d_remark }}{% endif %}
+                    {% if item.d_remark|is_not_none %}{{ item.remark | linebreaksbr | safe }}{% endif %}
                   </td>
                 {% else %}
                   <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>

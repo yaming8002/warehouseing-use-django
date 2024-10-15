@@ -75,7 +75,10 @@
     <th>項次</th>
     <th>工地代號</th>
     <th>業主</th>
-    <th>名稱</th>
+    <th>
+      名稱
+      <button id="hieddenConstnName" class="btn btn-sm btn-secondary ms-2">展開</button>
+    </th>
     {% if '28' == mat_id %}
       <th>鐵板 全</th>
       <th>鐵板 半</th>
@@ -95,7 +98,7 @@
       <td>{{ forloop.counter }}</td>
       <td>{{ item.siteinfo.code }}</td>
       <td>{{ item.siteinfo.owner }}</td>
-      <td>{{ item.siteinfo.name }}</td>
+      <td class="truncate constn_name collapsed-content">{{ item.siteinfo.name }}</td>
       <td>{{ item.quantity | floatformat:"0" }}</td>
       {% if '28' in mat_id %}
         <td>{{ item.quantity2 | floatformat:"0" }}</td>
@@ -113,7 +116,7 @@
         {% if item.siteinfo.member %}{{ item.siteinfo.member }}{% endif %}
       </td>
       <td>
-        {% if item.remark %}{{ item.remark }}{% endif %}
+        {% if item.remark %}{{ item.remark | linebreaksbr | safe }}{% endif %}
       </td>
       {% if request.session.u_permission > 1 %}
         <td>
