@@ -44,7 +44,7 @@ urlpatterns = [
     path("stock/edit/", stock_edit, name="stock"),
     path("constn_stock/list/", ConstnStockViewList.as_view(), name="constn"),
     path("constn/list/", SiteViewList.as_view(), name="constn"),
-    path("constn/get_sitelist", get_sitelist, name="constn"),
+    path("constn/get_sitelist/", get_sitelist, name="constn"),
     path("constn/edit/", ConstnSeveView.as_view(), name="construction_update"),
     path("constn/uploadexcel/", ImportConstnView.as_view(), name="constn"),
     path(
