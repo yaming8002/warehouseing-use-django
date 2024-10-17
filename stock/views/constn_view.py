@@ -202,7 +202,7 @@ def constn_diff_view(request):
 
 def get_sitelist(request):
     # 查詢資料庫中的資料
-    sitelist = get_global_site_json()
+    sitelist = get_global_site_json(True)
 
     # 返回 JSON 資料
     return JsonResponse(sitelist, safe=False)
