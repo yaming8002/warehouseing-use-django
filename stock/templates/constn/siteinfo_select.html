@@ -17,7 +17,7 @@
     // AJAX 請求獲取 sitelist 資料
     function fetchSitelist() {
         $.ajax({
-            url: '/constn/get_sitelist',  // Django 後端的 API 路徑
+            url: '/constn/get_sitelist/',  // Django 後端的 API 路徑
             method: 'GET',
             success: function(data) {
                 updateSitelist(data[0]);  // 調用函數更新下拉框
