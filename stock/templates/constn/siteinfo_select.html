@@ -20,7 +20,7 @@
             url: '/constn/get_sitelist/',  // Django 後端的 API 路徑
             method: 'GET',
             success: function(data) {
-                updateSitelist(data[0]);  // 調用函數更新下拉框
+                updateSitelist(data);  // 調用函數更新下拉框
             },
             error: function(xhr, status, error) {
                 console.error("Error fetching sitelist:", error);
