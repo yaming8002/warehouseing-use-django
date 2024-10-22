@@ -1,4 +1,5 @@
 
+from datetime import datetime
 from django.db import models
 from stock.models.site_model import SiteInfo
 
@@ -10,6 +11,8 @@ class PDFileModel(models.Model):
         default=None,
         verbose_name="工地",
     )
+
+    build_date = models.DateTimeField(default=datetime.now)
     version = models.IntegerField(default=0,verbose_name='版本號')
     file_path = models.CharField(max_length=255, default="", verbose_name="路徑")
 

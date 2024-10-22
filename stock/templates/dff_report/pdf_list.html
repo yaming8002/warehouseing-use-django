@@ -1,7 +1,7 @@
 {% extends 'base/base_search.html' %}{{ '' }}
 {% block title %}{{ title }} {{ '' }}{% endblock %}
 {% block javascript %}
-  <script>
+  <script type="text/javascript">
     $(document).ready(function () {
       // 使用 let 或 const，確保變數只聲明一次
       let pdfContainers = $('.pdf-container');  // 使用 jQuery 選擇所有的 .pdf-container
@@ -44,11 +44,39 @@
       });
 
     });
-    function resizeIframe(iframe) {
-      var high = $('canvas').height;
-      console.log(high)
-      iframe.style.height = high + 'px';
-  }
+
+    function downloadPDF(){
+      var contsn_code = $('#hid_code').val()
+
+      // 直接触发浏览器的下载行为
+      var downloadUrl = '/constn/diff_report/donwload_by_site/'+contsn_code+'/';
+      window.location.href = downloadUrl;
+
+    }
+
+
+    function removePDF(pdf_id){
+      var confirmation = confirm("是否刪除此PDF？");
+
+      if (confirmation) {
+          // 如果用户确认，发送 Ajax 请求
+          $.ajax({
+              url: '/constn/diff_report/remove/',
+              method: 'GET',
+              data: { pdf_id: pdf_id },  // 传递 PDF ID
+              success: function(data) {
+                  alert(data.msg);
+                  reLoadMainPage() ;
+              },
+              error: function(xhr, status, error) {
+                  alert("刪除過程出現錯誤: " + error);
+              }
+          });
+      } else {
+          // 用户取消了操作
+          alert("操作已取消");
+      }
+    }
   </script>
 {% endblock %}
 {% block styles %}
@@ -78,17 +106,22 @@
     {% csrf_token %}
     {% include "constn/siteinfo_select.html" %}
     <input type="submit" value="查詢" />
-    <input type="button" id="download" value="下載" />
+    <input type="button" onclick='downloadPDF()' value="下載" />
   </form>
 {% endblock %}
 {% block working %}
   {% for pdf_id, images in pdfs.items %}
     <div class="pdf-container" id="pdf-{{ forloop.counter0 }}">
+      {% if request.session.u_permission > 1 %}
+        <input type="button" onclick='removePDF("{{ pdf_id }}")' value="刪除" />
+      {% endif %}
       {% for image in images %}
         <!-- pdf 分頁用-->
-        <img src="data:image/png;base64,{{ image }}"
-             alt="PDF page"
-             class="pdf-image">
+        <p>
+          <img src="data:image/png;base64,{{ image }}"
+               alt="PDF page"
+               class="pdf-image">
+        </p>
       {% endfor %}
     </div>
   {% endfor %}

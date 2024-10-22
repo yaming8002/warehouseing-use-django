@@ -1,14 +1,20 @@
 
+from datetime import datetime
+import re
+import zipfile
 import fitz  # PyMuPDF
 from io import BytesIO
+from django.utils.encoding import escape_uri_path
 from django.shortcuts import render
-from django.http import  JsonResponse
+from django.http import  HttpResponse, JsonResponse
 import os
+from django.db.models import Max
 from django.utils.timezone import now
 import base64
 from stock.models.pdf_report import PDFileModel
 from stock.models.site_model import SiteInfo
 from warehousing_server import settings
+from wcom.utils.uitls import get_month_range
 
 
 def upload_pdf(request):
@@ -31,7 +37,11 @@ def upload_pdf(request):
             })
 
         # 儲存檔案
-        version_count = PDFileModel.objects.filter(siteinfo=site_info).count() + 1
+        # 获取当前 site_info 下的最大版本号
+        current_max_version = PDFileModel.objects.filter(siteinfo=site_info).aggregate(Max('version'))['version__max']
+
+        # 如果没有任何版本，设为 1，否则递增
+        version_count = 1 if current_max_version is None else current_max_version + 1
         file_path = os.path.join(upload_dir,f'{version_count}-{pdf_file.name}')
         with open(file_path, 'wb+') as destination:
             for chunk in pdf_file.chunks():
@@ -74,6 +84,70 @@ def report_end_view(request):
     context["total_pages"] = len(pdfs)
 
     return render(request, "dff_report/pdf_list.html", context)
+
+def report_remove(request):
+    if request.method == "GET":
+        pdf_id = request.GET.get("pdf_id")
+        pdf = PDFileModel.objects.get(id=pdf_id)
+        os.remove(pdf.file_path)
+        pdf.delete()
+
+    return JsonResponse({"success": True, "msg": "刪除成功"})
+
+def report_download_by_month(request):
+    # 1. 獲取當月範圍
+    first_day, last_day = get_month_range()
+
+    # 2. 查詢當月的 PDF 列表
+    pdf_list = PDFileModel.objects.filter(build_date__gte=first_day, build_date__lte=last_day).order_by('-id')
+
+    # 3. 定義 ZIP 文件的名稱
+    zip_filename = f'{first_day.year}-{first_day.month}-pdf.zip'
+
+    # 4. 創建 ZIP 文件
+    with zipfile.ZipFile(zip_filename, 'w') as zf:
+        for pdf in pdf_list:
+            # 獲取每個 PDF 文件的絕對路徑並寫入 ZIP 文件
+            filter_names = pdf.file_path.split('\\')
+            arcname = filter_names[-1]
+            zf.write(pdf.file_path,arcname=arcname)
+
+    # 5. 打開 ZIP 文件並返回作為 HttpResponse
+    with open(zip_filename, 'rb') as f:
+        response = HttpResponse(f.read(), content_type='application/zip')
+        # 設置下載的文件名，使用 escape_uri_path 防止中文亂碼
+        response['Content-Disposition'] = f'attachment; filename={escape_uri_path(zip_filename)}'
+
+    # 6. 刪除臨時 ZIP 文件（可選）
+    os.remove(zip_filename)
+
+    return response
+
+def report_download_by_site(request, contsn_code):
+    # 1. 獲取 PDF 的 id
+    site = SiteInfo.get_site_by_code(contsn_code)
+    pdf_list = PDFileModel.objects.filter(siteinfo=site).order_by('-id')
+
+    # 3. 定義 ZIP 文件的名稱
+    zip_filename = f'{site.code}-{site.owner}-{site.name}-pdf.zip'
+
+    # 4. 創建 ZIP 文件
+    with zipfile.ZipFile(zip_filename, 'w') as zf:
+        for pdf in pdf_list:
+            # 獲取每個 PDF 文件的絕對路徑並寫入 ZIP 文件
+            filter_names = pdf.file_path.split('\\')
+            arcname = filter_names[-1]
+            zf.write(pdf.file_path,arcname=arcname)
+
+    # 5. 打開 ZIP 文件並返回作為 HttpResponse
+    with open(zip_filename, 'rb') as f:
+        response = HttpResponse(f.read(), content_type='application/zip')
+        # 設置下載的文件名，使用 escape_uri_path 防止中文亂碼
+        response['Content-Disposition'] = f'attachment; filename={escape_uri_path(zip_filename)}'
+
+    # 6. 刪除臨時 ZIP 文件（可選）
+    os.remove(zip_filename)
+    return response
 
 def get_base64_images(file_path):
     pdf_document = fitz.open(file_path)

@@ -147,6 +147,14 @@ component_list = [
         "ng_value": 0.0,
     },
     {
+        "mat_id": "52",
+        "unit_name": "支",
+        "name": "黑皮",
+        "input": {"quantity": 0.0, "unit": 0.0},
+        "output": {"quantity": 0.0, "unit": 0.0},
+        "ng_value": 0.0,
+    },
+    {
         "mat_id": "105",
         "unit_name": "片",
         "name": "洗車版 2M *2M",

@@ -20,8 +20,15 @@ from stock.views import (
     StockView,
 )
 from stock.views.board_view import BoardControlView, get_board_edit_done
-from stock.views.constn_view import component_view, constn_diff_view,  get_sitelist, steel_control_view, steel_pile_edit_view, tool_view
-from stock.views.diff_report_view import  report_end_view, upload_pdf
+from stock.views.constn_view import (
+    component_view,
+    constn_diff_view,
+    get_sitelist,
+    steel_control_view,
+    steel_pile_edit_view,
+    tool_view,
+)
+from stock.views.diff_report_view import report_download_by_month, report_end_view, upload_pdf
 from stock.views.materials_view import DownloadMaterialView
 from stock.views.site_view import ConstnSeveView, ImportSiteInfoByTotalView
 from stock.views.steel_view import get_add_remark, get_edit_remark, get_move_mat
@@ -75,4 +82,5 @@ urlpatterns = [
     path("constn/constn_diff/", constn_diff_view, name="component_view"),
     path("constn/diff_report/upload/", upload_pdf, name="component_view"),
     path("constn/diff_report/", report_end_view, name="component_view"),
+    path("constn/diff_report/donwload/", report_download_by_month, name="component_view"),
 ]
