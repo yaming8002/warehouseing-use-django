@@ -1,0 +1,214 @@
+{% load static %}
+{% load strmap %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, height=device-height, initial-scale=1.0" />
+    <title>
+      {% block title %}base table{% endblock %}
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+    <script>
+      $(document).ready(function () {
+        // 選擇所有具有id="report"的表格，位於class="col-md-9 m-0"的div內
+        $(".col-md-9.m-0 table").not('.emptytable').each(function () {
+          // 添加所需的CSS類
+          $(this).addClass("table table-primary table-striped");
+        });
+
+        $("#base_table td").each(function () {
+          var value = parseFloat($(this).text()); // 尝试将内容转换为浮点数
+          if (!isNaN(value) && value < 0) { // 检查是否为负数
+              $(this).addClass("negative-value"); // 添加类以改变文本颜色
+          }
+
+        });
+
+        $("#base_table th").each(function () {
+          var value = parseFloat($(this).text()); // 尝试将内容转换为浮点数
+          if (!isNaN(value) && value < 0) { // 检查是否为负数
+              $(this).addClass("negative-value"); // 添加类以改变文本颜色
+          }
+
+        });
+
+
+        $('#exceloutput').click(function() {
+          let fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
+          fileName = fileName.replace(/[_\s]+/g, ' ').trim();
+          $('#base_table').tableExport({
+            type: 'excel',
+            mso: {
+              fileFormat: 'xlsx',
+            },
+            fileName: fileName // Using the captured file name
+          });
+        });
+
+      setMaxHeight();
+      $(window).resize(setMaxHeight);
+
+      function setMaxHeight() {
+          var windowHeight = $(window).height(); // 获取视窗的总高度
+          var barHeight = $('body > div.p-0.h-100.d-flex.flex-row > div.m-0.flex-shrink-0.p-2').outerHeight();
+          var formHeight = $('.formStyle').outerHeight(); // 获取表单的高度
+          var headerHight = $('header').outerHeight(); // 获取表单的高度
+          var desiredHeight = windowHeight - formHeight -headerHight - 20; // 分配剩余空间，这里的20可能是其他间隙或边距
+          var desiredHeight = barHeight - formHeight- 100;
+          $('.tableStyle').css('max-height', desiredHeight + 'px'); // 设置最大高度
+          $('#base_table').css('max-height', desiredHeight + 'px'); // 设置最大高度
+      }
+
+
+      $('#hieddenConstnName').click('click', function() {
+        const toggleContents = document.querySelectorAll('.constn_name');
+        const button = this;
+
+        toggleContents.forEach(content => {
+          content.classList.toggle('collapsed-content');
+          content.classList.toggle('expanded-content');
+        });
+
+        button.textContent = button.textContent === '縮小' ? '展開' : '縮小';
+      });
+      });
+
+    </script>
+    {% block javascript %}<script></script>{% endblock %}
+    <style>
+   .collapsed-content {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 8em;
+       /* 约等于6个中文字的宽度 */
+
+   }
+    .expanded-content {
+        white-space: normal;
+   }
+
+    .formStyle {
+        background-color: burlywood;
+        padding: 15px;
+       /* 添加内边距 */
+   }
+    .modal-body > form > div {
+        margin-bottom: 15px;
+   }
+    caption {
+        position: static;
+        caption-side: top;
+   }
+    .tableStyle {
+        height: 100%;
+       /* 减去表单和其他元素的高度 */
+        overflow-y: auto;
+       /* 添加垂直滚动 */
+   }
+    .table {
+        width: 100%;
+       /* overflow-y: auto;
+       */
+        margin-bottom: 0;
+       /* 减少或去除底部的外边距，如果有的话 */
+   }
+   /* CSS for freezing table rows or cells */
+    .sticky-header, .sticky-header th, .sticky-header td {
+        position: sticky;
+        text-align: center;
+        white-space: nowrap;
+       /* 防止内容换行 */
+        vertical-align: middle;
+        top: 0 !important;
+        z-index: 0 !important;
+        border: 1px solid black;
+       /* 为表头的顶部加粗 */
+   }
+    .sticky-header:nth-child(1) {
+        position: sticky;
+        top: 0;
+       /* 其他样式 */
+   }
+    .sticky-header:nth-child(2) {
+        position: sticky;
+        top: 50px;
+       /* 第一行高度 */
+       /* 其他样式 */
+   }
+    .tableStyle table tr:not(.sticky-header) th:not(.sticky-header) {
+        font-size:18px;
+        font-weight:bolder ;
+        white-space: nowrap;
+       /* 防止内容换行 */
+        border: 1px solid black;
+        text-align: center;
+        vertical-align: middle;
+   }
+    .tableStyle table{
+        table-layout: auto;
+        min-width: 100%;
+       /* 可以根据需要调整 */
+        min-height: 100% ;
+        width: auto;
+       /* 允许表格根据内容自动调整宽度 */
+   }
+    .tableStyle table td{
+        white-space: nowrap;
+       /* 防止内容换行 */
+        border: 1px solid black;
+        text-align: center;
+        vertical-align: middle;
+   }
+    .negative-value {
+        color: red !important;
+   }
+    .separator {
+        height: 20px !important;
+        background-color: #fff !important;
+        border-left: none !important;
+        border-right: none !important;
+        --bs-table-color-type: : none !important;
+        --bs-table-bg-type: none !important;
+   }
+    .noshow{
+        display: none;
+   }
+    .truncate {
+        white-space: nowrap;
+       /* 防止文本换行 */
+        overflow: hidden;
+       /* 隐藏超出元素宽度的内容 */
+        text-overflow: ellipsis;
+       /* 超出部分显示省略号 */
+        text-align: left !important;
+   }
+    .hidden {
+        display: none;
+   }
+
+
+    {% block styles %}{% endblock %}
+    </style>
+  </head>
+  <body>
+    <div class="m-3 p-3">
+      <div class="formStyle p-3 rounded">
+        {% block form %}<!-- 放置對應的表單-->{% endblock %}
+      </div>
+      <br />
+      {% block working %}<!-- 放置呈現的資料-->{% endblock %}
+    </div>
+  </div>
+</body>
+</html>

@@ -59,7 +59,7 @@ def home(request):
     # 查询菜单项并构建菜单映射
     else:
         menu_list = Menu.objects.filter(
-            id__in=UserPermissions.objects.filter(group=user.group,permission__gt=0).values("menu_id"),
+            id__in=UserPermissions.objects.filter(group=user.group,permission__gt=0).values("menu_id")
         ).order_by("category", "order")
     allmenu = []
     group = 0

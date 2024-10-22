@@ -34,6 +34,7 @@ CSRF_TRUSTED_ORIGINS_VALUE = [
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "Dv*4JqwxMSClY$x2lVzy!yAeBkX5ZVF0*qbGnCYZI@T#T4CIxA@p&GgeiRhrLhC4"
@@ -100,6 +101,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 WSGI_APPLICATION = "warehousing_server.wsgi.application"
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

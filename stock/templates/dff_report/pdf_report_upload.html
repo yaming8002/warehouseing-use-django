@@ -1,0 +1,81 @@
+{% extends 'base/base_search.html' %}
+{% load static %}
+{% block javascript %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+  <script type="text/javascript">
+  $(document).ready(function() {
+      // 綁定保存按鈕的點擊事件
+      $('#upload_button').on('click', async function(event) {
+          event.preventDefault();
+          var fileInput = document.getElementById('pdf_file');
+          var file = fileInput.files[0];
+
+          // 驗證是否選擇了檔案
+          if (!file) {
+              alert("請選擇一個 PDF 檔案");
+              return;
+          }
+
+          // 使用 FormData 發送檔案
+          var formData = new FormData();
+          formData.append('pdf_file', file);
+          formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+          // AJAX 上傳文件
+          $.ajax({
+              url: '/constn/diff_report/upload/', // 在這裡配置後端處理上傳的 URL
+              type: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function(response) {
+                  // 處理成功的回應，並將上傳的檔案顯示在表格中
+                  if (response.success) {
+                    alert("上傳成功");
+                    var container = $('#pdf-images-container');
+                    container.empty(); // 清空容器，防止重複加載
+
+                    // 遍歷獲取到的圖像數據，並動態生成 img 標籤插入容器
+                    response.images.forEach(function (image) {
+                      var imgTag = $('<img>', {
+                        src: 'data:image/png;base64,' + image,
+                        class: 'pdf-image' // 添加 CSS 類，確保應用樣式
+                      });
+                      container.append(imgTag);
+                    });
+                  } else {
+                      alert("上傳失敗：" + response.message);
+                  }
+              },
+              error: function(xhr, status, error) {
+                  console.error("上傳發生錯誤: ", error);
+                  alert("上傳發生錯誤，請稍後再試。");
+              }
+          });
+      });
+  });
+  </script>
+{% endblock %}
+{% block styles %}
+  .pdf-image {
+  width: 67%;      /* 初始狀態縮小到 67% */
+  height: auto;    /* 高度自適應 */
+  max-width: 100%; /* 防止圖片超過容器 */
+  cursor: zoom-in; /* 鼠標顯示放大指針 */
+  transition: transform 0.3s ease, width 0.3s ease; /* 過渡效果 */
+  }
+{% endblock %}
+{% block form %}
+  <h2>{{ titles }}上傳 PDF 檔案</h2>
+  <form id="upload_pdf_form"
+        method="post"
+        action="/transport_log/uploadpdf/"
+        enctype="multipart/form-data">
+    {% csrf_token %}
+    <div>
+      <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" />
+      <button type="button" id="upload_button">上傳</button>
+    </div>
+  </form>
+{% endblock %}
+{% block working %}<div id="pdf-images-container" class="pdf-image-container"></div>{% endblock %}

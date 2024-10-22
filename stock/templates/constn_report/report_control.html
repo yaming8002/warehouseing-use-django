@@ -1,0 +1,190 @@
+{% extends 'base/base_search.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}
+    <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+    <script type="text/javascript"
+            src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+    <script>
+  $(document).ready(function () {
+    // Adjusting the style of the caption in the table with id 'base_table'
+      $("#table_name").on('change', function() {
+        // 獲取當前選中的值
+        var selectedTable = $(this).val();
+        $('#level-container').hide();
+        $('#component_control').hide();
+        $('#tool_control').hide();
+        $('#checkall_div').hide();
+        // 根據選中的值顯示對應的控制項
+        switch (selectedTable) {
+            case 'pile':
+                break;
+            case 'braces':
+                $('#level-container').show();
+                break;
+            case 'component':
+                $('#level-container').show();
+                // $('#component_control').show();
+                $('#checkall_div').show();
+                break;
+            case 'tool':
+                $('#level-container').show();
+                // $('#tool_control').show();
+                $('#checkall_div').show();
+                break;
+        }
+    });
+
+      $("#control_list").click(function() {
+        let checklist = $('#component_control') ;
+        let selectedTable = $("#table_name").val();
+        if($("#table_name").val() === 'tool')
+            checklist =  $('#tool_control');
+        if (checklist.css('display') === 'none' || !checklist.css('display')) {
+            checklist.show();
+            $(this).val('收起');
+        } else {
+            checklist.hide();
+            $(this).val('展开');
+        }
+    });
+
+
+      $("#check_all").change(function () {
+        var isChecked = $(this).prop('checked');
+        $('.box_items').prop('checked', isChecked);
+      });
+      $("#group_1").change(function () {
+        var isChecked = $(this).prop('checked');
+        $('.class_1').prop('checked', isChecked);
+      });
+      $("#group_2").change(function () {
+        var isChecked = $(this).prop('checked');
+        $('.class_2').prop('checked', isChecked);
+      });
+
+
+    // Setting up the click event for the button with id 'exceloutput'
+    $('#reportexcel').click(function () {
+      var fileName = $('#file_name').text(); // Getting the text of the caption as file name
+      console.log(fileName) ;
+      $('#base_table').tableExport({
+        type: 'excel',
+        mso: {
+          fileFormat: 'xlsx',
+        },
+        fileName: fileName // Using the captured file name
+      });
+    });
+
+    $("#table_name").trigger('change');
+  });
+
+
+    </script>
+{% endblock %}
+{% block form %}
+    {% load strmap %}
+    {% load custom_filters %}
+    <!-- Corrected form tag and added trailing slash to action attribute -->
+    <form id="search" action="/constn/control/" method="POST">
+        {% csrf_token %}
+        {% include "constn/siteinfo_select.html" %}
+        <p>
+            <select id='table_name' name="table_name">
+                {% for table in tables %}
+                    <option value='{{ table.code }}'
+                            {% if table.name == table_name %}selected{% endif %}>{{ table.name }}</option>
+                {% endfor %}
+            </select>
+        </p>
+        <p>
+            <span id="level-container" style="display:none;">
+                <label for="level">層數</label>
+                <select id="level" name="level">
+                    {% get_level as levels %}
+                    {% for level in levels %}
+                        <option value="{{ level.0 }}"
+                                {% if table_level == level.0 %}selected{% endif %}>{{ level.1 }}</option>
+                    {% endfor %}
+                </select>
+            </span>
+            <span id="checkall_div" style="display:none;">
+                <input type="checkbox"
+                       class="form-check-input"
+                       id="check_all"
+                       name="is_all"
+                       {% if request.POST.is_all or request.method == 'GET' %}checked{% endif %}>
+                <label for="check_all">所有</label>
+                <input type="button" id="control_list" value="展开">
+            </span>
+        </p>
+        <div id='component_control' style="display:none;">
+            <table>
+                {% for cla in com_cla %}
+                    <tr>
+                        <td>
+                            <input type="checkbox"
+                                   class="form-check-input box_items "
+                                   id="group_{{ cla.id }}"
+                                   value="{{ cla.id }}"
+                                   name="{{ cla.id }}"
+                                   {% if cla.id|stringformat:"s" in request.POST or request.method == 'GET' %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ item.key }}">{{ cla.name }}</label>
+                        </td>
+                    </tr>
+                    {% for mat in component_list %}
+                        {% if forloop.counter == 1 %}
+                            <tr>
+                                <td></td>
+                            {% endif %}
+                            {% if mat.component ==  cla.id %}
+                                <td>
+                                    <input type="checkbox"
+                                           class="form-check-input box_items class_{{ cla.id }} "
+                                           id="{{ mat.id }}"
+                                           name="selected_items"
+                                           value="{{ mat.id }}"
+                                           {% if mat.id|stringformat:"s" in selected_items or request.method == 'GET' %}checked{% endif %}>
+                                    <label class="form-check-label" for="{{ item.key }}">{{ mat.name }}</label>
+                                </td>
+                                {% if forloop.counter|divisibleby:8 and not forloop.last %}
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+            <p></p>
+        </div>
+        <div id="tool_control" style="display:none;">
+            <table>
+                <tr>
+                    {% for item in tool_list %}
+                        <td>
+                            <input type="checkbox"
+                                   class="form-check-input box_items class_{{ mat.topic }} "
+                                   name="selected_items"
+                                   value="{{ item.id }}"
+                                   {% if item.id|stringformat:"s" in selected_items or request.method == 'GET' %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ item.key }}">{{ item.name }}</label>
+                        </td>
+                        {% if forloop.counter|divisibleby:8 and not forloop.last %}
+                        </tr>
+                        <tr>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </table>
+            <p></p>
+        </div>
+        <input type="submit" value="查詢" />
+        <input type="button" id="reportexcel" value="匯出EXCEL" />
+    </form>
+{% endblock %}
+{% block working %}
+    <h3 id='file_name'>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}-{{ table_name }}</h3>
+    {{ value|safe }}
+{% endblock %}

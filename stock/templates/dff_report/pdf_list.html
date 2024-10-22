@@ -1,0 +1,102 @@
+{% extends 'base/base_search.html' %}{{ '' }}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
+{% block javascript %}
+  <script>
+    $(document).ready(function () {
+      // 使用 let 或 const，確保變數只聲明一次
+      let pdfContainers = $('.pdf-container');  // 使用 jQuery 選擇所有的 .pdf-container
+      let totalPages = pdfContainers.length;
+      let currentPage = 0;
+      // 顯示當前頁面的 PDF
+      function showPage(page) {
+          pdfContainers.each(function(index) {
+              if (index === page) {
+                  $(this).show(); // 顯示當前頁
+              } else {
+                  $(this).hide(); // 隱藏其他頁
+              }
+          });
+
+          // 更新頁面指示器
+          $('#page-indicator').text(`頁數: ${page + 1} / ${totalPages}`);
+      }
+
+      // 下一頁按鈕
+      $('#next-btn').on('click', function () {
+          if (currentPage < totalPages - 1) {
+              currentPage++;
+              showPage(currentPage);
+          }
+      });
+
+      // 上一頁按鈕
+      $('#prev-btn').on('click', function () {
+          if (currentPage > 0) {
+              currentPage--;
+              showPage(currentPage);
+          }
+      });
+
+      // 頁面加載時顯示第一頁
+      showPage(currentPage);
+      $('.pdf-image').on('click', function () {
+        $(this).toggleClass('zoomed');  // 切換 zoomed 類，實現放大/縮小效果
+      });
+
+    });
+    function resizeIframe(iframe) {
+      var high = $('canvas').height;
+      console.log(high)
+      iframe.style.height = high + 'px';
+  }
+  </script>
+{% endblock %}
+{% block styles %}
+  .pdf-image {
+  width: 45%;      /* 寬度縮小到 67% */
+  height: auto;    /* 高度自適應 */
+  max-width: 100%; /* 防止圖片超過容器 */
+  cursor: pointer; /* 鼠標移動到圖片上顯示指針 */
+  transition: transform 0.3s ease; /* 動畫過渡效果 */
+  }
+  /* 點擊放大圖片 */
+  .pdf-image.zoomed {
+  width: 100%;    /* 放大到原始寬度 */
+  height: auto;
+  transform: scale(1); /* 放大 1.5 倍 */
+  cursor: zoom-out;      /* 鼠標指針變為縮小 */
+  }
+  .pdf-image-container {
+  max-width: 800px; /* 父容器最大寬度 */
+  margin: 0 auto;   /* 容器居中 */
+  }
+{% endblock %}
+{% block form %}
+  {% load strmap %}
+  <!-- Corrected form tag and added trailing slash to action attribute -->
+  <form id="search" action="/constn/diff_report/" method="POST">
+    {% csrf_token %}
+    {% include "constn/siteinfo_select.html" %}
+    <input type="submit" value="查詢" />
+    <input type="button" id="download" value="下載" />
+  </form>
+{% endblock %}
+{% block working %}
+  {% for pdf_id, images in pdfs.items %}
+    <div class="pdf-container" id="pdf-{{ forloop.counter0 }}">
+      {% for image in images %}
+        <!-- pdf 分頁用-->
+        <img src="data:image/png;base64,{{ image }}"
+             alt="PDF page"
+             class="pdf-image">
+      {% endfor %}
+    </div>
+  {% endfor %}
+  {% if total_pages > 1 %}
+    <div class="pagination-buttons">
+      <button id="prev-btn">上一頁</button>
+      <span id="page-indicator"></span>
+      <button id="next-btn">下一頁</button>
+    </div>
+  {% endif %}
+{% endblock %}
