@@ -19,8 +19,9 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     path("", include("wcom.urls")),
-    path("",include("stock.urls")),
-    path("",include("trans.urls")),
+    path("",include("w_stock.urls")),
+    path("",include("w_trans.urls")),
+    path("",include("w_constn.urls")),
     ]
 
 

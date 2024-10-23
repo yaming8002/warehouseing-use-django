@@ -7,6 +7,7 @@ from wcom.models.account import Muser
 from wcom.models.user_group import UserGroup
 
 
+
 class AddMuserForm(UserCreationForm):
     class Meta:
         model = Muser
@@ -67,7 +68,7 @@ class CustomPasswordChangeForm(PasswordChangeForm):
 
      class Meta:
          model = Muser
-    
+
      def clean_new_password1(self):
          new_password1 = self.cleaned_data.get('new_password1')
          if len(new_password1) < 8:

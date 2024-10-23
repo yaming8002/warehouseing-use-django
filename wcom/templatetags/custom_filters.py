@@ -1,7 +1,9 @@
 from decimal import Decimal
 from typing import List
+
 from django import template
 from django.db import models
+
 register = template.Library()
 
 @register.filter

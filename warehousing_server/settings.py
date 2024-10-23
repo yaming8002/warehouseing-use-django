@@ -59,8 +59,10 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap4",
     "wcom",
-    "stock",
-    "trans",
+    "w_stock",
+    "w_trans",
+    "w_constn",
+    "w_whreport",
 ]
 
 MIDDLEWARE = [

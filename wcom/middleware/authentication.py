@@ -1,8 +1,9 @@
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.http import JsonResponse
 
 from wcom.models.menu import UserPermissions
+
 
 class AuthenticationMiddleware:
     def __init__(self, get_response):
