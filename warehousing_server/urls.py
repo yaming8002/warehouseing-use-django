@@ -22,6 +22,7 @@ urlpatterns = [
     path("",include("w_stock.urls")),
     path("",include("w_trans.urls")),
     path("",include("w_constn.urls")),
+    path("",include("w_whreport.urls")),
     ]
 
 

@@ -1,7 +1,6 @@
 from decimal import Decimal
 from typing import Dict, List
 
-
 def transpose_list_of_lists(input_list):
     # 确定最大长度
     max_length = max(len(row) for row in input_list)
@@ -12,7 +11,6 @@ def transpose_list_of_lists(input_list):
         transposed_list.append(transposed_row)
 
     return transposed_list
-
 
 def level_summary_of_lists(input_list):
     # 确定最大长度

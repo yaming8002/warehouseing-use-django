@@ -5,9 +5,10 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from w_stock.models import RailReport
+
 from w_stock.models.site_model import SiteInfo
 from w_trans.service.update_rail_by_month import count_done_report
+from w_whreport.models.rail_model import RailReport
 from wcom.utils import MonthListView
 from wcom.utils.uitls import get_year_month
 

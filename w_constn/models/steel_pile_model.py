@@ -16,6 +16,7 @@ class SteelPile(models.Model):
         verbose_name="工地",
     )
 
+    is_mid = models.BooleanField(default=False, verbose_name="檢查")
     material = models.ForeignKey(
         Materials, on_delete=models.CASCADE, verbose_name="物料"
     )

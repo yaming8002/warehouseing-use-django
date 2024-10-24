@@ -1,12 +1,12 @@
 from decimal import Decimal
 from typing import Any, Dict, List
 
-from django.db.models import F,  Case, When, Value, Q
+from django.db.models import F, Case, When, Value, Q
 from django.forms import IntegerField
 
 
 from w_constn.models.steel_pile_model import SteelPile
-from w_constn.service.level_fn import level_summary_of_lists, transpose_list_of_lists
+from w_constn.service.level_fn import transpose_list_of_lists
 
 from w_trans.models.trans_model import TransLog
 from wcom.templatetags.custom_filters import kg_to_meter
@@ -15,7 +15,7 @@ ordering = Case(
     When(material__mat_code="3050", then=Value(1)),
     When(Q(material__mat_code="301") & Q(is_mid=False), then=Value(2)),
     When(Q(material__mat_code="301") & Q(is_mid=True), then=Value(3)),
-    When(Q(material__mat_code="351")  & Q(is_mid=False), then=Value(4)),
+    When(Q(material__mat_code="351") & Q(is_mid=False), then=Value(4)),
     When(Q(material__mat_code="351") & Q(is_mid=True), then=Value(5)),
     When(Q(material__mat_code="401") & Q(is_mid=False), then=Value(6)),
     When(Q(material__mat_code="401") & Q(is_mid=True), then=Value(7)),
@@ -41,16 +41,15 @@ def build_steel_pile_table(constn) -> Dict[str, Dict[str, any]]:
 
     transdefaullog = SteelPile.objects.filter(translog__in=translog, is_ng=False)
     mat_list = (
-        transdefaullog.values_list("material__mat_code", "material__name","is_mid")
+        transdefaullog.values_list("material__mat_code", "material__name", "is_mid")
         .distinct()  # 排除重复记录
         .order_by(ordering)
     )
     steel_map = {}
 
-
-    for mat_code, name ,is_mid in mat_list:
+    for mat_code, name, is_mid in mat_list:
         if is_mid:
-            name = '構台樑 ' + name
+            name = "構台樑 " + name
         steel_map[name] = {}
         tr_list: List[List[Any]] = [[] for _ in range(2)]
         max_length = 0
@@ -61,8 +60,8 @@ def build_steel_pile_table(constn) -> Dict[str, Dict[str, any]]:
             "unit_out": Decimal(0),
         }
 
-        query = Q(material__mat_code=mat_code , is_mid =is_mid )
-        items = transdefaullog.filter(query )
+        query = Q(material__mat_code=mat_code, is_mid=is_mid)
+        items = transdefaullog.filter(query)
         for item in items:
             if item.translog.transaction_type == "IN":
                 tr_list[1].append(item)
@@ -80,9 +79,22 @@ def build_steel_pile_table(constn) -> Dict[str, Dict[str, any]]:
         steel_map[name]["summary"] = summary
         steel_map[name]["max_length"] = max_length + 2
         steel_map[name]["table"] = transpose_list_of_lists(tr_list)
-        steel_map[name]["level_summary"] = level_summary_of_lists(tr_list)
+        steel_map[name]["level_summary"] = level_summary_of_lists_by_pile(tr_list)
     return steel_map
 
+
+def level_summary_of_lists_by_pile(input_list):
+    # 确定最大长度
+    level_list: List[Dict[str, Decimal]] = []
+    for row in input_list:
+        summary = {"count": Decimal(0), "unit": Decimal(0)}
+        for item in row:
+            summary["count"] += getattr(item,'quantity')
+            summary["unit"] += getattr(item,'unit')
+        level_list.append(summary)
+
+    # print(level_list)
+    return level_list
 
 
 def build_steel_ng_table(constn) -> Dict[str, Dict[str, any]]:
@@ -114,7 +126,7 @@ def build_steel_ng_table(constn) -> Dict[str, Dict[str, any]]:
             else:
                 tr_list[0].append(item)
                 summary["count_out"] += Decimal(item.quantity)
-                summary["unit_out"] +=  Decimal(item.unit)
+                summary["unit_out"] += Decimal(item.unit)
         max_length = max(max_length, len(tr_list[0]), len(tr_list[1]))
 
         summary["max_length"] = max_length + 1
@@ -134,7 +146,7 @@ def level_ng_summary_of_lists(input_list):
         for item in row:
             mat_code = item.material.mat_code
             summary["count"] += item.quantity
-            summary["unit"] += Decimal( kg_to_meter(mat_code, Decimal(item.quantity)))
+            summary["unit"] += Decimal(kg_to_meter(mat_code, Decimal(item.quantity)))
         level_list.append(summary)
 
     # print(level_list)

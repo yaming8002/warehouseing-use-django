@@ -7,11 +7,12 @@ from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 import copy
-from w_stock.models import SteelReport
+
 from w_whreport.models.done_steel_model import DoneSteelReport
 from w_stock.models.site_model import SiteInfo
 from w_stock.utils import get_global_site_json
 from w_trans.service.update_steel_by_month import update_steel_total_by_month
+from w_whreport.models.steel_model import SteelReport
 from wcom.utils import MonthListView
 from wcom.utils.uitls import get_year_month
 
