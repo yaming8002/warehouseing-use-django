@@ -78,7 +78,10 @@ def update_done_steel_by_month(year, month,first_day_of_month,last_day_of_month)
     # print(update_list.query)
     for detial in update_list:
         site = SiteInfo.get_site_by_code(detial["site_code"])
-        trun_site = SiteInfo.get_site_by_code(detial["trans_code"])
+        if detial["trans_code"] :
+            trun_site = SiteInfo.get_site_by_code(detial["trans_code"])
+        else:
+            trun_site = None
         column = f"m_{filtered_mat_codes[detial['mat_code']]}"
         value = (
             detial["quantity"]
