@@ -18,36 +18,57 @@ BEGIN
     CALL proc_stock_summary(firstfay, lastday, 0);
 
     -- 刪除 TransLogDetail 資料
-    DELETE FROM trans_translogdetail
+    DELETE FROM w_trans_translogdetail
     WHERE translog_id IN (
-        SELECT id FROM trans_translog
+        SELECT id FROM w_trans_translog
         WHERE build_date BETWEEN firstfay AND lastday
     );
 
     -- 刪除 SteelPile 資料
-    DELETE FROM stock_steelpile
+    DELETE FROM w_constn_steelpile
     WHERE translog_id IN (
-        SELECT id FROM trans_translog
+        SELECT id FROM w_trans_translog
+        WHERE build_date BETWEEN firstfay AND lastday
+    );
+
+    -- 刪除 w_constn_levelbrace 資料
+    DELETE FROM w_constn_levelbrace
+    WHERE translog_id IN (
+        SELECT id FROM w_trans_translog
+        WHERE build_date BETWEEN firstfay AND lastday
+    );
+
+    -- 刪除 w_constn_levelcomponent 資料
+    DELETE FROM w_constn_levelcomponent
+    WHERE translog_id IN (
+        SELECT id FROM w_trans_translog
+        WHERE build_date BETWEEN firstfay AND lastday
+    );
+
+    -- 刪除 w_constn_leveltool 資料
+    DELETE FROM w_constn_leveltool
+    WHERE translog_id IN (
+        SELECT id FROM w_trans_translog
         WHERE build_date BETWEEN firstfay AND lastday
     );
 
     -- 刪除 TransLog 資料
-    DELETE FROM trans_translog
+    DELETE FROM w_trans_translog
     WHERE build_date BETWEEN firstfay AND lastday;
 
     -- 刪除未完成的 SteelReport
-    DELETE FROM stock_steelreport
+    DELETE FROM w_whreport_railreport
     WHERE Year = yyyy AND Month = mm AND is_done = 0;
 
     -- 刪除未完成的 SteelReport
-    DELETE FROM stock_steelreport
+    DELETE FROM w_whreport_steelreport
     WHERE Year = yyyy AND Month = mm AND is_done = 0;
 
-    DELETE FROM stock_boardreport
-    WHERE Year = yyyy AND Month = mm AND close = 0;
+    DELETE FROM w_whreport_boardreport
+    WHERE Year = yyyy AND Month = mm AND is_mid = 0;
 
     -- 刪除 DoneSteelReport 資料
-    DELETE FROM stock_donesteelreport
+    DELETE FROM w_whreport_donesteelreport
     WHERE Year = yyyy AND Month = mm AND done_type = 2;
 END //
 

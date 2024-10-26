@@ -114,14 +114,19 @@ def update_steel_whse_by_month(first_day_of_month, last_day_of_month):
 
 def update_steel_total_by_month(year, month):
     query = Q(siteinfo__id__gt=1) & (Q(year__lt=year) | Q(year=year, month__lte=month))
-    total_month = SteelReport.get_current_by_query(query)
+    exclude_query = Q()
+    for x in SteelReport.static_column_code.keys():
+        exclude_query |= ~Q(**{f"m_{x}": 0})
+    total_month = SteelReport.get_current_by_query(query, final_query=exclude_query)
     total_dct = defaultdict(Decimal)  # 改用float以支援小數
-
+    i = 0
     for item in total_month:
+        print(i)
         for x in SteelReport.static_column_code.keys():
             total_dct[f"m_{x}"] += round(
                 getattr(item, f"m_{x}", 0), 2
             )  # 加入預設值0，以防字段不存在
+        i+=1
 
     total = SteelReport.get_current_by_site(
         SiteInfo.get_site_by_code("0000"), year, month

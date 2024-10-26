@@ -76,6 +76,9 @@ def filter_selected_items(item_list, selected_items):
     """過濾所選項目並返回對應的項目映射"""
     return [item for item in item_list if str(item["id"]) in selected_items]
 
+def filter_selected_mat_items(item_list, selected_items):
+    """過濾所選項目並返回對應的項目映射"""
+    return [item for item in item_list if str(item["id"]) in selected_items]
 
 def get_table_level(level_str):
     """將 level 字符串轉換為整數，或返回默認值"""

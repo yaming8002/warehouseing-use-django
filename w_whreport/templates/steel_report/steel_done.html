@@ -18,7 +18,20 @@
           "caption-side": "top"
         });
       });
+      $("tr.item").each(function () {
+        let allEmpty = true;
 
+        $(this).find("td.value").each(function () {
+          if ($(this).text().trim() !== "") {
+            allEmpty = false;
+            return false; // 找到非空值時跳出迴圈
+          }
+        });
+
+        if (allEmpty) {
+          $(this).hide(); // 隱藏包含所有空值的 <tr>
+        }
+      });
 
     });
 
@@ -192,44 +205,44 @@
         </th>
       </tr>
     {% endif %}
-    <tr>
+    <tr class="item seat_{{ forloop.counter }}">
       <td>{{ item.siteinfo.code }}</td>
       <td>{{ item.siteinfo.owner }}</td>
       <td class="truncate constn_name collapsed-content">{{ item.siteinfo.name }}</td>
-      <td>
+      <td class="value">
         {% if item.m_358 != 0 %}{{ item.m_358 }}{% endif %}
       </td>
-      <td>
+      <td class="value">
         {% if item.m_352 != 0 %}{{ item.m_352 }}{% endif %}
       </td>
-      <td>
+      <td class="value">
         {% if item.m_295 != 0 %}{{ item.m_295 }}{% endif %}
       </td>
-      <td>
+      <td class="value">
         {% if item.m_400 != 0 %}{{ item.m_400 }}{% endif %}
       </td>
-      <td>
+      <td class="value">
         {% if item.m_424 != 0 %}{{ item.m_424 }}{% endif %}
       </td>
-      <td>
+      <td class="value">
         {% if item.m_367 != 0 %}{{ item.m_367 }}{% endif %}
       </td>
-      <td>
+      <td class="value">
         {% if item.m_170 != 0 %}{{ item.m_170 }}{% endif %}
       </td>
-      <td>
+      <td class="value">
         {% if item.m_193 != 0 %}{{ item.m_193 }}{% endif %}
       </td>
-      <td>
+      <td class="value">
         {% if item.m_265 != 0 %}{{ item.m_265 }}{% endif %}
       </td>
-      <td>
+      <td class="value">
         {% if item.m_102 != 0 %}{{ item.m_102 }}{% endif %}
       </td>
-      <td>
+      <td class="value">
         {% if item.m_18 != 0 %}{{ item.m_18 |floatformat:"0" }}{% endif %}
       </td>
-      <td>
+      <td class="value">
         {% if item.m_19 != 0 %}{{ item.m_19 |floatformat:"0" }}{% endif %}
       </td>
       <td colspan='6'

@@ -9,7 +9,7 @@ from django.db.models import Case, When, Value, Sum, DecimalField, F
 
 from w_whreport.models.board_model import BoardReport
 
-def conditional_sum(field_name):
+def conditional_sum(field_name) -> Sum:
     """Returns a conditional sum expression for a given field using DecimalField."""
     return Sum(
         Case(

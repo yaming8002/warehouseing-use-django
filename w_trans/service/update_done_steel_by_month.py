@@ -1,17 +1,17 @@
+from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal
 
+from django.db.models import F, Q, Sum  # Ensure Sum is also imported
+from django.utils.translation import gettext as _
 
-from w_whreport.models.done_steel_model import DoneSteelReport
 from w_stock.models.material_model import Materials
 from w_stock.models.site_model import SiteInfo
 from w_stock.models.stock_model import Stock
 from w_trans.models.trans_model import TransLogDetail
-from django.db.models import Q, F, Sum  # Ensure Sum is also imported
-from collections import defaultdict
-
 from w_trans.service.update_board_by_month import conditional_sum
 from w_trans.utils import get_global_done_steel_list, get_global_steel_list
+from w_whreport.models.done_steel_model import DoneSteelReport
 from w_whreport.models.steel_model import SteelReport
 
 filtered_mat_codes = get_global_steel_list()
@@ -78,7 +78,7 @@ def update_done_steel_by_month(year, month,first_day_of_month,last_day_of_month)
     # print(update_list.query)
     for detial in update_list:
         site = SiteInfo.get_site_by_code(detial["site_code"])
-        trun_site = SiteInfo.get_site_by_code(detial["trans_code"])
+        trun_site = SiteInfo.get_site_by_code(detial["trans_code"])  if detial["trans_code"] else None
         column = f"m_{filtered_mat_codes[detial['mat_code']]}"
         value = (
             detial["quantity"]

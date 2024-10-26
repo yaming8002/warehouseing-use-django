@@ -1,28 +1,5 @@
 {% extends 'base/base.html' %}{{ '' }}
 {% block title %}{{ title }} {{ '' }}{% endblock %}
-{% block javascript %}
-  <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
-  <script type="text/javascript"
-          src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
-  <script>
-  $(document).ready(function () {
-    // Adjusting the style of the caption in the table with id 'base_table'
-    $("#base_table caption").each(function () {
-      $(this).css({
-        "position": "static",
-        "left": "auto",
-        "width": "auto",
-        "height": "auto",
-        "overflow": "visible",
-        "clip": "auto",
-        "caption-side": "top"
-      });
-    });
-  });
-
-
-  </script>
-{% endblock %}
 {% block content %}
   {% load strmap %}
   {% load custom_filters %}
@@ -38,11 +15,11 @@
                 <!--{{level}}-->
                 <th class="s3 table-danger"
                     dir="ltr"
-                    colspan="5"
+                    colspan="6"
                     style="border-left: 1px solid black">{{ level.1 }}出料</th>
                 <th class="s2 table-success"
                     dir="ltr"
-                    colspan="5"
+                    colspan="6"
                     style="border-left: 1px solid black">{{ level.1 }}入料</th>
               {% endif %}
             {% endfor %}
@@ -66,6 +43,8 @@
                     dir="ltr">總計</th>
                 <th class="s3 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"
                     dir="ltr">備註</th>
+                <th class="s3 {% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"
+                    dir="ltr">檢核</th>
               {% endfor %}
               <th class="s4" dir="ltr"  style="border-left: 1px solid black">出數量</th>
               <th class="s4" dir="ltr"  style="border-left: 1px solid black">入數量</th>
@@ -76,39 +55,45 @@
                 {% with tr_count=forloop.counter %}
                   {% for item in row %}
                     {% if item %}
-                      <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
-                        {{ item.build_date | date:"Y/m/d" }}
+                      <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %} item_{{ item.id }}">
+                        {{ item.translog.build_date | date:"Y/m/d" }}
                       </td>
-                      <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
-                        {{ item.total_quantity |floatformat:"0" }}
+                      <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %} item_{{ item.id }}">
+                        {{ item.quantity |floatformat:"0" }}
                       </td>
-                      <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">{{ item.code }}</td>
+                      <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %} item_{{ item.id }}">
+                        {{ item.translog.code }}
+                      </td>
                       {% if tr_count == 1 %}
                         <td rowspan="{{ tran_map.summary.max_length }}"  class="table-secondary">
-                          {{ tran_map.level_summary|list_index_value:forloop.counter }}
+                          {{ tran_map.level_summary|list_index_value:forloop.counter|dict_get_value:'count' }}
                         </td>
                       {% endif %}
-                      <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}">
-                        {% if item.turn_site|is_not_none %}
+                      <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %} item_{{ item.id }}">
+                        {% if item.translog.turn_site|is_not_none %}
                           {% if forloop.counter|divisibleby:2 %}
                             轉移
                           {% else %}
                             來源
                           {% endif %}
-                          {{ item.turn_site }}
+                          {{ item.translog.turn_site.code }}
                           <br>
                         {% endif %}
-                        {% if item.d_remark|is_not_none %}{{ item.remark | linebreaksbr | safe }}{% endif %}
+                        {% if item.remark|is_not_none %}{{ item.remark | linebreaksbr | safe }}{% endif %}
+                      </td>
+                      <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}  item_{{ item.id }}">
+                        <input type='checkbox'
+                               class='check_box'
+                               id="box_{{ item.id }}"
+                               onclick="check_item('{{ item.id }}')"
+                               {% if item.is_mid %}checked{% endif %} />
                       </td>
                     {% else %}
                       <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
                       <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
                       <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
-                      {% if tr_count == 1 %}
-                        <td rowspan="{{ tran_map.summary.max_length }}"  class="table-secondary">
-                          {{ tran_map.level_summary|list_index_value:forloop.counter }}
-                        </td>
-                      {% endif %}
+                      {% if tr_count == 1 %}<td rowspan="{{ tran_map.summary.max_length }}"  class="table-secondary">0.0</td>{% endif %}
+                      <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
                       <td class="{% if forloop.counter|divisibleby:2 %}table-success{% else %}table-danger{% endif %}"></td>
                     {% endif %}
                   {% endfor %}

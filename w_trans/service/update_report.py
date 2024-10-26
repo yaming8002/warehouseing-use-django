@@ -12,6 +12,7 @@ from wcom.utils.excel_tool import execute_stored_procedure
 
 stock_sql_command = "CALL proc_stock_summary(%s, %s, %s)"
 pile_sql_command = "CALL proc_steel_pile_summary(%s, %s)"
+constn_sql_command = "CALL proc_constn_report_summary(%s, %s)"
 
 def count_all_report(count_date: datetime):
     year, month = count_date.year, count_date.month
@@ -21,6 +22,7 @@ def count_all_report(count_date: datetime):
     )
     execute_stored_procedure(stock_sql_command, [first_day_of_month, last_day_of_month, True])
     execute_stored_procedure(pile_sql_command, [first_day_of_month, last_day_of_month])
+    execute_stored_procedure(constn_sql_command, [first_day_of_month, last_day_of_month])
     update_rail_by_month(
         year, month, first_day_of_month, last_day_of_month
     )  # 鋼軌的計算

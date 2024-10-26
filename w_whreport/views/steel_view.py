@@ -196,20 +196,25 @@ def get_edit_remark(request):
             setattr(report, column, value)
 
         report.save()
-        from_report = SteelReport.get_current_by_site(
-            report.siteinfo, report.year, report.month
-        )
+        if report.done_type != 2:
+            from_report = SteelReport.get_current_by_site(
+                report.siteinfo if report.siteinfo.code not in ["F001", "F003"]  else SiteInfo.get_site_by_code("F002"),
+                report.year,
+                report.month,
+            )
+            for k, v in diff_dct.items():
+                setattr(from_report, k, getattr(from_report, k) - v)
+            from_report.save()
+
         trun_reprot = SteelReport.get_current_by_site(
             report.turn_site if report.turn_site else SiteInfo.get_warehouse(),
             report.year,
             report.month,
         )
-
         for k, v in diff_dct.items():
-            setattr(from_report, k, getattr(from_report, k) - v)
             setattr(trun_reprot, k, getattr(trun_reprot, k) + v)
-        from_report.save()
         trun_reprot.save()
+
         update_steel_total_by_month(report.year, report.month)
         # update_total_by_month(report.year, report.month)
         context = {"msg": "成功"}
@@ -239,6 +244,7 @@ def get_add_remark(request):
         steel = SteelReport.get_current_by_site(
             report.siteinfo, report.year, report.month
         )
+        print(model_to_dict(steel))
         for mat_code in DoneSteelReport.static_column_code.keys():
             column = f"m_{mat_code}"
             value_str = request.POST.get(column)
@@ -256,11 +262,11 @@ def get_add_remark(request):
 def get_move_mat(request):
     if request.method == "GET":
         id = request.GET.get("id")
-        context = {'report': SteelReport.objects.get(id=id)}
+        context = {"report": SteelReport.objects.get(id=id)}
         return render(request, "steel_report/steel_wh_edit.html", context)
     else:
         y, m = get_year_month(request.POST.get("yearMonth"))
-        id = request.POST.get('id')
+        id = request.POST.get("id")
         wh = SteelReport.objects.get(id=id)
         for mat_code in DoneSteelReport.static_column_code.keys():
             column = f"m_{mat_code}"

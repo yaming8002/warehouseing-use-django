@@ -16,19 +16,10 @@
         $('#checkall_div').hide();
         // 根據選中的值顯示對應的控制項
         switch (selectedTable) {
-            case 'pile':
-                break;
-            case 'braces':
-                $('#level-container').show();
-                break;
             case 'component':
-                $('#level-container').show();
-                // $('#component_control').show();
                 $('#checkall_div').show();
                 break;
             case 'tool':
-                $('#level-container').show();
-                // $('#tool_control').show();
                 $('#checkall_div').show();
                 break;
         }
@@ -77,8 +68,74 @@
     });
 
     $("#table_name").trigger('change');
-  });
+    $('.check_box').each(function () {
+        let table_id = $(this).attr('id').split('_')[1];
+        if ($(this).is(':checked')) {
+          $('.item_' + table_id)
+            .addClass(function (index, currentClass) {
+              return currentClass.includes('table-success') ? 'success' : 'danger';
+            })
+            .removeClass('table-success table-danger')
+            .addClass('table-secondary');
+        }
+      });
 
+    $('#processCheckedItems').on('click', function () {
+        let checkedIds = [];
+        $('.check_box:checked').each(function () {
+          let table_id = $(this).attr('id').split('_')[1];
+          checkedIds.push(table_id);
+        });
+        let table_name = $('#table_name').find(":selected").val();
+        let site_code = $('#hid_code').val() ;
+
+        // 將已勾選的 ID 發送到後端
+        $.ajax({
+        url: '/constn/control/item_check/', // 替換為實際的後端處理 URL
+        type: 'POST',
+        data: {
+            site_code:site_code,
+            table_name: table_name,
+            ids: checkedIds,
+            csrfmiddlewaretoken: '{{ csrf_token }}' // 確保 CSRF token 可用
+        },
+        success: function (response) {
+            alert('已更新表單');
+            // 在此可以進一步更新前端顯示
+        },
+        error: function (xhr, status, error) {
+            console.error(error);
+            alert('處理過程中發生錯誤');
+        }
+        });
+
+      });
+
+  });
+  function check_item(table_id) {
+    let box = $('#box_' + table_id).is(':checked'); // 檢查是否被勾選
+    console.log('aaaaa', box);
+    if (box) {
+      // 勾選時將 'table-success' 和 'table-danger' 替換為 'success' 和 'danger' 並加上 'table-secondary'
+      $('.item_' + table_id).each(function() {
+        $(this)
+          .addClass(function(index, currentClass) {
+            return currentClass.includes('table-success') ? 'success' : 'danger';
+          })
+          .removeClass('table-success table-danger')
+          .addClass('table-secondary');
+      });
+    } else {
+      // 取消勾選時，恢復到 'table-success' 和 'table-danger'
+      $('.item_' + table_id).each(function(index) {
+        $(this)
+          .removeClass('table-secondary')
+          .addClass(function(index, currentClass) {
+            return currentClass.includes('success') ? 'table-success' : 'table-danger';
+          });
+      });
+    }
+  }
 
     </script>
 {% endblock %}
@@ -98,16 +155,6 @@
             </select>
         </p>
         <p>
-            <span id="level-container" style="display:none;">
-                <label for="level">層數</label>
-                <select id="level" name="level">
-                    {% get_level as levels %}
-                    {% for level in levels %}
-                        <option value="{{ level.0 }}"
-                                {% if table_level == level.0 %}selected{% endif %}>{{ level.1 }}</option>
-                    {% endfor %}
-                </select>
-            </span>
             <span id="checkall_div" style="display:none;">
                 <input type="checkbox"
                        class="form-check-input"
@@ -186,5 +233,8 @@
 {% endblock %}
 {% block working %}
     <h3 id='file_name'>{{ constn.code }}{{ constn.owner }}-{{ constn.name }}-{{ table_name }}</h3>
+    <p>
+        {% if table_name and table_name != '鋼樁' %}<button id="processCheckedItems">更新</button>{% endif %}
+    </p>
     {{ value|safe }}
 {% endblock %}

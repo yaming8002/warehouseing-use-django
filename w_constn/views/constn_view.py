@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
 from w_constn.models.steel_pile_model import SteelPile
+from w_constn.service.level_fn import level_table_build ,model_dict
 from w_constn.service.steel_brace import build_steel_brace_table
 from w_constn.service.steel_component import build_component_table
 from w_constn.service.steel_diff_summary import build_constn_diff_view
@@ -69,37 +70,53 @@ def steel_control_view(request):
 def render_table_to_string(context, table_name, selected_items, table_level,request):
     """根據 table_name 渲染對應模板，並返回 HTML 字符串"""
     context["u_permission"] = request.session.get("u_permission")
-
-    if table_name == "braces":
-        context["steel_pile_table"] = build_steel_brace_table(
-            context["constn"], table_level
-        )
-        return render_to_string("constn_report/brace_table.html", context)
-
-    elif table_name == "pile":
+    if table_name == "pile":
         context["steel_pile_table"] = build_steel_pile_table(context["constn"])
         context["steel_ng_table"] = build_steel_ng_table(context["constn"])
         return render_to_string("constn_report/pile_table.html", context)
 
-    elif table_name == "component":
+    elif table_name == "braces":
+        context["steel_pile_table"],context['table_level'] = level_table_build(table_name,context["constn"] )
+        context['column_count']=range((context['table_level']+1)  * 2)
+        # context["steel_pile_table"] = build_steel_brace_table(
+        #     context["constn"], table_level
+        # )
+        return render_to_string("constn_report/brace_table.html", context)
+    else:
+        lst= context["component_list"] if table_name == "component" else context["tool_list"]
         selected_items_map = filter_selected_items(
-            context["component_list"], selected_items
+            lst, selected_items
         )
-        context["steel_pile_table"] = build_component_table(
-            context["constn"], table_level, selected_items_map
-        )
+        context["steel_pile_table"],context['table_level'] = level_table_build(table_name,context["constn"],selected_items_map )
+        context['column_count']=range((context['table_level']+1)  * 2)
+        # context["steel_pile_table"] = build_component_table(
+        #     context["constn"], table_level, selected_items_map
+        # )
         context["selected_items"] = selected_items
         return render_to_string("constn_report/component_table.html", context)
 
-    elif table_name == "tool":
-        selected_items_map = filter_selected_items(context["tool_list"], selected_items)
-        context["steel_pile_table"] = build_tools_table(
-            context["constn"], table_level, selected_items_map
-        )
-        context["selected_items"] = selected_items
-        return render_to_string("constn_report/tools_table.html", context)
+def steel_control_item_check_view(request):
+    if request.method == "POST":
+        site_code = request.POST.get("site_code")
+        table_name = request.POST.get("table_name")
+        ids = request.POST.get("ids[]")
+        print(site_code)
+        # 驗證 table_name 是否存在於 model_dict
+        model = model_dict.get(table_name)
+        if not model:
+            return JsonResponse({'error': '表單選擇錯誤'}, status=400)
 
-    return "無效的表格類型"
+        # 將 ids 從字符串轉換為列表
+        if ids:
+            ids = [int(i) for i in ids.split(',')]
+        print(ids)
+        # 更新數據庫中的 is_mid 字段
+        model.objects.filter(translog__constn_site__code=site_code).update(is_mid=False)
+        if ids:
+            model.objects.filter(id__in=ids).update(is_mid=True)
+
+        return JsonResponse({'success': True}, status=200)
+    return JsonResponse({'error': '處理過程中發生錯誤'}, status=405)
 
 
 def steel_brace_view(request):
@@ -223,6 +240,8 @@ def component_view(request):
     context["table_level"] = table_level
     context["column_count"] = range((table_level + 1) * 2)
     return render(request, "constn_report/component.html", context)
+
+
 
 
 def tool_view(request):
