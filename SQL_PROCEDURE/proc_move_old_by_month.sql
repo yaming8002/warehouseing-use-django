@@ -1,4 +1,4 @@
-DELIMITER //
+DELIMITER $$
 
 DROP PROCEDURE IF EXISTS proc_move_old_by_month;
 

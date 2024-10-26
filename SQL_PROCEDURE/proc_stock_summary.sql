@@ -1,6 +1,7 @@
-DELIMITER //
+DELIMITER $$
+DROP PROCEDURE IF EXISTS proc_stock_summary;
 
-CREATE OR REPLACE PROCEDURE proc_stock_summary(
+CREATE PROCEDURE proc_stock_summary(
     IN begin_date DATETIME,
     IN end_date DATETIME,
     IN is_add BOOLEAN
@@ -8,6 +9,13 @@ CREATE OR REPLACE PROCEDURE proc_stock_summary(
 BEGIN
    -- Drop and create temporary table
     DROP TEMPORARY TABLE IF EXISTS temp_materials_constn_summary;
+    CREATE TEMPORARY TABLE temp_materials_constn_summary (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        mat_code VARCHAR(50),
+        quantity DECIMAL(10, 2),
+        unit DECIMAL(10, 2)
+    );
+
     CREATE TEMPORARY TABLE temp_materials_constn_summary AS
     SELECT
         d.material_id,
@@ -139,6 +147,6 @@ BEGIN
 	    w_stock_stock.total_unit = VALUES(total_unit);
 
     delete w_stock_stock FROM w_stock_stock where siteinfo_id in (940,942) ;
-END //
+END $$
 
 DELIMITER ;

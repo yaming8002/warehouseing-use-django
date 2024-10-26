@@ -1,8 +1,9 @@
-DELIMITER //
+DELIMITER $$
+DROP PROCEDURE IF EXISTS proc_steel_pile_summary;
 
-CREATE OR REPLACE PROCEDURE proc_steel_pile_summary(
+CREATE PROCEDURE proc_steel_pile_summary(
     IN begin_date DATETIME,
-    IN end_date DATETIME,
+    IN end_date DATETIME
 )
 BEGIN
     -- Drop and create temporary table
@@ -77,6 +78,6 @@ BEGIN
         t.translog_id,m.specification_id, t.remark;
 
     DROP TEMPORARY TABLE IF EXISTS temp_steel_pile;
-END //
+END $$
 
 DELIMITER ;
