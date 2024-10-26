@@ -15,16 +15,16 @@ BEGIN
         d.all_unit,
         d.remark
     FROM
-        trans_translogdetail AS d
+        w_trans_translogdetail AS d
     INNER JOIN
-        trans_translog AS tg ON d.translog_id = tg.id
+        w_trans_translog AS tg ON d.translog_id = tg.id
     WHERE
         tg.build_date BETWEEN begin_date AND end_date
         AND d.remark NOT LIKE '%#%'
         AND tg.constn_site_id <> 1;
 
-    -- 插入到 stock_steelpile 中
-    INSERT INTO `warehousingdb`.`stock_steelpile`
+    -- 插入到 w_constn_steelpile 中
+    INSERT INTO `warehousingdb`.`w_constn_steelpile`
     (`translog_id`, `is_mid`, `is_ng`, `material_id`, `quantity`, `unit`, `remark`)
     SELECT
         t.translog_id,
@@ -45,13 +45,13 @@ BEGIN
     FROM
         temp_steel_pile AS t
     JOIN
-        stock_materials AS m ON t.material_id = m.id
+        w_stock_materials AS m ON t.material_id = m.id
     WHERE
         m.mat_code IN ('3050', '301', '351', '401')
     GROUP BY
         t.translog_id,m.mat_code, t.remark;
 
-    INSERT INTO `warehousingdb`.`stock_steelpile`
+    INSERT INTO `warehousingdb`.`w_constn_steelpile`
     (`translog_id`, `is_mid`, `is_ng`, `material_id`, `quantity`, `unit`, `remark`)
     SELECT
         t.translog_id,
@@ -69,7 +69,7 @@ BEGIN
     FROM
         temp_steel_pile AS t
     JOIN
-        stock_materials AS m ON t.material_id = m.id
+        w_stock_materials AS m ON t.material_id = m.id
     WHERE
         m.mat_code = '999'
         AND m.specification_id IN (25, 26, 27, 28)

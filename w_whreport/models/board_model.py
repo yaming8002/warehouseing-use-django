@@ -1,0 +1,160 @@
+from datetime import datetime
+from decimal import Decimal
+from typing import Optional
+
+from django.db import models
+from django.db.models import F, Q, Window
+from django.db.models.functions import Rank
+
+from w_whreport.models.monthreport_model import MonthReport
+from w_stock.models.site_model import SiteInfo
+import logging
+
+# # Create your models here.
+import logging.config
+from django.conf import settings
+
+from wcom.utils.uitls import get_before_year_month
+
+logging.config.dictConfig(settings.LOGGING)
+
+logger = logging.getLogger(__name__)
+
+
+class BoardReport(MonthReport):
+    static_column_code = {
+        "28": "鋪路鐵板 全",
+        "29": "鋪路鐵板 半",
+        "102": "簍空覆工板",
+        "105": "洗車板",
+    }
+
+    is_lost = models.BooleanField(default=False, verbose_name="是否遺失")
+
+    mat_id = models.CharField(
+        max_length=5, default="28", verbose_name="物料(預設鐵板 全)"
+    )
+    mat_id2 = models.CharField(
+        max_length=5, null=True, verbose_name="物料(預設鐵板半)"
+    )
+
+    quantity = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="數量"
+    )
+
+    quantity2 = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="數量2"
+    )
+
+    close = models.BooleanField(default=False, null=True, verbose_name="關閉")
+
+    class Meta:
+        unique_together = (
+            "siteinfo",
+            "year",
+            "month",
+            "done_type",
+            "is_done",
+            "mat_id",
+        )
+
+    @classmethod
+    def get_site_matial(
+        cls,
+        site: SiteInfo,
+        mat_id: str,
+        year: Optional[int] = None,
+        month: Optional[int] = None,
+        is_done: bool = False,
+    ):
+        # 如果没有提供年份和月份，使用当前的年份和月份
+        if not year or not month:
+            now = datetime.now()
+            year, month = now.year, now.month
+
+        # 构建查询条件
+
+        query = Q(mat_id=mat_id) & Q(siteinfo=site) & Q(is_done=is_done)  & (Q(year__lt=year) | Q(year=year, month__lte=month))
+        # 尝试查找当前年份和月份的记录
+        report = cls.objects.filter(query).order_by("-year", "-month").first()
+
+        # 如果没有找到当前年份和月份的记录，查找更早的记录
+        if report:
+            if f"{report.year}{report.month:02d}" < f"{year}{month:02d}":
+                report.pk = None
+                report.year = year
+                report.month = month
+                report.save()
+        else:
+            # 如果没有找到更早的记录，创建新的记录
+            report= cls.objects.create(
+                siteinfo=site,
+                year=year,
+                month=month,
+                mat_id=mat_id,
+                is_done=is_done
+            )
+
+              # 设置 mat_id2 的值
+        report.mat_id2 = '29' if mat_id == '28' else None
+        report.save()
+        return report
+
+    @classmethod
+    def get_current_by_query(cls, query, final_query=None, is_done=False):
+        if final_query is None:
+            final_query = Q()  # 初始化为一个空的 Q 对象
+        query_set = (
+            cls.objects.annotate(
+                rank=Window(
+                    expression=Rank(),
+                    partition_by=[F("siteinfo__id")],
+                    order_by=[F("year").desc(), F("month").desc()],
+                )
+            )
+            .filter(rank=1)
+            .filter(query)
+            .order_by("-year", "-month")
+            .values("id", "siteinfo__code")
+        )
+        # print(query_set.query)
+        ids = [item["id"] for item in query_set]
+
+        final_query &= Q(id__in=ids) & Q(is_done=is_done)
+
+        return (
+            cls.objects.select_related("siteinfo")
+            .filter(final_query)
+            .order_by("done_type", "siteinfo__code", "siteinfo__genre")
+            .all()
+        )
+
+    @classmethod
+    def update_column_value_by_before(
+        cls,
+        site: SiteInfo,
+        year: int,
+        month: int,
+        is_add: bool,
+        column: int,
+        value: Decimal,
+    ):
+        find_code = '28' if column == '29' else column
+        target_field = "quantity2" if column == '29' else "quantity"
+
+        now = cls.get_site_matial(site, find_code, year, month)
+        b_year, b_month = get_before_year_month(year, month)
+        before = cls.get_site_matial(site, find_code, b_year, b_month)
+
+        if column in ['28', '29']:
+            now.mat_id2 = '29'
+
+        new_value = getattr(before,target_field)
+        new_value += value if is_add else -value
+        setattr(now, target_field, new_value)
+
+        if now.quantity + now.quantity2 == 0:
+            now.close = True
+        else:
+            now.close = False
+        now.save()

@@ -59,8 +59,10 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap4",
     "wcom",
-    "stock",
-    "trans",
+    "w_stock",
+    "w_trans",
+    "w_constn",
+    "w_whreport",
 ]
 
 MIDDLEWARE = [
@@ -146,8 +148,8 @@ DATABASES = {
         "OPTIONS": {
             'charset': 'utf8mb4',
             'use_unicode': True,
-            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'; SET default_storage_engine=INNODB;",
+        }
         # 'TEST': {
         #     'CHARSET': 'utf8mb4',
         #     'COLLATION': 'utf8mb4_general_ci',

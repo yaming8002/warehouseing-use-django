@@ -1,7 +1,9 @@
 from decimal import Decimal
 from typing import List
+
 from django import template
 from django.db import models
+
 register = template.Library()
 
 @register.filter
@@ -14,7 +16,7 @@ def dict_get_value(dct, key):
             return ''
         # 检查值是否为 int 或 Decimal，并且值是否为 0
         if isinstance(val, (int, Decimal)) and val == 0:
-            return ''
+            return 0
         return val
     return ''
 
