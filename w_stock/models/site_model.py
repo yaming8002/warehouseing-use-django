@@ -3,7 +3,7 @@ from django.forms import ValidationError
 from wcom.templatetags import constn_state, site_genre
 from django.utils import timezone
 from django.db.models import Q
-
+from django.utils.translation import gettext as _
 
 class SiteInfo(models.Model):
     code = models.CharField(max_length=10, verbose_name="工地代號")

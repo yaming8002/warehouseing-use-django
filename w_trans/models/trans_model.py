@@ -10,7 +10,7 @@ from w_stock.models.site_model import SiteInfo
 from w_stock.models.stock_model import Stock
 from w_trans.models.car_model import CarInfo
 from wcom.utils.uitls import excel_num_to_date, excel_value_to_str, get_month_range
-
+from django.utils.translation import gettext as _
 
 class TransLog(models.Model):
     code = models.CharField(max_length=100)
@@ -148,9 +148,9 @@ class TransLogDetail(models.Model):
                 remark=remark,
             )
         except IntegrityError as e:
-            raise ValidationError('資料重複，有相同單號、工地、物料、註解。')
+            raise ValidationError(_('資料重複，有相同單號、工地、物料、註解。'))
         except Exception as e:
-            raise ValidationError(f'進出錯誤: {str(e)}')
+            raise ValidationError(_(f'進出錯誤: {str(e)}'))
 
 
 

@@ -2,7 +2,7 @@ import math
 from django.db import  models
 from django.db.models import Q
 from django.forms import ValidationError
-
+from django.utils.translation import gettext as _
 
 ng_spec_name = ["鋼軌", "中H300", "中H350", "中H400"]
 
@@ -70,7 +70,7 @@ class Materials(models.Model):
         count = queryset.count()
         if count > 1 or count == 0:
             # 如果有多筆匹配記錄，拋出重複的錯誤
-            raise ValidationError(f'物料代碼 "{code}" 查詢異常。')
+            raise ValidationError(_(f'物料代碼 "{code}" 查詢異常。'))
         else:
             # 傳回單一符合的記錄
             return queryset.first()
