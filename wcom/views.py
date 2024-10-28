@@ -216,6 +216,18 @@ def group_edit(request):
         group = UserGroup.objects.filter(id=request.GET.get("id")).first()
         context["group"] = group
 
+        all_menus = Menu.objects.all()
+
+        # 取得該 group 已經擁有的 permissions
+        existing_permissions = UserPermissions.objects.filter(group=group)
+        existing_menu_ids = existing_permissions.values_list('menu_id', flat=True)
+
+        # 找出缺少的 menu 並為其創建 UserPermissions 條目
+        missing_menus = [menu for menu in all_menus if menu.id not in existing_menu_ids]
+        print(len(missing_menus))
+        for menu in missing_menus:
+            UserPermissions.objects.create(group=group, menu=menu, permission=0)  # 根據需求設定預設權限
+
         context["list"] = (
             UserPermissions.objects.select_related("menu")
             .filter(group=group)
