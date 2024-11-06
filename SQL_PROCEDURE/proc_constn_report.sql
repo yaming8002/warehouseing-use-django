@@ -36,7 +36,10 @@ BEGIN
     CREATE TEMPORARY TABLE temp_steel_level AS
     SELECT
         d.translog_id,
-        m.mat_code,
+        CASE
+            WHEN m.mat_code IN (SELECT mat_code FROM temp_brace) THEN (SELECT id FROM temp_brace WHERE mat_code = m.mat_code)
+            ELSE m.id
+        END AS material_id,
         SUM(d.quantity) AS quantity,
         SUM(d.all_unit) AS unit,
         d.remark,
@@ -53,7 +56,10 @@ BEGIN
         AND tg.constn_site_id <> 1
     GROUP BY
         d.translog_id,
-        m.mat_code,
+         CASE
+            WHEN m.mat_code IN (SELECT mat_code FROM temp_brace) THEN (SELECT id FROM temp_brace WHERE mat_code = m.mat_code)
+            ELSE m.id
+        END,
         d.remark,
         COALESCE(d.level, 0) ;
 
@@ -65,14 +71,21 @@ BEGIN
         s.name,
         t.level,
         s.id,
-        t.quantity,
-        t.unit,
+        SUM(t.quantity) AS quantity,
+        SUM(t.unit) AS unit,
         t.remark,
         FALSE
     FROM
         temp_steel_level AS t
     INNER JOIN
-        temp_brace AS s ON t.mat_code = s.mat_code;
+        temp_brace AS s ON t.material_id = s.id;
+    GROUP BY
+        t.translog_id,
+        s.name,
+        t.level,
+        s.id,
+        t.remark ;
+
 
     -- 插入到 w_constn_levelcomponent 表
     INSERT INTO `warehousingdb`.`w_constn_levelcomponent`
@@ -89,7 +102,13 @@ BEGIN
     FROM
         temp_steel_level AS t
     INNER JOIN
-        temp_components AS s ON t.mat_code = s.mat_code;
+        temp_components AS s ON t.material_id = s.id;
+    GROUP BY
+        t.translog_id,
+        s.name,
+        t.level,
+        s.id,
+        t.remark ;
 
     -- 插入到 w_constn_leveltool 表
     INSERT INTO `warehousingdb`.`w_constn_leveltool`
@@ -106,7 +125,13 @@ BEGIN
     FROM
         temp_steel_level AS t
     INNER JOIN
-        temp_tools AS s ON t.mat_code = s.mat_code;
+        temp_tools AS s ON t.material_id = s.id;
+    GROUP BY
+        t.translog_id,
+        s.name,
+        t.level,
+        s.id,
+        t.remark ;
 
     -- 刪除臨時表
     DROP TEMPORARY TABLE IF EXISTS temp_components;

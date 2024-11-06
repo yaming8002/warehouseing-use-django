@@ -100,7 +100,6 @@ def steel_control_item_check_view(request):
         site_code = request.POST.get("site_code")
         table_name = request.POST.get("table_name")
         ids = request.POST.get("ids[]")
-        print(site_code)
         # 驗證 table_name 是否存在於 model_dict
         model = model_dict.get(table_name)
         if not model:
@@ -109,7 +108,6 @@ def steel_control_item_check_view(request):
         # 將 ids 從字符串轉換為列表
         if ids:
             ids = [int(i) for i in ids.split(',')]
-        print(ids)
         # 更新數據庫中的 is_mid 字段
         model.objects.filter(translog__constn_site__code=site_code).update(is_mid=False)
         if ids:
@@ -300,7 +298,7 @@ def constn_diff_view(request):
 def export_report_list(request):
     # Fetch the list of reports from the database
     code = request.GET.get("sitecode")
-    print(code)
+
     constn = SiteInfo.get_site_by_code(code)
     output_path = os.path.join(settings.BASE_DIR, "templates", "filled_report.xlsx")
 

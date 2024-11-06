@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.conf import settings
 from django.core.cache import cache
 from openpyxl import load_workbook
+from w_constn.service.steel_diff_summary import build_constn_diff_view
 from w_stock.models.material_model import Materials
 from w_stock.models.site_model import SiteInfo
 from w_trans.models.trans_model import TransLog
@@ -57,11 +58,7 @@ def get_global_site_json(update=False):
             .order_by("code")
             .all()
         )
-        print(  SiteInfo.objects.exclude(name="None", owner="None")
-            .filter( genre__in=[1, 2] )
-            .values("code", "name", "owner")
-            .order_by("code")
-            .all().query)
+
         # 將撈取到的資料存入緩存，並設置過期時間
         cache.set("global_site_json", sitelist, timeout=7 * 24 * 60 * 60)  # 七天過期
     return sitelist

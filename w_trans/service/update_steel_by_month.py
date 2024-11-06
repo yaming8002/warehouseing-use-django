@@ -121,7 +121,6 @@ def update_steel_total_by_month(year, month):
     total_dct = defaultdict(Decimal)  # 改用float以支援小數
     i = 0
     for item in total_month:
-        print(i)
         for x in SteelReport.static_column_code.keys():
             total_dct[f"m_{x}"] += round(
                 getattr(item, f"m_{x}", 0), 2

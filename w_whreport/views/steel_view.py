@@ -244,7 +244,7 @@ def get_add_remark(request):
         steel = SteelReport.get_current_by_site(
             report.siteinfo, report.year, report.month
         )
-        print(model_to_dict(steel))
+
         for mat_code in DoneSteelReport.static_column_code.keys():
             column = f"m_{mat_code}"
             value_str = request.POST.get(column)
