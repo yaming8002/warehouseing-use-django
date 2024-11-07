@@ -25,8 +25,8 @@ class MaterialsForm(forms.ModelForm):
             "name": "料名",
             "category": "分類",
             "specification": "規格",
-            "is_consumable": "是否為耗材",
-            "is_divisible": "是否可拆分",
+            "is_consumable": "耗材",
+            "is_divisible": "可拆分",
             "unit_of_division": "拆分單位",
         }
 
@@ -41,6 +41,7 @@ class MaterialsForm(forms.ModelForm):
         initial="",  # 將默認值設置為 False
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control required"}),
+        label_suffix="(可留空)"  # 添加帮助文本
     )
 
     mat_code3 = forms.CharField(
@@ -48,6 +49,7 @@ class MaterialsForm(forms.ModelForm):
         initial="",  # 將默認值設置為 False
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control required"}),
+        label_suffix="(可留空)"  # 添加帮助文本
     )
 
     name = forms.CharField(

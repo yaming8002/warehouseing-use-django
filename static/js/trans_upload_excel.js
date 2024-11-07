@@ -1,4 +1,5 @@
-var conditionMet = false;
+let conditionMet = false;
+let item_count = 0;
 
 async function totalUpload(file) {
     if (file) {
@@ -165,8 +166,8 @@ async function processAndUploadData(count_date, rows, is_rent, csrftoken) {
     let batchData = [];
     let is_all = $('#is_all').is(':checked');
     const end_date = new Date();  // Assuming end_date is defined elsewhere
-
-    for (let i = 0; i < rows.length; i++) {
+    let i = 0
+    for (; i < rows.length; i++) {
         if (end_date < rows[i][1] || is_all) {
             batchData.push(rows[i]);
         }
@@ -179,6 +180,9 @@ async function processAndUploadData(count_date, rows, is_rent, csrftoken) {
         }
 
         if (rows[i].length < 2 || !rows[i][6]) {
+            if (!is_rent) {
+                item_count = i;
+            }
             break; // Exit loop if incomplete data
         }
     }
@@ -190,7 +194,7 @@ async function processAndUploadData(count_date, rows, is_rent, csrftoken) {
                 data: { "count_date": formatDate(count_date) },
                 method: 'GET'
             });
-            alert("上傳完成");
+            alert("上傳" + item_count + "筆資料\n上傳完成");
             hideSpinner();
         } catch (error) {
             console.error("更新結束日期過程中出現錯誤：", error);

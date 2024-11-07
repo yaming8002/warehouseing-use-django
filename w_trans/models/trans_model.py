@@ -57,6 +57,7 @@ class TransLog(models.Model):
         query = (
             Q(code=code)
             & Q(constn_site=consite)
+            & Q(turn_site=turn_site)
             & Q(build_date__gte=build_date_range[0])
             & Q(build_date__lte=build_date_range[1])
             & Q(transaction_type=transaction_type)
