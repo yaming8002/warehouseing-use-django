@@ -166,8 +166,8 @@ async function processAndUploadData(count_date, rows, is_rent, csrftoken) {
     let batchData = [];
     let is_all = $('#is_all').is(':checked');
     const end_date = new Date();  // Assuming end_date is defined elsewhere
-    let i = 0
-    for (; i < rows.length; i++) {
+
+    for (let i = 0; i < rows.length; i++) {
         if (end_date < rows[i][1] || is_all) {
             batchData.push(rows[i]);
         }

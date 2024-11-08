@@ -148,7 +148,7 @@ class TransLogDetail(models.Model):
                 all_unit=all_unit,
                 remark=remark,
             )
-        except IntegrityError as e:
+        except IntegrityError :
             raise ValidationError(_('資料重複，有相同單號、工地、物料、註解。'))
         except Exception as e:
             raise ValidationError(_(f'進出錯誤: {str(e)}'))

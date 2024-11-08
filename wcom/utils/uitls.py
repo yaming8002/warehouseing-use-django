@@ -13,7 +13,10 @@ def excel_value_to_str(code,desired_length=None):
         return "{:.0f}".format(code)
 
 def excel_num_to_date(excel_num):
-    # Excel中的起始日期
+    if isinstance(excel_num, str):
+        if excel_num.strip() == "":
+            return datetime.today()
+        excel_num = int(excel_num)
     excel_epoch = datetime(1900, 1, 1)
     delta = timedelta(days=excel_num - 2)
     actual_date = excel_epoch + delta
