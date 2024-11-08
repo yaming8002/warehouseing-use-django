@@ -154,6 +154,9 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
                     column ='m_170'
                 elif trun_id =='230'  :
                     column ='m_193'
+                else:
+                    continue
+
 
                 donesteel, _ = DoneSteelReport.objects.get_or_create(
                     siteinfo=SiteInfo.get_site_by_code("F003"),
