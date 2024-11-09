@@ -1,7 +1,7 @@
 from django.urls import path
 from w_trans.views import CarInfoControlView, CarListView, ImportCarInfoView, ImportTransportView, TrandportView, TransRentView
 from w_trans.views.carinfo_view import ImportCarInfoByTotalView
-from w_trans.views.transportlog_view import TransTurn, move_old_data, trans_detial_rollback_view, update_end_date
+from w_trans.views.transportlog_view import TransTurn, move_old_data, trans_detial_rollback_view, trans_edit_view, trans_recalculate_view, update_end_date
 
 urlpatterns = [
     # carinfo
@@ -16,8 +16,9 @@ urlpatterns = [
     # transport_log
     path("transport_log/move_old_data/",move_old_data),
     path("transport_log/list/", TrandportView.as_view(), name="transport_log"),
-    # path("transport_log/edit/", TransDetialControlView.as_view(), name="transport_log"),
+    path("transport_log/edit/", trans_edit_view, name="transport_log"),
     path("transport_log/remove/", trans_detial_rollback_view, name="transport_log"),
+    path("transport_log/recalculate/", trans_recalculate_view, name="transport_log"),
 
     # other table
     path("tran_rent/list/", TransRentView.as_view(), name="carinfo"),

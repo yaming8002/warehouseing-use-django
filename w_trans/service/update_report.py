@@ -41,9 +41,9 @@ def count_all_report(count_date: datetime):
     update_steel_total_by_month(year, month)
 
 
-def move_old_data_by_month(year, month):
+def move_old_data_by_month(year, month,delete_translog =True):
     first_day_of_month = datetime(year, month, 1)
     last_day_of_month = (
         first_day_of_month + relativedelta(months=1) - relativedelta(seconds=1)
     )
-    execute_stored_procedure("CALL proc_move_old_by_month(%s, %s)", [first_day_of_month, last_day_of_month])
+    execute_stored_procedure("CALL proc_move_old_by_month(%s, %s, %s)", [first_day_of_month, last_day_of_month,int(delete_translog)])

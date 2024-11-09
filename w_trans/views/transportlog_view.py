@@ -6,8 +6,8 @@ import traceback
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.db.models import Q
-from django.http import JsonResponse
-from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, render
 
 from w_stock.models.material_model import MatCat, Materials
 from w_stock.models.site_model import SiteInfo
@@ -370,10 +370,40 @@ def update_end_date(request):
     return JsonResponse(response_data)
 
 
-# class TransDetialControlView(SaveControlView):
-#     name = "進出料資訊"
-#     model = TransLogDetail
-#     form_class = TransLogDetailForm
+def trans_edit_view(request) -> HttpResponse | JsonResponse | None:
+    if request.method == 'GET':
+        id = request.GET.get('id')
+        # 使用 get_object_or_404 簡化查詢
+        item = get_object_or_404(TransLogDetail, id=id)
+        context = {'title': '編輯', 'report': item}
+        return render(request, 'trans/transport_edit.html', context)
+
+    elif request.method == 'POST':
+        id = request.POST.get('id')
+        remark = request.POST.get('remark')
+
+        if not id or not remark:
+            # 如果 id 或 remark 缺失，返回錯誤
+            return JsonResponse({"success": False, "msg": "缺少必要的字段"}, status=400)
+
+        try:
+            item = TransLogDetail.objects.get(id=id)
+            item.remark = remark
+            item.save()  # 使用 save() 方法保存更改
+            response_data = {
+                "success": True,
+                "msg": "修改成功",
+            }
+        except TransLogDetail.DoesNotExist:
+            response_data = {
+                "success": False,
+                "msg": "找不到對應的項目",
+            }
+            return JsonResponse(response_data, status=404)
+
+        return JsonResponse(response_data)
+
+
 
 
 def trans_detial_rollback_view(request):
@@ -400,6 +430,30 @@ def trans_detial_rollback_view(request):
     response_data = {
         "success": True,
         "msg": "作廢成功",
+    }
+
+    return JsonResponse(response_data)
+
+
+def trans_recalculate_view(request):
+    # 獲取基準日期，若無效則使用當前日期
+    date_str = request.GET.get('count_date')
+    try:
+        base_date = datetime.strptime(date_str, "%Y-%m-%d") if date_str else datetime.now()
+    except (ValueError, TypeError):
+        base_date = datetime.now()  # 如果日期無效，則使用當前日期
+    print(date_str)
+    # 提取年份和月份
+    year = base_date.year
+    month = base_date.month
+
+    # 移動舊數據並進行重新計算報表
+    move_old_data_by_month(year, month, False)
+    count_all_report(base_date)
+
+    response_data = {
+        "success": True,
+        "msg": "重新計算成功",
     }
 
     return JsonResponse(response_data)

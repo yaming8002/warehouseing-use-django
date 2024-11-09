@@ -141,13 +141,20 @@
           }
         })
       }
-      function showSpinner() {
-        $('#loadingSpinner').modal('show') ;
+      function showSpinner(html_text) {
+        if (html_text) {
+          $('#update_text').html(html_text);
+        } else {
+          $('#update_text').html('上傳中...');
+        }
+        $('#loadingSpinner').modal('show');
       }
+
 
       function hideSpinner() {
         $('#loadingSpinner').modal('hide') ;
       }
+
       function aboutSys() {
         // 使用 jQuery AJAX 获取 about_sys.html 的内容
         window.open("/about_sys/", "AboutSysWindow", "width=800,height=600");

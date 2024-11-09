@@ -54,7 +54,8 @@ th {
           method: 'POST',
           data: form.serialize(), // 序列化表單數據
           success: function (response) {
-            alert(response.msg)
+            alert(response.msg);
+            hideSpinner() ;
             $('#createModal').modal('hide') // 隱藏模態框
             reLoadMainPage()
           },

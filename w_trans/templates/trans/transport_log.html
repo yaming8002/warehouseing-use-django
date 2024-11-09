@@ -9,10 +9,29 @@
       $(this).addClass("table table-primary table-striped");
     });
 
+    $('#recalculate').click(function() {
+      showSpinner('重新計算中...');
+      let count_date = $('#begin').val()
+      $.ajax({
+        url: '/transport_log/recalculate/',
+        method: 'GET',
+        data: { 'count_date': count_date },
+        success: function (response) {
+          console.info('sussesss');
+          alert(response.msg)
+          hideSpinner();
+          reLoadMainPage()
+        },
+        error: function (error) {
+          console.error('資料異常: ', error)
+        }
+      })
+    });
+
   });
 
   function editRow(id) {
-    // 轉換姓名欄位
+    // 編輯註解
 
     $.ajax({
       url: '/transport_log/edit/',
@@ -28,7 +47,7 @@
     })
   }
   function removeRow(id) {
-    // 轉換姓名欄位
+    // 刪除
 
     $.ajax({
       url: '/transport_log/remove/',
@@ -125,8 +144,8 @@
       </select>
     </p>
     <input type="submit" value="查詢" />
+    <input type="button" id="recalculate" value="重新計算" />
   </form>
-
 {% endblock %}
 {% block table %}
   <caption>
@@ -142,9 +161,7 @@
       <th rowspan="2">施工層別</th>
       <th colspan="2">吊卡車公司</th>
       <th colspan="1">經手人</th>
-      {% if request.session.u_permission > 1 %}
-      <th rowspan="2">編輯</th>
-      {% endif %}
+      {% if request.session.u_permission > 1 %}<th rowspan="2">編輯</th>{% endif %}
     </tr>
     <tr>
       <th>工地編號</th>
@@ -201,11 +218,10 @@
         <!--<td>{{ item.transportlog.member }}</td>-->
         <td>{{ item.translog.member }}</td>
         {% if request.session.u_permission > 1 %}
-        <td>
-          {% if not item.is_rollback %}
-            <a href="#" onclick="removeRow({{ item.id }})">作廢</a>
-          {% endif %}
-        </td>
+          <td>
+            <a href="#" onclick="editRow({{ item.id }})">編輯註解</a>
+            {% if not item.is_rollback %}<a href="#" onclick="removeRow({{ item.id }})">作廢</a>{% endif %}
+          </td>
         {% endif %}
       </tr>
     {% endfor %}
