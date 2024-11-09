@@ -2,6 +2,7 @@ from collections import defaultdict
 from decimal import Decimal
 
 from django.db.models import F, Q, Sum  # Ensure Sum is also imported
+from django.forms import model_to_dict
 from django.utils.translation import gettext as _
 
 from w_stock.models.material_model import Materials
@@ -65,7 +66,7 @@ def update_done_steel_by_month(year, month,first_day_of_month,last_day_of_month)
         .filter(query)
         .values(
             site_code=F("translog__constn_site__code"),  # sitecode
-            trans_code=F("translog__turn_site__code"),  # sitecode
+            turn_site=F("translog__turn_site__code"),  # sitecode
             trans_type=F("translog__transaction_type"),  # transaction_type
             mat_code=F("material__mat_code"),  # mat_code
         )
@@ -77,18 +78,19 @@ def update_done_steel_by_month(year, month,first_day_of_month,last_day_of_month)
     # print(update_list.query)
     for detial in update_list:
         site = SiteInfo.get_site_by_code(detial["site_code"])
-        trun_site = SiteInfo.get_site_by_code(detial["trans_code"])  if detial["trans_code"] else None
+        trun_site = SiteInfo.get_site_by_code(detial["turn_site"])  if detial["turn_site"] else None
         column = f"m_{filtered_mat_codes[detial['mat_code']]}"
         value = (
             detial["quantity"]
             if filtered_mat_codes[detial['mat_code']] in ["102", "18", "19"]
             else detial["all_unit_sum"]
         )
-        if trun_site:
-            report = SteelReport.get_current_by_site(
-                trun_site, first_day_of_month.year, first_day_of_month.month
-            )
-            setattr(report, column,getattr(report, column) +value)
+        # if not detial["turn_site"] :
+        #     report = SteelReport.get_current_by_site(
+        #         SiteInfo.get_warehouse(), first_day_of_month.year, first_day_of_month.month
+        #     )
+        #     setattr(report, column,getattr(report, column) +value)
+        #     report.save()
 
 
         donesteel, _ = DoneSteelReport.objects.get_or_create(

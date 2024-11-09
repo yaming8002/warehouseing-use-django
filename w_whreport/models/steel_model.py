@@ -2,11 +2,11 @@ from datetime import datetime
 from decimal import Decimal
 
 from django.db import models
-
+from typing import Optional
 from w_stock.models.material_model import Materials
 from w_whreport.models.monthreport_model import MonthReport
 from w_stock.models.site_model import SiteInfo
-
+from django.db.models import Q
 import logging
 
 # # Create your models here.
@@ -38,11 +38,39 @@ class BaseSteelReport(MonthReport):
         locals()[f"m_{k}"] = models.DecimalField(
             max_digits=10, decimal_places=2, default=0.0, verbose_name=v
         )
+
     class Meta:
         abstract = True
 
 
-class SteelReport(BaseSteelReport) :
+class SteelReport(BaseSteelReport):
+
+    @classmethod
+    def get_current_by_site(
+        cls, site: SiteInfo, year: Optional[int] = None, month: Optional[int] = None
+    ):
+        if not year:
+            now = datetime.now()
+            year, month = now.year, now.month
+
+        query = Q(siteinfo=site) & (Q(year__lt=year) | Q(year=year, month__lte=month))
+        # print( cls.objects.filter(query).order_by('-year', '-month').query)
+        report = cls.objects.filter(query).order_by("-year", "-month").first()
+
+        if not report or ( report.is_done  and f"{report.year}{report.month:02d}" < f"{year}{month:02d}" ):
+            report = cls.objects.create(
+                siteinfo=site,
+                year=year,
+                month=month,
+            )
+        else:
+            if f"{report.year}{report.month:02d}" < f"{year}{month:02d}":
+                report.pk = None
+                report.year = year
+                report.month = month
+            report.save()
+
+        return report
 
     @classmethod
     def add_report(
@@ -83,6 +111,7 @@ class SteelColumn(models.Model):
     class Meta:
         unique_together = ["report", "material", "all_quantity"]
         ordering = ["id"]  # 按照 id 升序排序
+
 
 # class SteelItem(MonthReport):
 #     steel = models.ForeignKey(
