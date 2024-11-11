@@ -196,24 +196,24 @@ def get_edit_remark(request):
             setattr(report, column, value)
 
         report.save()
-
-        from_report = SteelReport.get_current_by_site(
-            report.siteinfo if report.siteinfo.code not in ["F001", "F003"]  else SiteInfo.get_site_by_code("F002"),
-            report.year,
-            report.month,
-        )
-        for k, v in diff_dct.items():
-            setattr(from_report, k, getattr(from_report, k) - v)
-        from_report.save()
-
-        trun_reprot = SteelReport.get_current_by_site(
-            report.turn_site if report.turn_site else SiteInfo.get_warehouse(),
-            report.year,
-            report.month,
-        )
-        for k, v in diff_dct.items():
-            setattr(trun_reprot, k, getattr(trun_reprot, k) + v)
-        trun_reprot.save()
+        if report.siteinfo  and report.siteinfo.genre != 6 :
+            from_report = SteelReport.get_current_by_site(
+                report.siteinfo if report.siteinfo.code not in ["F001", "F003"]  else SiteInfo.get_site_by_code("F002"),
+                report.year,
+                report.month,
+            )
+            for k, v in diff_dct.items():
+                setattr(from_report, k, getattr(from_report, k) - v)
+            from_report.save()
+        if report.turn_site  and report.turn_site.genre != 6 :
+            trun_reprot = SteelReport.get_current_by_site(
+                report.turn_site if report.turn_site else SiteInfo.get_warehouse(),
+                report.year,
+                report.month,
+            )
+            for k, v in diff_dct.items():
+                setattr(trun_reprot, k, getattr(trun_reprot, k) + v)
+            trun_reprot.save()
 
         update_steel_total_by_month(report.year, report.month)
         # update_total_by_month(report.year, report.month)
