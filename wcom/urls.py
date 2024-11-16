@@ -6,7 +6,7 @@ from wcom.views import (
     MuserCreateView,
     MuserListView,
     about_sys_view,
-    account_edit,
+    # account_edit,
     group_add,
     group_edit,
     home,
@@ -23,7 +23,7 @@ urlpatterns = [
     path("about_sys/", about_sys_view, name="about_sys"),
     path("account/list/", MuserListView.as_view(), name="account"),
     path("account/add/", MuserCreateView.as_view(), name="account"),
-    path("account/edit/", account_edit, name="account"),
+    # path("account/edit/", account_edit, name="account"),
     path(
         "account/change-password/",
         CustomPasswordChangeView.as_view(),

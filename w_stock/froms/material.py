@@ -33,6 +33,7 @@ class MaterialsForm(forms.ModelForm):
 
     mat_code = forms.CharField(
         label="物料編號",
+        help_text="(必填)",
         widget=forms.TextInput(attrs={"class": "form-control required"}),
     )
 
@@ -54,11 +55,13 @@ class MaterialsForm(forms.ModelForm):
 
     name = forms.CharField(
         label="料名",
+        help_text="(必填)",
         widget=forms.TextInput(attrs={"class": "form-control required"}),
     )
 
     category = forms.ModelChoiceField(
         label="分類",
+        help_text="(必填)",
         queryset=MatCat.objects.all(),
         empty_label=None,
         widget=forms.Select(attrs={"class": "form-control required"}),

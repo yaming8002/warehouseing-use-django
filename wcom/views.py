@@ -112,58 +112,40 @@ class MuserListView(PageListView):
         return context
 
 
-def account_edit(request):
-    if request.method == "GET":
-        account = request.GET.get("account")
-        username_zh = request.GET.get("username_zh")
-        unit = request.GET.get("unit")
-        group = UserGroup.objects.filter(id=request.GET.get("group_id")).first()
+# def account_edit(request):
+#     if request.method == "GET":
+#         account = request.GET.get("account")
+#         username_zh = request.GET.get("username_zh")
+#         unit = request.GET.get("unit")
+#         group = UserGroup.objects.filter(id=request.GET.get("group_id")).first()
 
-        # 获取要更新的 Muser 对象
-        info = Muser.objects.filter(username=account).first()
+#         # 获取要更新的 Muser 对象
+#         info = Muser.objects.filter(username=account).first()
 
-        if info:
-            # 更新对象的属性
-            info.username_zh = username_zh
-            info.unit = unit
-            info.group = group
-            # 保存更新到数据库
-            info.save()
+#         if info:
+#             # 更新对象的属性
+#             info.username_zh = username_zh
+#             info.unit = unit
+#             info.group = group
+#             # 保存更新到数据库
+#             info.save()
 
-            # 返回JSON响应
-            response_data = {"success": True, "message": "信息更新成功"}
-            return JsonResponse(response_data)
-        else:
-            response_data = {"success": False, "message": "未找到相应的账户信息"}
-            return JsonResponse(response_data)
-    else:
-        response_data = {"success": False, "message": "仅支持GET请求"}
-        return JsonResponse(response_data)
+#             # 返回JSON响应
+#             response_data = {"success": True, "message": "信息更新成功"}
+#             return JsonResponse(response_data)
+#         else:
+#             response_data = {"success": False, "message": "未找到相应的账户信息"}
+#             return JsonResponse(response_data)
+#     else:
+#         response_data = {"success": False, "message": "仅支持GET请求"}
+#         return JsonResponse(response_data)
 
 
 class MuserCreateView(SaveControlView):
     model = Muser
+    name = '使用者'
     form_class = AddMuserForm
     template_name = "base/model_edit.html"
-
-    def form_valid(self, form):
-        """如果表單數據有效，則執行此方法。"""
-        form.save()
-        return JsonResponse({"status": "success", "msg": "新增成功"})
-
-    def form_invalid(self, form):
-        """如果表單數據無效，則執行此方法。"""
-        logger.error("表單數據無效：%s", form.errors)
-        return JsonResponse({"status": "error", "msg": form.errors.as_json()})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # 将查询条件传递到模板
-        context["action"] = "/account/add/"
-        context["title"] = "新增使用者"
-
-        return context
 
 
 class GroupListView(PageListView):

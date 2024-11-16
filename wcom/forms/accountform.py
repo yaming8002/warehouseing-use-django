@@ -57,6 +57,40 @@ class AddMuserForm(UserCreationForm):
         widget=forms.Select(attrs={"class": "form-control required"}),
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:  # 編輯模式
+            self.fields['password1'].widget = forms.HiddenInput()
+            self.fields['password2'].widget = forms.HiddenInput()
+            self.fields['password1'].required = False
+            self.fields['password2'].required = False
+            self.fields['username'].widget.attrs['readonly'] = True
+
+
+    def clean_username(self):
+        # 在新增模式下檢查用戶名唯一性
+        username = self.cleaned_data.get("username")
+        if not self.instance.pk:  # 只有在新增模式下執行
+            if Muser.objects.filter(username=username).exists():
+                raise forms.ValidationError("A user with that username already exists.")
+        return username
+
+    def save(self, commit=True):
+        if self.instance.pk:
+            # 編輯模式 - 透過 ID 取得實例，並逐一更新欄位
+            user = Muser.objects.get(pk=self.instance.pk)
+            user.username_zh = self.cleaned_data.get("username_zh", user.username_zh)
+            user.unit = self.cleaned_data.get("unit", user.unit)
+            user.group = self.cleaned_data.get("group", user.group)
+
+            if commit:
+                user.save()
+            return user
+        else:
+            # 新增模式 - 正常調用父類別的保存方法
+            return super().save(commit=commit)
+
+
 
 class CustomPasswordChangeForm(PasswordChangeForm):
      def __init__(self, *args, **kwargs):

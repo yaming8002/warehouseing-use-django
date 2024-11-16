@@ -58,19 +58,19 @@ class SiteInfoForm(forms.ModelForm):
 
     code = forms.CharField(
         label="工地代號",
-        help_text="*",
+        help_text="(必填)",
         widget=forms.TextInput(attrs={"class": "form-control required"}),
     )
 
     owner = forms.CharField(
         label="業主",
-        help_text="*",
+        help_text="(必填)",
         widget=forms.TextInput(attrs={"class": "form-control required"}),
     )
 
     name = forms.CharField(
         label="工程名稱",
-        help_text="*",
+        help_text="(必填)",
         widget=forms.TextInput(attrs={"class": "form-control required"}),
     )
 
