@@ -70,7 +70,7 @@ class SiteInfoForm(forms.ModelForm):
 
     name = forms.CharField(
         label="工程名稱",
-        help_text="(必填)",
+        required=False,  # 允许字段为空
         widget=forms.TextInput(attrs={"class": "form-control required"}),
     )
 
