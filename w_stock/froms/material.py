@@ -42,7 +42,6 @@ class MaterialsForm(forms.ModelForm):
         initial="",  # 將默認值設置為 False
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control required"}),
-        label_suffix="(可留空)"  # 添加帮助文本
     )
 
     mat_code3 = forms.CharField(
@@ -50,7 +49,6 @@ class MaterialsForm(forms.ModelForm):
         initial="",  # 將默認值設置為 False
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control required"}),
-        label_suffix="(可留空)"  # 添加帮助文本
     )
 
     name = forms.CharField(
@@ -69,10 +67,11 @@ class MaterialsForm(forms.ModelForm):
 
     specification = forms.ModelChoiceField(
         label="規格",
-        queryset=MatSpec.objects.all(),
+        queryset=MatSpec.objects.filter(id__lt=25),
+        help_text="(必填)",
         empty_label=None,
-        required=False,
         widget=forms.Select(attrs={"class": "form-control required"}),
+        initial=MatSpec.objects.get(id=24)
     )
 
     is_consumable = forms.BooleanField(

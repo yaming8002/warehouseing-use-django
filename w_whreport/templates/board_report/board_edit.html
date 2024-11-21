@@ -1,33 +1,33 @@
 {% extends 'base/model_edit.html' %}
 {% block javascript %}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+  <script>
+    // 将 Django 数据传递给 JavaScript
+    $(document).ready(function () {
+      // Adjusting the style of the caption in the table with id 'base_table'
+      adjustModalPosition(550);
+
+      // 當視窗調整大小時重新計算
+      $(window).resize(function () {
+        adjustModalPosition(550);
+      });
+    });
+
+  </script>
 {% endblock %}
 {% block styles %}
   <style>
-  .modal-content {
-   width: auto ;
+  :where(.steel_edit_table) td {
+    border: 1px solid black !important;
+    padding: 8px !important;
+    text-align: center !important;
   }
 
-  .helptext{
-  color:red ;
-  display:inline-block ;
-  }
-  .steel_table{
-    width:1300px ;
-  }
-
-  .steel_table input{
-    width:100% ;
-  }
-
-  th, td {
-    border: 1px solid black; /* 設置單元格邊框 */
-    padding: 8px; /* 設置內邊距 */
-    text-align: center; /* 文字居中 */
-  }
-
-  th {
-    background-color: #f2f2f2; /* 設置表頭背景顏色 */
+  :where(.steel_edit_table) th {
+    background-color: #f2f2f2 !important;
+    border: 1px solid black !important;
+    padding: 8px !important;
+    text-align: center !important;
   }
   </style>
 {% endblock %}
@@ -80,7 +80,7 @@
       </select>
     </div>
     <div>
-      <table>
+      <table class='steel_edit_table'>
         {% if report.mat_id == '28' %}
           鐵板
         {% elif report.mat_id == '102' %}

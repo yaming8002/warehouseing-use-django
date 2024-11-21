@@ -250,22 +250,3 @@ def get_add_remark(request):
         # update_total_by_month(report.year, report.month)
         context = {"msg": "成功"}
         return JsonResponse(context)
-
-
-def get_move_mat(request):
-    if request.method == "GET":
-        id = request.GET.get("id")
-        context = {'report': SteelReport.objects.get(id=id)}
-        return render(request, "steel_report/steel_wh_edit.html", context)
-    else:
-        y, m = get_year_month(request.POST.get("yearMonth"))
-        id = request.POST.get('id')
-        wh = SteelReport.objects.get(id=id)
-        for mat_code in DoneSteelReport.static_column_code.keys():
-            column = f"m_{mat_code}"
-            value_str = request.POST.get(column)
-            value = Decimal(value_str) if value_str else Decimal(0)
-            setattr(wh, column, value)
-        wh.save()
-        context = {"msg": "成功"}
-        return JsonResponse(context)

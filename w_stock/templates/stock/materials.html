@@ -16,7 +16,7 @@
         }
       })
     }
-    
+
     function upload(event) {
       // 向後端發送 AJAX 請求
       $.ajax({
@@ -31,10 +31,10 @@
         }
       })
     }
-    
+
     function editRow(id) {
       // 轉換姓名欄位
-    
+
       $.ajax({
         url: '/material/save/',
         method: 'GET',
@@ -85,11 +85,9 @@
              {% if request.GET.is_detail == "on" %}checked{% endif %} />
     </p>
     <input type="submit" value="查詢" />
-    {% if request.session.u_permission > 1 %}
-      <button type="button" onclick="addMaterial(event)">新增</button>
-      <button type="button" onclick="upload(event)">上傳EXCEL</button>
-    {% endif %}
+    {% if request.session.u_permission > 1 %}<button type="button" onclick="addMaterial(event)">新增</button>{% endif %}
     <button type="button" onclick="download()">匯出EXCEL</button>
+    {% if request.session.u_permission > 1 %}<button type="button" onclick="upload(event)">上傳EXCEL</button>{% endif %}
   </form>
   <div id="modalContainer"></div>
 {% endblock %}
@@ -120,22 +118,22 @@
         <td>{{ item.mat_code }}</td>
         <td>
           {% if item.mat_code2 %}{{ item.mat_code2 }}{% endif %}
-          </td>
+        </td>
+        <td>
+          {% if item.mat_code3 %}{{ item.mat_code3 }}{% endif %}
+        </td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.category }}</td>
+        <td>{{ item.specification }}</td>
+        <td>{{ item.is_consumable|yesno:'是,否' }}</td>
+        <td>{{ item.is_divisible|yesno:'是,否' }}</td>
+        <td>{{ item.unit_of_division }}</td>
+        {% if request.session.u_permission > 1 %}
           <td>
-            {% if item.mat_code3 %}{{ item.mat_code3 }}{% endif %}
-            </td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.category }}</td>
-            <td>{{ item.specification }}</td>
-            <td>{{ item.is_consumable|yesno:'是,否' }}</td>
-            <td>{{ item.is_divisible|yesno:'是,否' }}</td>
-            <td>{{ item.unit_of_division }}</td>
-            {% if request.session.u_permission > 1 %}
-              <td>
-                <a href="#" onclick="editRow({{ item.id }})">編輯</a>
-              </td>
-            {% endif %}
-          </tr>
-        {% endfor %}
-      </tbody>
-    {% endblock %}
+            <a href="#" onclick="editRow({{ item.id }})">編輯</a>
+          </td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock %}

@@ -1,54 +1,60 @@
 {% extends 'base/model_edit.html' %}
+{% block title %}{{ title }} {{ '' }}{% endblock %}
 {% block javascript %}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+  <script>
+    $(document).ready(function () {
+
+      // 初次載入時調整
+      adjustModalPosition(1300);
+
+      // 當視窗調整大小時重新計算
+      $(window).resize(function () {
+        adjustModalPosition(1300);
+      });
+    });
+  </script>
 {% endblock %}
 {% block styles %}
   <style>
-    .modal-dialog {
-      position: fixed;
-      margin: auto;
-      width: 320px;
-      height: 100%;
-      left: 80px;
-    }
-
-    .modal.left .modal-content {
-      height: 100%;
-      border: 0;
-    }
-
-  .helptext{
-  color:red ;
-  display:inline-block ;
-  }
-  .steel_table{
-    width:1300px ;
+  :where(.steel_edit_table) {
+    width: 1200px !important;
   }
 
-  .steel_table input{
-    width:100% ;
+  :where(.steel_edit_table) input {
+    width: 100% !important;
   }
 
-  th, td {
-    border: 1px solid black; /* 設置單元格邊框 */
-    padding: 8px; /* 設置內邊距 */
-    text-align: center; /* 文字居中 */
+  :where(.steel_edit_table) td {
+    border: 1px solid black !important;
+    padding: 8px !important;
+    text-align: center !important;
   }
 
-  th {
-    background-color: #f2f2f2; /* 設置表頭背景顏色 */
+  :where(.steel_edit_table) th {
+    background-color: #f2f2f2 !important;
+    border: 1px solid black !important;
+    padding: 8px !important;
+    text-align: center !important;
   }
+
   </style>
 {% endblock %}
 {% block form %}
   <!-- 修改了 form 的 id 以便直接选中 -->
   <form style="with:100%" method="post" action="/steel_control/move/">
     {% csrf_token %}
-    <div>林口倉轉移到高雄</div>
     <input type="hidden" name="yearMonth" id="yearMonth" value="{{ yearMonth }}">
-    <input type="hidden" name="id" id="id" value="{{ report.id }}">
+    <input type="hidden"
+           name="from_site_code"
+           id="from_site_code"
+           value="{{ from_site_code }}">
+    <input type="hidden"
+           name="to_site_code"
+           id="to_site_code"
+           value="{{ to_site_code }}">
     <div>
-      <table id="input_table" class="steel_table" style="width:1200px;">
+      <table id="input_table" class="steel_edit_table" style="width:1200px;">
         <tr>
           <th>
             H300
@@ -103,74 +109,40 @@
           <td>
             <input type="hidden" id="year" name="year" value="{{ report.year }}">
             <input type="hidden" id="month" name="month" value="{{ report.month }}">
-            <input type="hidden"
-                   id="done_type"
-                   name="done_type"
-                   value="{{ report.done_type }}">
-            <input type="text"
-                   id="m_358"
-                   name="m_358"
-                   value="{{ report.m_358|default:0 }}">
+            <input type="text" id="m_358" name="m_358">
           </td>
           <td>
-            <input type="text"
-                   id="m_352"
-                   name="m_352"
-                   value="{{ report.m_352|default:0 }}">
+            <input type="text" id="m_352" name="m_352">
           </td>
           <td>
-            <input type="text"
-                   id="m_295"
-                   name="m_295"
-                   value="{{ report.m_295|default:0 }}">
+            <input type="text" id="m_295" name="m_295">
           </td>
           <td>
-            <input type="text"
-                   id="m_400"
-                   name="m_400"
-                   value="{{ report.m_400|default:0 }}">
+            <input type="text" id="m_400" name="m_400">
           </td>
           <td>
-            <input type="text"
-                   id="m_424"
-                   name="m_424"
-                   value="{{ report.m_424|default:0 }}">
+            <input type="text" id="m_424" name="m_424">
           </td>
           <td>
-            <input type="text"
-                   id="m_367"
-                   name="m_367"
-                   value="{{ report.m_367|default:0 }}">
+            <input type="text" id="m_367" name="m_367">
           </td>
           <td>
-            <input type="text"
-                   id="m_170"
-                   name="m_170"
-                   value="{{ report.m_170|default:0 }}">
+            <input type="text" id="m_170" name="m_170">
           </td>
           <td>
-            <input type="text"
-                   id="m_193"
-                   name="m_193"
-                   value="{{ report.m_193|default:0 }}">
+            <input type="text" id="m_193" name="m_193">
           </td>
           <td>
-            <input type="text"
-                   id="m_265"
-                   name="m_265"
-                   value="{{ report.m_265|default:0 }}">
+            <input type="text" id="m_265" name="m_265">
           </td>
           <td>
-            <input type="text"
-                   id="m_102"
-                   name="m_102"
-                   value="{{ report.m_102|default:0 }}">
+            <input type="text" id="m_102" name="m_102">
           </td>
           <td>
-            <input type="text" id="m_18" name="m_18" value="{{ report.m_18|default:0 }}">
+            <input type="text" id="m_18" name="m_18">
           </td>
           <td>
-            <input type="text" id="m_19" name="m_19" value="{{ report.m_19|default:0 }}">
+            <input type="text" id="m_19" name="m_19">
           </td>
         </tr>
       </table>

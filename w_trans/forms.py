@@ -10,6 +10,7 @@ class CarinfoFrom(forms.ModelForm):
 
     car_number = forms.CharField(
         label="車號",
+        help_text="(必填)",
         widget=forms.TextInput(attrs={"class": "form-control required"}),
     )
 
@@ -169,7 +170,7 @@ class CarinfoFrom(forms.ModelForm):
 #         if mat.id == original.material.id:
 #             if  diff_quantity == 0 and diff_all_unit == 0:
 #                 self.instance.save()
-#                 return 
+#                 return
 #             tran = self.instance.translog
 #             is_stock_add = tran.transaction_type == "IN"
 #             MainStock.move_material(mat, quantity, all_unit, is_stock_add)
@@ -178,14 +179,13 @@ class CarinfoFrom(forms.ModelForm):
 #                 """if this case not new material"""
 #                 ConStock.move_material( tran.constn_site, mat, quantity, all_unit, not is_stock_add )
 #                 SteelReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity, all_unit )
-                
+
 #             RailReport.add_report( tran.constn_site, tran.build_date, is_stock_add, mat, quantity )
 #             BoardReport.add_report(tran.constn_site, self.instance.remark, is_stock_add, mat, quantity)
-#         elif 
+#         elif
 
 #         self.instance.save()
-        
+
 
 
 #         return self.instance
-  

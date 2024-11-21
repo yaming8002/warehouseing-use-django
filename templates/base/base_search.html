@@ -18,26 +18,49 @@
         });
 
         $("#base_table td").each(function () {
-          var value = parseFloat($(this).text()); // 尝试将内容转换为浮点数
-          if (!isNaN(value) && value < 0) { // 检查是否为负数
-              $(this).addClass("negative-value"); // 添加类以改变文本颜色
+          var value = $(this).text().trim(); // 獲取文本並去掉空白
+          if (value === "None") { // 檢查是否為字符串 "None"
+            $(this).text(""); // 清空內容或選擇隱藏
+            // $(this).hide(); // 或者隱藏該元素
           }
 
+          var numericValue = parseFloat(value); // 尝试将内容转换为浮点数
+          if (!isNaN(numericValue) && numericValue < 0) { // 检查是否为负数
+            $(this).addClass("negative-value"); // 添加类以改变文本颜色
+          }
         });
 
         $("#base_table th").each(function () {
-          var value = parseFloat($(this).text()); // 尝试将内容转换为浮点数
-          if (!isNaN(value) && value < 0) { // 检查是否为负数
-              $(this).addClass("negative-value"); // 添加类以改变文本颜色
+          var value = $(this).text().trim(); // 獲取文本並去掉空白
+          if (value === "None") { // 檢查是否為字符串 "None"
+            $(this).text(""); // 清空內容或選擇隱藏
+            // $(this).hide(); // 或者隱藏該元素
           }
 
+          var numericValue = parseFloat(value); // 尝试将内容转换为浮点数
+          if (!isNaN(numericValue) && numericValue < 0) { // 检查是否为负数
+            $(this).addClass("negative-value"); // 添加类以改变文本颜色
+          }
         });
 
 
         $('#exceloutput').click(function() {
+          const table = $('#base_table');
+          if (table.length === 0) {
+            alert('頁面上沒有可導出的表格！');
+            return; // 結束執行
+          }
+
+          // 確認表格行數是否超過 2
+          const rowCount = table.find('tr').length;
+          if (rowCount <= 2) {
+            alert('請查尋資料後再匯出');
+            return; // 結束執行
+          }
+
           let fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
           fileName = fileName.replace(/[_\s]+/g, ' ').trim();
-          $('#base_table').tableExport({
+          table.tableExport({
             type: 'excel',
             mso: {
               fileFormat: 'xlsx',

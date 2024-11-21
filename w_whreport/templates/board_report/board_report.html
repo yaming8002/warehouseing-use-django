@@ -47,7 +47,7 @@
              id="yearMonthInput"
              name="yearMonth"
              value='{{ yearMonth }}'>
-      <label for="mat_id">物料:</label>
+      <label for="mat_id">物料項目:</label>
       <select id="mat_id" name="mat_id">
         <option value='28' {% if mat_id == '28' %}selected{% endif %}>鐵板</option>
         <option value='-28' {% if mat_id == '-28' %}selected{% endif %}>鐵板遺失</option>
@@ -74,12 +74,12 @@
   <tr>
     <th>項次</th>
     <th>工地代號</th>
-    <th>業主</th>
+    <th>業主{{ mat_id }}</th>
     <th>
       名稱
       <button id="hieddenConstnName" class="btn btn-sm btn-secondary ms-2">展開</button>
     </th>
-    {% if '28' == mat_id %}
+    {% if '28' == mat_id or mat_id == '-28' %}
       <th>鐵板 全</th>
       <th>鐵板 半</th>
       <th>總計</th>

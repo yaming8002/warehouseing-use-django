@@ -3,93 +3,64 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
   <script>
     // 将 Django 数据传递给 JavaScript
-    var sitelist_js = {{ sitelist |safe }};
     $(document).ready(function () {
       // Adjusting the style of the caption in the table with id 'base_table'
-      $.each(sitelist_js, function(index, item) {
-        // 截取 name 和 address 的前 6 个字符
-        var optionText =  item.code +"|"+ item.owner ;
-        if (item.name && item.name.trim() !== "") {
-          optionText += "|" + item.name.substring(0, 6);
-        }
-        // 动态创建并添加 option 元素
-        $('#sitelist').append($('<option>', {
-            value: item.code,
-            text: optionText
-        }));
+      adjustModalPosition(1300);
+
+      // 當視窗調整大小時重新計算
+      $(window).resize(function () {
+        adjustModalPosition(1300);
       });
-    // 确认数据是否正确写入
     });
 
-    $('#sitelist').on('change', function() {
-      let value = this.value;
+    function updateDetails() {
+      let value = $('#sitelist').val(); // 使用 .val() 獲取 select 的值
       $.each(sitelist_js, function(index, item) {
         if (value == item.code) {
-          $('#name').text(item.name);
-          $('#owner').text(item.owner);
+          $('#show_name').text(item.name);
+          $('#show_owner').text(item.owner);
         }
       });
-    });
+    }
+
+    // 綁定事件給相關的元素
+    $('#code, #owner, #name, #sitelist').on('change', updateDetails);
 
   </script>
 {% endblock %}
 {% block styles %}
   <style>
-    .modal-dialog {
-      position: fixed;
-      margin: auto;
-      width: 320px;
-      height: 100%;
-      left: 80px;
-    }
-
-    .modal.left .modal-content {
-      height: 100%;
-      border: 0;
-    }
-
-  .helptext{
-  color:red ;
-  display:inline-block ;
-  }
-  .steel_table{
-    width:1300px ;
+  :where(.steel_edit_table) {
+    width: 1200px !important;
   }
 
-  .steel_table input{
-    width:100% ;
+  :where(.steel_edit_table) input {
+    width: 100% !important;
   }
 
-  th, td {
-    border: 1px solid black; /* 設置單元格邊框 */
-    padding: 8px; /* 設置內邊距 */
-    text-align: center; /* 文字居中 */
+  :where(.steel_edit_table) td {
+    border: 1px solid black !important;
+    padding: 8px !important;
+    text-align: center !important;
   }
 
-  th {
-    background-color: #f2f2f2; /* 設置表頭背景顏色 */
+  :where(.steel_edit_table) th {
+    background-color: #f2f2f2 !important;
+    border: 1px solid black !important;
+    padding: 8px !important;
+    text-align: center !important;
   }
+
   </style>
 {% endblock %}
 {% block form %}
   <!-- 修改了 form 的 id 以便直接选中 -->
   <form style="with:100%" method="post" action="/steel_done/add/">
     {% csrf_token %}
-    <div>狀態 : 總數變動</div>
-    <div>
-      <select id='sitelist' name ='sitelist'></select>
-    </div>
-    <div>
-      工地 :
-      <span id='name'></span>
-    </div>
-    <div>
-      業主 :
-      <span id='owner'></span>
-    </div>
+    <div>{% include "constn/siteinfo_select.html" %}</div>
     <input type="hidden" name="yearMonth" id="yearMonth" value="{{ yearMonth }}">
     <div>
-      <table id="input_table" class="steel_table" style="width:1200px;">
+      <table id="input_table" class="steel_edit_table">
         <tr>
           <th>
             H300

@@ -180,7 +180,7 @@ def get_edit_remark(request):
     if request.method == "GET":
         report_id = request.GET.get("id")
         report = DoneSteelReport.objects.get(id=report_id)
-        context = {"report": report}
+        context = {"title": '修改物料數量',"report": report}
 
         return render(request, "steel_report/steel_edit_remark.html", context)
     else:
@@ -196,16 +196,18 @@ def get_edit_remark(request):
             setattr(report, column, value)
 
         report.save()
-        if report.siteinfo  and report.siteinfo.genre != 6 :
+        if report.siteinfo and report.siteinfo.genre != 6:
             from_report = SteelReport.get_current_by_site(
-                report.siteinfo if report.siteinfo.code not in ["F001", "F003"]  else SiteInfo.get_site_by_code("F002"),
+                report.siteinfo
+                if report.siteinfo.code not in ["F001", "F003"]
+                else SiteInfo.get_site_by_code("F002"),
                 report.year,
                 report.month,
             )
             for k, v in diff_dct.items():
                 setattr(from_report, k, getattr(from_report, k) - v)
             from_report.save()
-        if report.turn_site  and report.turn_site.genre != 6 :
+        if report.turn_site and report.turn_site.genre != 6:
             trun_reprot = SteelReport.get_current_by_site(
                 report.turn_site if report.turn_site else SiteInfo.get_warehouse(),
                 report.year,
@@ -225,13 +227,13 @@ def get_add_remark(request):
     if request.method == "GET":
         year_month = request.GET.get("yearMonth")
         context = {
-            "sitelist": get_global_site_json(),
+            "title": '總數變動',
             "yearMonth": year_month,
         }
         return render(request, "steel_report/steel_add.html", context)
     else:
-        site_code = request.POST.get("sitelist")
-        site = SiteInfo.objects.get(code=site_code)
+        site_code = request.POST.get("site_code")
+        site = SiteInfo.get_site_by_code(site_code)
         y, m = get_year_month(request.POST.get("yearMonth"))
         report = DoneSteelReport.objects.create(
             siteinfo=site,
@@ -262,17 +264,35 @@ def get_add_remark(request):
 def get_move_mat(request):
     if request.method == "GET":
         id = request.GET.get("id")
-        context = {"report": SteelReport.objects.get(id=id)}
+        report = SteelReport.objects.get(id=id)
+        if report.siteinfo.code == "0001":
+            title = "林口倉轉移到高雄倉"
+            from_site_code = "0001"
+            to_site_code = "0003"
+        else:
+            title = "高雄倉轉移到林口倉"
+            from_site_code = "0003"
+            to_site_code = "0001"
+
+        context = {
+            "title": title,
+            "from_site_code": from_site_code,
+            "to_site_code": to_site_code,
+        }
         return render(request, "steel_report/steel_wh_edit.html", context)
     else:
         y, m = get_year_month(request.POST.get("yearMonth"))
-        id = request.POST.get("id")
-        wh = SteelReport.objects.get(id=id)
+        from_site_code = request.POST.get("from_site_code")
+        to_site_code = request.POST.get("to_site_code")
+        from_site = SteelReport.get_current_by_site(SiteInfo.get_site_by_code(from_site_code), y, m)
+        to_site = SteelReport.get_current_by_site(SiteInfo.get_site_by_code(to_site_code), y, m)
         for mat_code in DoneSteelReport.static_column_code.keys():
             column = f"m_{mat_code}"
             value_str = request.POST.get(column)
             value = Decimal(value_str) if value_str else Decimal(0)
-            setattr(wh, column, value)
-        wh.save()
+            setattr(from_site, column,getattr(from_site,column) - value)
+            setattr(to_site, column,getattr(to_site,column) + value)
+        from_site.save()
+        to_site.save()
         context = {"msg": "成功"}
         return JsonResponse(context)

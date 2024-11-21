@@ -76,13 +76,40 @@ th {
 
       $('#createModal').on('click', '.btn-secondary', function (event) {
         // 關閉模態框，這行代碼是可選的，因為 `data-dismiss="modal"` 已經處理了關閉行為
-        console.info('check close')
         $('#createModal').modal('hide');
       })
 
 
 
     })
+    function adjustModalPosition(modalWidth) {
+      // 取得視窗寬度
+      var windowWidth = $(window).width();
+      // 設定 modal 的寬度
+
+      // 計算 margin-left
+      var marginLeft = (windowWidth - modalWidth) / 2;
+
+      // 確保 margin-left 不為負值
+      if (marginLeft < 0) {
+        marginLeft = 0;
+      }
+
+      // 設定樣式
+      $('.modal-dialog').css({
+        position: 'fixed',
+        margin: 'auto',
+        width: modalWidth + 'px',
+        height: '100%',
+        left: marginLeft + 'px'
+      });
+      $('.modal-content').css({
+        width: modalWidth + 'px'
+      });
+
+
+
+    }
     </script>
     {% block javascript %}{% endblock %}
   </head>

@@ -19,7 +19,7 @@
       }
     })
   }
-  
+
   function upload(event) {
     // 向後端發送 AJAX 請求
     $.ajax({
@@ -49,10 +49,7 @@
       <label for="owner">業主</label>
       <input type="text" id="owner" name="owner" value="{{ request.GET.owner }}" />
       <label for="name">工地名稱</label>
-      <input type="text"
-             id="name"
-             name="name"
-             value="{{ request.GET.name }}" />
+      <input type="text" id="name" name="name" value="{{ request.GET.name }}" />
     </p>
     <p>
       {% get_constn_state as constn_state %}  <!-- 调用模板标签并将结果赋值给变量 -->
@@ -79,28 +76,31 @@
     </p>
     <input type="submit" value="查詢" />
     {% if request.session.u_permission > 1 %}
-    <td>
-      <button type="button" onclick="constn_edit(null)">新增</button>
-    </td>
+      <td>
+        <button type="button" onclick="constn_edit(null)">新增</button>
+      </td>
     {% endif %}
     <!--<button type="button" onclick="upload(event)">上傳EXCEL</button>-->
   </form>
-
 {% endblock %}
 {% block table %}
-  <caption><h3>工地清單</h3></caption>
+  <caption>
+    <h3>工地清單</h3>
+  </caption>
   <thead>
     <tr>
       <th scope="col">工地編號</th>
       <th scope="col">業主</th>
       <th scope="col">工程名稱</th>
       <th scope="col">發案日期</th>
-      <th scope="col">鋼樁結算</th>
-      <th scope="col">鋼軌結算</th>
+      <!-- <th scope="col">鋼樁結算</th>
+      <th scope="col">鋼軌結算</th>-->
+      <th scope="col">現場人員</th>
+      <th scope="col">會計人員</th>
       <th scope="col">狀態</th>
       <th scope="col">類別</th>
-      <th scope="col">結案日期</th>
-      {% if request.session.u_permission > 1  %}<th scope="col">編輯</th>{% endif %}
+      <!--<th scope="col">結案日期</th>-->
+      {% if request.session.u_permission > 1 %}<th scope="col">編輯</th>{% endif %}
     </tr>
   </thead>
   <tbody>
@@ -110,17 +110,12 @@
         <td>
           <!--{{item.id}}-->{{ item.code }}
         </td>
-        <td>
-          <!--{{item.id}}-->{{ item.owner }}
-        </td>
-        <td>
-          <!--{{item.id}}-->
-          {{ item.name }}
-        </td>
+        <td>{{ item.owner }}</td>
+        <td>{{ item.name }}</td>
         <td>
           {% if item.crate_date %}{{ item.crate_date | date:'Y-m-d' }}{% endif %}
         </td>
-        <td>
+        <!-- <td>
           {% if "1" != item.genre|stringformat:"s" %}
             ---
           {% elif item.poling_done %}
@@ -137,12 +132,16 @@
           {% else %}
             否
           {% endif %}
-        </td>
+        </td>-->
+        <td>{{ item.member }}</td>
+        <td>{{ item.counter }}</td>
         <td>
           {% get_constn_state as constn_state %}
           {% for state in constn_state %}
             <!-- 迭代 constn_state 变量 -->
-            {% if state.0|stringformat:"s" == item.state|stringformat:"s" %}{{ state.1 }}{% endif %}
+            {% if state.0|stringformat:"s" == item.state|stringformat:"s" %}
+              {{ state.1 }}
+            {% endif %}
           {% endfor %}
         </td>
         <td>
@@ -152,13 +151,13 @@
             {% if genre.0|stringformat:"s" == item.genre|stringformat:"s" %}{{ genre.1 }}{% endif %}
           {% endfor %}
         </td>
-        <td>
+        <!-- <td>
           {% if item.done_date %}{{ item.done_date | date:'Y-m-d' }}{% endif %}
-        </td>
-        {% if request.session.u_permission > 1  %}
-        <td>
-          <a href="#" onclick="constn_edit('{{ item.pk }}')">編輯</a>
-        </td>
+        </td>-->
+        {% if request.session.u_permission > 1 %}
+          <td>
+            <a href="#" onclick="constn_edit('{{ item.pk }}')">編輯</a>
+          </td>
         {% endif %}
       </tr>
     {% endfor %}

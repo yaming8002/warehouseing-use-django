@@ -24,7 +24,7 @@ $(document).ready(function () {
 
   });
 
-  
+
   $('#exceloutput').click(function() {
     var fileName = $('#base_table caption').text(); // Getting the text of the caption as file name
     $('#base_table').tableExport({
@@ -50,8 +50,37 @@ function setMaxHeight() {
     $('#base_table').css('max-height', desiredHeight + 'px'); // 设置最大高度
 }
 
+    // 初次載入時調整
+    adjustModalPosition(800);
+
+    // 當視窗調整大小時重新計算
+    $(window).resize(function () {
+      adjustModalPosition(800);
+    });
+
 });
   </script>
+{% endblock %}
+{% block styles %}
+  <style>
+  :where(.steel_edit_table) {
+    width: 720px !important;
+  }
+
+  :where(.steel_edit_table) td {
+    border: 1px solid black !important;
+    padding: 8px !important;
+    text-align: center !important;
+  }
+
+  :where(.steel_edit_table) th {
+    background-color: #f2f2f2 !important;
+    border: 1px solid black !important;
+    padding: 8px !important;
+    text-align: center !important;
+  }
+
+  </style>
 {% endblock %}
 {% block form %}
   <!-- 修改了 form 的 id 以便直接选中 -->
@@ -79,13 +108,8 @@ function setMaxHeight() {
       <label for='isdone'>是否結案</label>
       <input id="isdone" name="isdone" type='checkbox' checked>
     </div>
-    <div style="with:100%">
-      <label for="remark">說明</label>
-      <br>
-      <textarea style="with:100%" id="remark" name="remark" row="5">{% if report.remark %}{{report.remark}}{% endif %}</textarea>
-    </div>
     <div>
-      <table id="base_table">
+      <table id="base_table" class='steel_edit_table'>
         <tr>
           <th>項目</th>
           <th>5M</th>
@@ -203,6 +227,11 @@ function setMaxHeight() {
           <td>{{ sum.sum_total |floatformat:"0" }}</td>
         </tr>
       </table>
+    </div>
+    <div style="with:100%">
+      <label for="remark">說明</label>
+      <br>
+      <textarea style="width:720px" id="remark" name="remark" row="5">{% if report.remark %}{{report.remark}}{% endif %}</textarea>
     </div>
   </form>
 {% endblock %}
