@@ -7,6 +7,7 @@
     <label for="name">名稱</label>
     <input type="text" id="name" />
     <input type="hidden" id="hid_code" value="{{ constn.code }}">
+    <input type="hidden" id="not_wh" value="{{ not_wh|default:'False' }}">
 </p>
 <p>
     <label for="code">工地選單</label>
@@ -30,44 +31,46 @@
 
     function updateSitelist(data) {
         // 取得輸入框的值
-        let code = $('#code').val().trim();
-        let owner = $('#owner').val().trim();
-        let name = $('#name').val().trim();
-        var hid_code= $('#hid_code').val() ;
+        const code = $('#code').val().trim();
+        const owner = $('#owner').val().trim();
+        const name = $('#name').val().trim();
+        const hid_code = $('#hid_code').val();
+        const not_wh = $('#not_wh').val().trim() === 'True';
+
         // 清空現有的 sitelist
         $('#sitelist').empty();
-        // 遍歷 sitelist_js 進行篩選
-        $.each(data, function(index, item) {
-            let isMatch = true;
 
-            // 根據 code 篩選
-            if (code && !item.code.startsWith(code)) {
-                isMatch = false;
-            }
+        // 遍歷 data 進行篩選
+        $.each(data, function (index, item) {
+            // 判斷是否符合篩選條件
+            const matchesCode = !code || item.code.startsWith(code);
+            const matchesOwner = !owner || item.owner.startsWith(owner);
+            const matchesName = !name || item.name.includes(name);
 
-            // 根據 owner 篩選
-            if (owner && !item.owner.startsWith(owner)) {
-                isMatch = false;
-            }
-
-            // 根據 name 篩選
-            if (name && !item.name.includes(name)) {
-                isMatch = false;
-            }
-
-            // 如果符合所有篩選條件，則加入選項
-            if (isMatch) {
-                var optionText = item.code + "|" + item.owner;
-                if (item.name && item.name.trim() !== "") {
-                    optionText += "|" + item.name.substring(0, 6);
+            // 如果符合篩選條件，處理選項
+            if (matchesCode && matchesOwner && matchesName) {
+                // 設置選項文字
+                let optionText = `${item.code}|${item.owner}`;
+                if (item.name && item.name.trim()) {
+                    optionText += `|${item.name.substring(0, 6)}`;
                 }
-                var option = $('<option>', {
+
+                // 創建選項
+                const option = $('<option>', {
                     value: item.code,
                     text: optionText
                 });
-                if (hid_code == item.code ){
-                    option.prop("selected", true)
+
+                // 如果匹配 hid_code，則設為選中
+                if (hid_code === item.code) {
+                    option.prop('selected', true);
                 }
+
+                if (not_wh && ['0000', '0001', '0002', '0003','0004'].includes(item.code)){
+                    return true;
+                }
+                // 判斷是否需要排除不在倉庫的條件
+
                 $('#sitelist').append(option);
 
             }

@@ -77,10 +77,7 @@ class ConstnStockViewList(PageListView):
     title_name = "工地庫存"
 
     def get_queryset(self):
-        owner = self.request.GET.get("owner")
-        code = self.request.GET.get("code")
-        address = self.request.GET.get("address")
-        state = self.request.GET.get("state")
+        code = self.request.GET.get("site_code")
         mat_code = self.request.GET.get("mat_code")
         mat_name = self.request.GET.get("mat_name")
         category_id = self.request.GET.get("category_id")
@@ -88,12 +85,6 @@ class ConstnStockViewList(PageListView):
         query = Q(siteinfo__id__gt=4)
         if code:
             query &= Q(siteinfo__code=code)
-        if owner:
-            query &= Q(siteinfo__owner__istartswith=owner)
-        if address:
-            query &= Q(siteinfo__address__istartswith=address)
-        if state:
-            query &= Q(siteinfo__state=int(state))
         if mat_code:
             query &= Q(material__mat_code=mat_code)
         if mat_name:
@@ -105,6 +96,9 @@ class ConstnStockViewList(PageListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if self.request.GET.get("site_code"):
+            context['constn'] = SiteInfo.get_site_by_code(self.request.GET.get("site_code"))
+        context['not_wh'] = True
         return context
 
 

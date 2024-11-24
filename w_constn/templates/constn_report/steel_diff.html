@@ -7,7 +7,7 @@
     function exceloutput_diff(){
       var sitecode = $('#sitelist').val() ;
       $.ajax({
-        url: '/constn/constn_diff/output',
+        url: '/constn/constn_diff/output/',
         method: 'GET',
         data: { 'sitecode': sitecode },
         xhrFields: {
