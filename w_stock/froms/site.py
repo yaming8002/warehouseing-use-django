@@ -43,19 +43,11 @@ class SiteInfoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # 如果是新增操作，则设置 crate_date 字段的初始值为当前日期
-        if not self.instance:
+        if not self.instance.pk:
             self.initial["crate_date"] = timezone.now().date()
-            # self.fields["done_date"].widget = forms.HiddenInput()
-            # self.fields["is_steel_done"].widget = forms.HiddenInput()
-            # self.fields["is_rail_done"].widget = forms.HiddenInput()
         else:
-            # self.fields["code"].widget.attrs["readonly"] = True
             self.fields['code'].widget.attrs['disabled'] = True
-            # self.fields['owner'].widget.attrs['disabled'] = True
-            # if not self.instance.is_steel_done:
-            #     self.fields["is_steel_done"].widget = forms.HiddenInput()
-            # if not self.instance.is_rail_done:
-            #     self.fields["is_rail_done"].widget = forms.HiddenInput()
+
 
     code = forms.CharField(
         label="工地代號",
