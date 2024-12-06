@@ -41,6 +41,7 @@ class PageListView(ListView):
             # 将字符串转换为 datetime 对象
             self.begin = datetime.strptime(self.request.GET.get("begin"), "%Y-%m-%d")
             self.end = datetime.strptime(self.request.GET.get("end"), "%Y-%m-%d")
+            print(self.begin ,self.end )
         else:
             today = datetime.today()
             # 获取这个月的第一天
@@ -48,8 +49,13 @@ class PageListView(ListView):
             self.begin = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
             # Get the first day of the next month, then subtract one day to get the last day of the current month
-            first_day_next_month = self.begin.replace(month=self.begin.month % 12 + 1, day=1)
+            if self.begin.month == 12:
+                first_day_next_month = self.begin.replace(year=self.begin.year + 1, month=1, day=1)
+            else:
+                first_day_next_month = self.begin.replace(month=self.begin.month + 1, day=1)
+
             self.end = (first_day_next_month - timedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=999999)
+
 
         return self.begin, self.end
 class MonthListView(ListView):
