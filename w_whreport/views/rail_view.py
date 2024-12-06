@@ -129,7 +129,7 @@ def rail_update__total(report:RailReport,is_withdraw: bool , year,month):
             update_value =   getattr(report, f'out_{i}') - getattr(report, f'in_{i}')
             update_value = Decimal(f'{update_value:.2f}')
             update_value = update_value if is_withdraw  else -1*update_value
-            setattr(total, f'in_{i}', getattr(total, f'in_{i}') + update_value)
+            setattr(total, f'in_{i}', getattr(total, f'in_{i}') + Decimal(update_value))
         report_total =  report.out_total -report.in_total
         report_total = report_total if is_withdraw  else -1*report_total
         total.in_total += report_total

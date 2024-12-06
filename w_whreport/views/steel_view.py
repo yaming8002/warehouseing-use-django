@@ -162,12 +162,16 @@ def steel_done_withdraw(request):
         report_id = request.GET.get("id")
         # print(report_id)
         report = DoneSteelReport.objects.select_related("siteinfo").get(id=report_id)
-        reports = DoneSteelReport.objects.select_related("siteinfo").filter(siteinfo=report.siteinfo)
+        reports = DoneSteelReport.objects.select_related("siteinfo").filter(
+            siteinfo=report.siteinfo
+        )
         for report in reports:
             report.is_done = False
             report.delete()
 
-        steels = SteelReport.objects.select_related("siteinfo").filter(siteinfo=report.siteinfo)
+        steels = SteelReport.objects.select_related("siteinfo").filter(
+            siteinfo=report.siteinfo
+        )
         for steel in steels:
             steel.is_done = False
             steel.done_type = False
@@ -182,7 +186,7 @@ def get_edit_remark(request):
     if request.method == "GET":
         report_id = request.GET.get("id")
         report = DoneSteelReport.objects.get(id=report_id)
-        context = {"title": '修改物料數量',"report": report}
+        context = {"title": "修改物料數量", "report": report}
 
         return render(request, "steel_report/steel_edit_remark.html", context)
     else:
@@ -207,7 +211,7 @@ def get_edit_remark(request):
                 report.month,
             )
             for k, v in diff_dct.items():
-                setattr(from_report, k, getattr(from_report, k) - v)
+                setattr(from_report, k, getattr(from_report, k) - Decimal(v))
             from_report.save()
         if report.turn_site and report.turn_site.genre != 6:
             trun_reprot = SteelReport.get_current_by_site(
@@ -216,7 +220,7 @@ def get_edit_remark(request):
                 report.month,
             )
             for k, v in diff_dct.items():
-                setattr(trun_reprot, k, getattr(trun_reprot, k) + v)
+                setattr(trun_reprot, k, getattr(trun_reprot, k) + Decimal(v))
             trun_reprot.save()
 
         update_steel_total_by_month(report.year, report.month)
@@ -229,7 +233,7 @@ def get_add_remark(request):
     if request.method == "GET":
         year_month = request.GET.get("yearMonth")
         context = {
-            "title": '總數變動',
+            "title": "總數變動",
             "yearMonth": year_month,
         }
         return render(request, "steel_report/steel_add.html", context)
@@ -254,7 +258,7 @@ def get_add_remark(request):
             value_str = request.POST.get(column)
             value = Decimal(value_str) if value_str else Decimal(0)
             setattr(report, column, value)
-            setattr(steel, column, getattr(steel, column) + value)
+            setattr(steel, column, getattr(steel, column) + Decimal(value))
         report.save()
         steel.save()
         update_steel_total_by_month(report.year, report.month)
@@ -286,14 +290,18 @@ def get_move_mat(request):
         y, m = get_year_month(request.POST.get("yearMonth"))
         from_site_code = request.POST.get("from_site_code")
         to_site_code = request.POST.get("to_site_code")
-        from_site = SteelReport.get_current_by_site(SiteInfo.get_site_by_code(from_site_code), y, m)
-        to_site = SteelReport.get_current_by_site(SiteInfo.get_site_by_code(to_site_code), y, m)
+        from_site = SteelReport.get_current_by_site(
+            SiteInfo.get_site_by_code(from_site_code), y, m
+        )
+        to_site = SteelReport.get_current_by_site(
+            SiteInfo.get_site_by_code(to_site_code), y, m
+        )
         for mat_code in DoneSteelReport.static_column_code.keys():
             column = f"m_{mat_code}"
             value_str = request.POST.get(column)
             value = Decimal(value_str) if value_str else Decimal(0)
-            setattr(from_site, column,getattr(from_site,column) - value)
-            setattr(to_site, column,getattr(to_site,column) + value)
+            setattr(from_site, column, getattr(from_site, column) - Decimal(value))
+            setattr(to_site, column, getattr(to_site, column) + Decimal(value))
         from_site.save()
         to_site.save()
         context = {"msg": "成功"}

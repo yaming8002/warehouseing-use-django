@@ -93,7 +93,7 @@ class SteelDoneView(MonthListView):
                 setattr(
                     context["sum_report"],
                     column,
-                    getattr(context["sum_report"], column) + getattr(item, column),
+                    Decimal(getattr(context["sum_report"], column)) +Decimal( getattr(item, column)),
                 )
 
         context["diff"] = self.get_diff_value(
@@ -205,8 +205,8 @@ def get_edit_remark(request):
         )
 
         for k, v in diff_dct.items():
-            setattr(from_report, k, getattr(from_report, k) - v)
-            setattr(trun_reprot, k, getattr(trun_reprot, k) + v)
+            setattr(from_report, k, getattr(from_report, k) - Decimal(v))
+            setattr(trun_reprot, k, getattr(trun_reprot, k) + Decimal(v))
         from_report.save()
         trun_reprot.save()
         update_steel_total_by_month(report.year, report.month)
@@ -243,7 +243,7 @@ def get_add_remark(request):
             value_str = request.POST.get(column)
             value = Decimal(value_str) if value_str else Decimal(0)
             setattr(report, column, value)
-            setattr(steel, column, getattr(steel, column) + value)
+            setattr(steel, column, getattr(steel, column) + Decimal(value))
         report.save()
         steel.save()
         update_steel_total_by_month(report.year, report.month)
