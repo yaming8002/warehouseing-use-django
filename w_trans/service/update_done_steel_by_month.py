@@ -206,7 +206,16 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
                     remark="採購",
                 )
                 DoneSteelReport.update_column_value(donesteel.id,True,f"m_{trun_id}",value)
-            # setattr(donesteel, f"m_{detial['mat_code']}", value)
+            else:
+                """正常的進出"""
+                column = f"m_{trun_id}"
+                value = (
+                    detial["quantity"]
+                    if trun_id in ["102", "18", "19"]
+                    else detial["all_unit_sum"]
+                )
+                f002_dct[column] -=value
+                # setattr(donesteel, f"m_{detial['mat_code']}", value)
         elif detial["mat_code"] in change_mapping.keys() and detial["all_unit_sum"] > 0:
             """轉中柱"""
             donesteel, _ = DoneSteelReport.objects.get_or_create(
