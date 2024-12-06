@@ -225,11 +225,13 @@ def update_done_steel_by_month_only_F(year, month,first_day_of_month,last_day_of
             setattr(
                 donesteel,
                 column,
+                Decimal( getattr(donesteel,column)) +
                 Decimal(detial["all_unit_sum"]),
             )
             setattr(
                 donesteel,
                 column_by,
+                Decimal( getattr(donesteel,column_by))
                 -Decimal(detial["all_unit_sum"]),
             )
             donesteel.mat_code = detial["mat_code"]
