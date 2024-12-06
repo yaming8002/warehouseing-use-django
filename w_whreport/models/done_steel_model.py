@@ -99,5 +99,5 @@ class DoneSteelReport(BaseSteelReport):
             value = request.POST.get(f"{case_name}.m_{k}")
             value = Decimal(value) if value else Decimal(0)
             setattr(done_report, f"m_{k}", value)
-
+        done_report.is_done = True
         done_report.save()

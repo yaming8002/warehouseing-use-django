@@ -51,9 +51,11 @@
       }) ;
     }
 
-    function rollback(id) {
+    function rollback(id,sitename) {
       // 退回
-      if (confirm("您确定要退回此信息吗？")) {
+      let msg = "您确定要退回" +sitename+ "此信息吗？\n"
+      msg = msg + '包含異動變動及切除變動兩項。'
+      if (confirm(msg)) {
         $.ajax({
             url: '/steel_done/withdraw/',
             method: 'GET',
@@ -258,7 +260,10 @@
       {% if request.session.u_permission > 1 %}
         <td>
           <a class="editRow_select" href="#" onclick="editRow({{ item.id }})">編輯</a>
-          {% if item.done_type > 2 %}<a href="#" onclick="rollback({{ item.id }})">退回</a>{% endif %}
+          {% if item.done_type > 2 %}
+            <a href="#"
+               onclick="rollback({{ item.id }}, '{{ item.siteinfo.code }}')">退回</a>
+          {% endif %}
         </td>
       {% endif %}
     </tr>

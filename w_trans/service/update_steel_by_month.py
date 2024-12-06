@@ -24,7 +24,7 @@ def update_steel_by_month(year, month, first_day_of_month, last_day_of_month):
             | Q(translog__constn_site__code="0003")
         )
         & ~Q(translog__constn_site__code__in=["F001", "F002", "F003"])
-        & ~ ( Q(remark__contains="#") & Q(translog__transaction_type='IN'))
+        & ~Q(remark__contains="#")
         & Q(is_rollback=False)
     )
 
@@ -51,10 +51,10 @@ def update_steel_by_month(year, month, first_day_of_month, last_day_of_month):
             if filtered_mat_codes[x["mat_code"]] in ["102", "18", "19"]
             else x["all_unit_sum"]
         )
-        if siteinfo.genre != 6 :
-            SteelReport.update_column_value_by_before(
-                siteinfo, year, month, False, column, value
-            )
+        # if siteinfo.genre != 6 :
+        SteelReport.update_column_value_by_before(
+            siteinfo, year, month, False, column, value
+        )
 
     update_steel_whse_by_month(first_day_of_month, last_day_of_month)
     # update_steel_total_by_month(year,month)

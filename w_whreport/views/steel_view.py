@@ -162,14 +162,16 @@ def steel_done_withdraw(request):
         report_id = request.GET.get("id")
         # print(report_id)
         report = DoneSteelReport.objects.select_related("siteinfo").get(id=report_id)
-        report.is_done = False
-        report.save()
-        query = (
-            Q(year__lt=report.year) | Q(year=report.year, month__lte=report.month)
-        ) & Q(siteinfo=report.siteinfo)
-        steel = SteelReport.get_current_by_query(query).first()
-        steel.is_done = False
-        steel.save()
+        reports = DoneSteelReport.objects.select_related("siteinfo").filter(siteinfo=report.siteinfo)
+        for report in reports:
+            report.is_done = False
+            report.delete()
+
+        steels = SteelReport.objects.select_related("siteinfo").filter(siteinfo=report.siteinfo)
+        for steel in steels:
+            steel.is_done = False
+            steel.done_type = False
+            steel.save()
         context = {"msg": "成功退回"}
         update_steel_total_by_month(report.year, report.month)
         # update_total_by_month(report.year, report.month)
