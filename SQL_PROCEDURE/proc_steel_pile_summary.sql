@@ -35,7 +35,6 @@ BEGIN
         END AS `is_mid`,
         FALSE AS `is_ng`,
         CASE
-            WHEN m.mat_code = '3050' THEN 244
             WHEN m.mat_code = '301' THEN 352
             WHEN m.mat_code = '351' THEN 400
             WHEN m.mat_code = '401' THEN 367
@@ -48,9 +47,30 @@ BEGIN
     JOIN
         w_stock_materials AS m ON t.material_id = m.id
     WHERE
-        m.mat_code IN ('3050', '301', '351', '401')
+        m.mat_code IN ('301', '351', '401')
     GROUP BY
         t.translog_id,m.mat_code, t.remark;
+
+
+    INSERT INTO `warehousingdb`.`w_constn_steelpile`
+    (`translog_id`, `is_mid`, `is_ng`, `material_id`, `quantity`, `unit`, `remark`)
+    SELECT
+        t.translog_id,
+        FALSE AS `is_mid`,
+        FALSE AS `is_ng`,
+        t.material_id ,
+        SUM(t.quantity) AS `quantity`,
+        SUM(t.all_unit) AS `unit`,
+        t.remark
+    FROM
+        temp_steel_pile AS t
+    JOIN
+        w_stock_materials AS m ON t.material_id = m.id
+    WHERE
+        m.mat_code ='3050'
+    GROUP BY
+        t.translog_id,t.material_id, t.remark;
+
 
     INSERT INTO `warehousingdb`.`w_constn_steelpile`
     (`translog_id`, `is_mid`, `is_ng`, `material_id`, `quantity`, `unit`, `remark`)
