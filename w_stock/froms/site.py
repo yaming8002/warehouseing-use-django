@@ -46,7 +46,7 @@ class SiteInfoForm(forms.ModelForm):
         if not self.instance.pk:
             self.initial["crate_date"] = timezone.now().date()
         else:
-            self.fields['code'].widget.attrs['disabled'] = True
+            self.fields['code'].widget.attrs['readonly'] = True
 
 
     code = forms.CharField(

@@ -108,7 +108,7 @@ class ConstnSeveView(SaveControlView):
 
     def form_is_valid(self, form):
         if form.cleaned_data.get("state") == 0:
-            form.instance.done_date = timezone.now().date()
+            form.instance.done_date = datetime.now()
         else:
             form.instance.done_date = None
 
