@@ -54,6 +54,7 @@ def get_global_site_json(update=False):
                 Q(name='None') | Q(name='') | Q(name__isnull=True),  # 排除 name 為 'None'、空字串或 None
                 Q(owner='None') | Q(owner='') | Q(owner__isnull=True)
               )  # 排除 owner 為 'None'、空字串或 None)
+            .filter(state__gt=0)
             .values("code", "name", "owner")
             .order_by("code")
             .all()
