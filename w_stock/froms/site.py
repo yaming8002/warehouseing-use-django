@@ -5,7 +5,6 @@ from w_stock.models.site_model import SiteInfo
 from wcom.templatetags import constn_state, site_genre
 
 
-
 class SiteInfoForm(forms.ModelForm):
     class Meta:
         model = SiteInfo
@@ -21,6 +20,7 @@ class SiteInfoForm(forms.ModelForm):
             # "is_steel_done",
             # "is_rail_done",
             "state",
+            "genre",
             # "done_date",
             # "remark",
         ]
@@ -36,6 +36,7 @@ class SiteInfoForm(forms.ModelForm):
             # "is_steel_done":"鋼樁結案",
             # "is_rail_done":"鋼軌結案",
             "state": "狀態",
+            "genre": "類別",
             # "done_date": "結案日期",
             # "remark": "備註",
         }
@@ -46,8 +47,7 @@ class SiteInfoForm(forms.ModelForm):
         if not self.instance.pk:
             self.initial["crate_date"] = timezone.now().date()
         else:
-            self.fields['code'].widget.attrs['readonly'] = True
-
+            self.fields["code"].widget.attrs["readonly"] = True
 
     code = forms.CharField(
         label="工地代號",
