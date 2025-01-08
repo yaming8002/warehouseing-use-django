@@ -20,7 +20,7 @@ class StockView(PageListView):
 
     def get_queryset(self):
         stock_obj = Stock.objects
-        site_obj = SiteInfo.objects.filter(code__in=["0001", "0003"])
+        site_obj = SiteInfo.objects.filter(code__in=["0001", "0003","0004"])
         mat_obj = Materials.objects.select_related("category", "specification")
         siteinfo = self.request.GET.get("siteinfo")
         code = self.request.GET.get("code")
@@ -56,7 +56,7 @@ class StockView(PageListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["categorys"] = MatCat.objects.all()
-        context["siteInfos"] = SiteInfo.objects.filter(code__in=["0001", "0003"]).all()
+        context["siteInfos"] = SiteInfo.objects.filter(code__in=["0001", "0003","0004"]).all()
         return context
 
 
@@ -82,7 +82,7 @@ class ConstnStockViewList(PageListView):
         mat_name = self.request.GET.get("mat_name")
         category_id = self.request.GET.get("category_id")
 
-        query = Q(siteinfo__id__gt=4)
+        query = Q(siteinfo__id__gt=4) & Q(siteinfo__state__gt=0) & Q(siteinfo__genre__gt=0)
         if code:
             query &= Q(siteinfo__code=code)
         if mat_code:
@@ -99,6 +99,7 @@ class ConstnStockViewList(PageListView):
         if self.request.GET.get("site_code"):
             context['constn'] = SiteInfo.get_site_by_code(self.request.GET.get("site_code"))
         context['not_wh'] = True
+        context['all'] = True
         return context
 
 

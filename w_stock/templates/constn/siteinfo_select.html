@@ -8,6 +8,7 @@
     <input type="text" id="name" />
     <input type="hidden" id="hid_code" value="{{ constn.code }}">
     <input type="hidden" id="not_wh" value="{{ not_wh|default:'False' }}">
+    <input type="hidden" id="is_all" value="{{ all|default:'False' }}">
 </p>
 <p>
     <label for="code">工地選單</label>
@@ -36,16 +37,23 @@
         const name = $('#name').val().trim();
         const hid_code = $('#hid_code').val();
         const not_wh = $('#not_wh').val().trim() === 'True';
-
+        const is_all = $('#is_all').val().trim() === 'True';
         // 清空現有的 sitelist
         $('#sitelist').empty();
-
+        if (is_all){
+            const option = $('<option>', {
+                value: '',
+                text: '全部'
+            });
+            $('#sitelist').append(option);
+        }
         // 遍歷 data 進行篩選
         $.each(data, function (index, item) {
             // 判斷是否符合篩選條件
             const matchesCode = !code || item.code.startsWith(code);
             const matchesOwner = !owner || item.owner.startsWith(owner);
             const matchesName = !name || item.name.includes(name);
+
 
             // 如果符合篩選條件，處理選項
             if (matchesCode && matchesOwner && matchesName) {
