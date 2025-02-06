@@ -51,6 +51,9 @@ class TransLog(models.Model):
 
         build_date = excel_num_to_date(item[1])
 
+        car_firm = excel_value_to_str(item[23])
+        car_number = excel_value_to_str(item[24])
+        carinfo = CarInfo.create(car_number=car_number, firm=car_firm)
         if build_date is None:
             build_date = datetime.now()
         build_date_range = get_month_range(build_date)
@@ -61,15 +64,12 @@ class TransLog(models.Model):
             & Q(build_date__gte=build_date_range[0])
             & Q(build_date__lte=build_date_range[1])
             & Q(transaction_type=transaction_type)
+            & Q(carinfo=carinfo)
         )
 
         if cls.objects.filter(query).exists():
             return cls.objects.get(query)
 
-        car_firm = excel_value_to_str(item[23])
-        car_number = excel_value_to_str(item[24])
-
-        carinfo = CarInfo.create(car_number=car_number, firm=car_firm)
         member = excel_value_to_str(item[26])
 
         return cls.objects.create(
