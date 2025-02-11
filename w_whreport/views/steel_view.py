@@ -151,7 +151,24 @@ def get_steel_edit_done(request):
                 Q(year=y, month__gt=m) | Q(year__gt=y)
             )
             SteelReport.objects.filter(query).update(is_done=True)
-        update_steel_total_by_month(y, m)
+        # 取得目前日期，並計算上個月 (不包括本月)
+        today = datetime.date.today()
+        if today.month == 1:
+            end_year = today.year - 1
+            end_month = 12
+        else:
+            end_year = today.year
+            end_month = today.month - 1
+
+        # 迴圈條件：當 (year, month) 小於等於 (end_year, end_month) 時
+        while (y < end_year) or (y == end_year and m <= end_month):
+            update_steel_total_by_month(y, m)
+            # 增加月份：如果目前為 12 月，則下一個月為 1 月且年數增加；否則月數 +1
+            if m == 12:
+                m = 1
+                y += 1
+            else:
+                m += 1
         # update_total_by_month(y, m)
         context = {"msg": "成功"}
         return JsonResponse(context)
