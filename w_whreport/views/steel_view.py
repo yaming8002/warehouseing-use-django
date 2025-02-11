@@ -152,7 +152,7 @@ def get_steel_edit_done(request):
             )
             SteelReport.objects.filter(query).update(is_done=True)
         # 取得目前日期，並計算上個月 (不包括本月)
-        today = datetime.date.today()
+        today = datetime.now()
         if today.month == 1:
             end_year = today.year - 1
             end_month = 12

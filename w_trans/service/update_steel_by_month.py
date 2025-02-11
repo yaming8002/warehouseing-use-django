@@ -66,6 +66,7 @@ def update_steel_whse_by_month(first_day_of_month, last_day_of_month):
         Q(translog__build_date__range=(first_day_of_month, last_day_of_month))
         & Q(material__mat_code__in=filtered_mat_codes.keys())
         & Q(is_rollback=False)
+        & Q(is_rent=False)
     )
     update_list = (
         TransLogDetail.objects.select_related("material")
@@ -78,6 +79,7 @@ def update_steel_whse_by_month(first_day_of_month, last_day_of_month):
             all_unit_sum=conditional_sum("all_unit"),
         )
     )
+
     # print(update_list.query)
     site_whse = SiteInfo.get_site_by_code("0001")
     for x in update_list:
