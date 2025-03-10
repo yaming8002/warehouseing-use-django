@@ -94,8 +94,9 @@ class MonthReport(MonthData):
         query = Q(siteinfo=site) & (Q(year__lt=year) | Q(year=year, month__lte=month))
         # print( cls.objects.filter(query).order_by('-year', '-month').query)
         report = cls.objects.filter(query).order_by("-year", "-month").first()
-
-        if report and not report.is_done:
+        if  report.is_done:
+            return report
+        elif report:
             if f"{report.year}{report.month:02d}" < f"{year}{month:02d}":
                 report.pk = None
                 report.year = year
