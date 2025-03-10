@@ -147,7 +147,8 @@ class MonthReport(MonthData):
     def update_column_value_by_before(cls, site: SiteInfo,year:int,month:int, is_add: bool, column: str, value: Decimal):
 
         now = cls.get_current_by_site(site,year, month)
-
+        if now.is_done:
+            return
         update_value = Decimal(getattr(now, column, 0))
         update_value += value if is_add else -value
         setattr(now,column,update_value)
