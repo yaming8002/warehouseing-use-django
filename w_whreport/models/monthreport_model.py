@@ -95,11 +95,12 @@ class MonthReport(MonthData):
         # print( cls.objects.filter(query).order_by('-year', '-month').query)
         report = cls.objects.filter(query).order_by("-year", "-month").first()
 
-        if report :
+        if report and not report.is_done:
             if f"{report.year}{report.month:02d}" < f"{year}{month:02d}":
                 report.pk = None
                 report.year = year
                 report.month = month
+                report.edit_date = datetime.now()
             report.save()
         else:
             report = cls.objects.create(
@@ -145,10 +146,8 @@ class MonthReport(MonthData):
     def update_column_value_by_before(cls, site: SiteInfo,year:int,month:int, is_add: bool, column: str, value: Decimal):
 
         now = cls.get_current_by_site(site,year, month)
-        b_year,b_month=get_before_year_month(year, month)
-        before = cls.get_current_by_site(site,b_year,b_month)
 
-        update_value =Decimal( getattr(before,column,0) )
+        update_value = Decimal(getattr(now, column, 0))
         update_value += value if is_add else -value
         setattr(now,column,update_value)
         now.save()

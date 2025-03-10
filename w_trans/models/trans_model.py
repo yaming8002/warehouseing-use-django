@@ -56,13 +56,12 @@ class TransLog(models.Model):
         carinfo = CarInfo.create(car_number=car_number, firm=car_firm)
         if build_date is None:
             build_date = datetime.now()
-        build_date_range = get_month_range(build_date)
+        # build_date_range = get_month_range(build_date)
         query = (
             Q(code=code)
             & Q(constn_site=consite)
             & Q(turn_site=turn_site)
-            & Q(build_date__gte=build_date_range[0])
-            & Q(build_date__lte=build_date_range[1])
+            & Q(build_date=build_date)
             & Q(transaction_type=transaction_type)
             & Q(carinfo=carinfo)
         )

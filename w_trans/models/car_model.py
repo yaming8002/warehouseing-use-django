@@ -28,7 +28,7 @@ class CarInfo(models.Model):
         else:
             query = Q(car_number=car_number, firm=firm)
             if cls.objects.filter(query).exists():
-                return cls.objects.get(query)
+                return cls.objects.filter(query).first()
 
         return cls.objects.create(car_number=car_number, firm=firm, remark=remark)
 
